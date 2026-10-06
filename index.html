@@ -804,7 +804,7 @@ body.powered .hero{animation:aura 2.4s ease-out}
       <a class="brand" id="brand" href="#get-yours" aria-label="flexippo.com: get your own website"><span class="brand-mark" aria-hidden="true">F</span><span class="brand-word">flex<em>ippo</em><small>.com</small></span></a>
     </div>
     <div class="wrap hero-in">
-      <div class="name-wrap"><h1 class="name" id="name" data-text="SATYAM">SATYAM</h1><span class="taps" id="taps" aria-hidden="true">×1</span></div>
+      <div class="name-wrap"><h1 class="name" id="name" data-text="KAI">KAI</h1><span class="taps" id="taps" aria-hidden="true">×1</span></div>
       <div class="kana" id="kana">サティヤム</div>
       <div class="typed" aria-live="polite"><span id="typed"></span><span class="caret"></span></div>
       <div class="count" id="countBox">
@@ -1015,6 +1015,7 @@ body.powered .hero{animation:aura 2.4s ease-out}
    ===================================================================== */
 const CONFIG = {
   name: "SATYAM",
+  heroName: "KAI",                   // big name at the top of the page
   kana: "サティヤム",
   titles: ["S-Rank Otaku", "Builds websites at 3AM", "Main character energy", "Collector of shiny things"],
   avatar: "assets/avatar.webp",       // profile picture (used in the Instagram/X post previews)
@@ -1466,7 +1467,7 @@ const OnceFx = (() => {
 
 /* ======================= HERO ======================= */
 function renderName() {
-  const h = $("#name"); h.dataset.text = CONFIG.name; h.innerHTML = [...CONFIG.name].map((c, i) => `<span style="--i:${i}">${esc(c)}</span>`).join("");
+  const HN = CONFIG.heroName || CONFIG.name; const h = $("#name"); h.dataset.text = HN; h.innerHTML = [...HN].map((c, i) => `<span style="--i:${i}">${esc(c)}</span>`).join("");
   $("#kana").textContent = CONFIG.kana; $("#footName").textContent = CONFIG.name;
   $("#introKick").textContent = CONFIG.name; $("#introAv").src = CONFIG.avatar;
   if (CONFIG.cover) document.documentElement.style.setProperty("--intro-img", `url("${CONFIG.cover}")`);
