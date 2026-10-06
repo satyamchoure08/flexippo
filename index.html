@@ -1046,7 +1046,7 @@ const CONFIG = {
       posts: [
         { img: "assets/post-beach-crew.jpg", cap: "golden hour with the gang 🌅" },
         { img: "assets/post-hike-crew.jpg", cap: "weekend with the crew 🏕️" },
-        { img: "assets/post-guitar.jpg", cap: "late night strings 🎸" }
+        { img: "assets/post-lake.jpg", cap: "lake days 🌊" }
       ] },
     { id: "spotify", label: "Spotify", url: "https://open.spotify.com/", icon: "fa-spotify", brand: "#1ed760", cta: "Listen" },          // sits in the bottom card, next to Discord
     { id: "snapchat", label: "Snapchat", handle: "@flexippo", url: "https://www.snapchat.com/", icon: "fa-snapchat", brand: "#fffc00", cta: "Add me", width: "w3",
@@ -1054,7 +1054,7 @@ const CONFIG = {
       stories: [                      // tap a story to watch it, like on Snapchat
         { img: "assets/col/ginger-cat.jpg", cap: "new roommate 🐱", when: "2h" },
         { img: "assets/col/mecha-robot.jpg", cap: "built different 🤖", when: "5h" },
-        { img: "assets/col/tuxedo-cat.jpg", cap: "me seeing my screen time 💀", when: "9h" },
+        { img: "assets/story-palms.jpg", cap: "touching grass fr 🌴", when: "9h" },
         { img: "assets/col/guitar.jpg", cap: "3am jam 🎸", when: "14h" }
       ] },
     { id: "x", label: "X", handle: "@flexippo", url: "https://x.com/", icon: "fa-x-twitter", brand: "#111111", cta: "Follow", width: "w3",
@@ -1078,15 +1078,17 @@ const CONFIG = {
   collectionLimit: 9,
   collection: [
     { id: "uc", type: "uc", amount: "10,000", unit: "UC", game: "PUBG MOBILE", icon: "", logo: "" },
-    { id: "nvidia", img: "assets/col/nvidia.jpg", alt: "NVIDIA graphics card box", meme: "Those who know" },
-    { id: "glass-tower", img: "assets/col/glass-tower.jpg", alt: "Gaming PC with glowing fans" },
-    { id: "neon-room", img: "assets/col/neon-room.jpg", alt: "Neon gaming room" },
-    { id: "rgb-pc", img: "assets/col/rgb-pc.jpg", alt: "RGB gaming PC and monitor" },
-    { id: "night-setup", img: "assets/col/night-setup.jpg", alt: "Gaming setup at night" },
-    { id: "retro-mac", img: "assets/col/retro-mac.jpg", alt: "Retro computer" },
-    { id: "scottish-fold", img: "assets/col/scottish-fold.jpg", alt: "Grey cat" },
-    { id: "axolotls", img: "assets/col/axolotls.jpg", alt: "Axolotls in an aquarium" }
-  ]
+    { id: "nvidia", img: "assets/col/nvidia.jpg", alt: "NVIDIA 😏", meme: "Those who know" },
+    { id: "axolotls", img: "assets/col/axolotls.jpg", alt: "Axolotls in an aquarium" },
+    { id: "tuxedo-cat", img: "assets/col/tuxedo-cat.jpg", alt: "Black and white cat" },
+    { id: "tin-robots", img: "assets/col/tin-robots.jpg", alt: "Tin toy robots" },
+    { id: "guitar", img: "assets/col/guitar.jpg", alt: "Acoustic guitar" },
+    { id: "doll-shelf", img: "assets/col/doll-shelf.jpg", alt: "Shelf of vintage dolls" },
+    { id: "figurine", img: "assets/col/figurine.jpg", alt: "Ceramic figurine" },
+    { id: "mixtape-cd", img: "assets/col/mixtape-cd.jpg", alt: "CD" }
+  ],
+  // comment pinned on a photo (photo id: commenter)
+  pins: { "figurine": "midnight.gamer", "tuxedo-cat": "aura.farmer" }
 };
 
 /* ===================================================================== */
@@ -1860,7 +1862,7 @@ function hypeFor(it) {
 // owner choices for comments: pinned comment per photo + comments the owner removed
 let cmOverride = null;                                   // used right after a change, until the save comes back
 const cmSettings = () => cmOverride || Custom.settings || {};
-function pinsNow() { return cmSettings().pins || {}; }
+function pinsNow() { return cmSettings().pins || CONFIG.pins || {}; }
 function removedFor(it) { return (cmSettings().cmHidden || {})[it.id] || []; }
 function commentsFor(it) { const gone = removedFor(it); return hypeFor(it).list.filter(c => !gone.includes(c.who)); }
 function commentCount(it) { return Math.max(0, hypeFor(it).comments - removedFor(it).length); }
