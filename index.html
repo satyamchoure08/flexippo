@@ -264,7 +264,26 @@ body.music-on .bars i{animation:eq .9s ease-in-out infinite alternate}
 .bars i:nth-child(2){animation-delay:-.3s}.bars i:nth-child(3){animation-delay:-.6s}.bars i:nth-child(4){animation-delay:-.15s}.bars i:nth-child(5){animation-delay:-.45s}
 @keyframes eq{0%{height:20%}100%{height:100%}}
 .dc{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
-.soc[data-soc="discord"]{align-self:start}
+/* bottom card: Spotify + Discord, half each */
+.soc-duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;padding:0}
+.soc-duo.solo{grid-template-columns:minmax(0,1fr)}
+.duo-half{display:flex;flex-direction:column;gap:12px;padding:14px;min-width:0}
+.duo-half + .duo-half{border-left:1px solid var(--line)}
+.duo-half .soc-h{gap:10px}
+.duo-half .soc-ic{width:34px;height:34px;border-radius:10px;font-size:18px}
+.duo-half .soc-ic svg{width:18px;height:18px}
+.duo-half .soc-id b{font-size:15px}
+.duo-half .soc-id span{font-size:12px}
+.duo-half .ed-chip{width:30px;height:30px;font-size:13px}
+.sp-mini{display:flex;gap:10px;align-items:center;min-width:0}
+.sp-mini .sp-cover{width:56px;height:56px;border-radius:10px;box-shadow:0 6px 18px color-mix(in srgb,var(--sp,#1ed760) 30%,transparent)}
+.sp-mini .sp-n{font-size:15px}
+.sp-mini .sp-a{font-size:12px}
+.sp-mini .bars{height:14px;margin-top:5px}
+.duo-blurb{margin:0;color:var(--mute);font-size:14px;line-height:1.45}
+.duo-cta{margin-top:auto;display:flex;flex-wrap:wrap;gap:8px}
+.duo-cta .btn{padding:8px 14px;font-size:13px}
+@media (max-width:599px){.duo-half{padding:12px;gap:10px}.duo-cta .btn{flex:1 1 100%}.sp-mini{flex-direction:column;align-items:flex-start;gap:8px}.sp-mini .sp-cover{width:48px;height:48px}.sp-mini .sp-n{font-size:14px}.duo-blurb{font-size:13px}}
 .credit{margin:0;font-size:11px;line-height:1.4;color:var(--mute)}
 /* Snapchat card */
 .soc[data-soc="snapchat"] .soc-ic{color:#111}
@@ -1017,13 +1036,13 @@ const CONFIG = {
   song: { src: "assets/theme.mp3", title: "Anime Cyberpunk", artist: "HitsLab" },
   ticker: ["夜の東京", "S-RANK OTAKU", "限界突破", "WELCOME TO MY UNIVERSE", "サティヤム"],
   socials: [
-    { id: "instagram", label: "Instagram", handle: "@flexippo", url: "https://www.instagram.com/", icon: "fa-instagram", brand: "linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5)", cta: "Follow", width: "w4",
+    { id: "instagram", label: "Instagram", handle: "@flexippo", url: "https://www.instagram.com/", icon: "fa-instagram", brand: "linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5)", cta: "Follow", width: "",
       posts: [
         { img: "assets/post-beach-crew.jpg", cap: "golden hour with the gang 🌅" },
         { img: "assets/post-hike-crew.jpg", cap: "weekend with the crew 🏕️" },
         { img: "assets/post-guitar.jpg", cap: "late night strings 🎸" }
       ] },
-    { id: "spotify", label: "Spotify", url: "https://open.spotify.com/", icon: "fa-spotify", brand: "#1ed760", cta: "Listen", width: "w2" },
+    { id: "spotify", label: "Spotify", url: "https://open.spotify.com/", icon: "fa-spotify", brand: "#1ed760", cta: "Listen" },          // sits in the bottom card, next to Discord
     { id: "snapchat", label: "Snapchat", handle: "@flexippo", url: "https://www.snapchat.com/", icon: "fa-snapchat", brand: "#fffc00", cta: "Add me", width: "w3",
       score: 128402, streak: 365,     // Snapscore and 🔥 streak shown on the card
       stories: [                      // tap a story to watch it, like on Snapchat
@@ -1033,8 +1052,9 @@ const CONFIG = {
         { img: "assets/col/guitar.jpg", cap: "3am jam 🎸", when: "14h" }
       ] },
     { id: "x", label: "X", handle: "@flexippo", url: "https://x.com/", icon: "fa-x-twitter", brand: "#111111", cta: "Follow", width: "w3",
-      post: { img: "assets/post-yt1.webp", text: "bought a flagship GPU. zero regrets 🔥", when: "2h" } },
-    { id: "discord", label: "Discord", handle: "Neon Dojo server", url: "https://discord.com/", icon: "fa-discord", brand: "#5865f2", cta: "Join server", width: "",
+      avatar: "assets/x-avatar.jpg",  // profile picture shown on the X post
+      post: { img: "assets/post-x-cat.jpg", text: "he said no work today 😭🐱", when: "2h" } },
+    { id: "discord", label: "Discord", handle: "Neon Dojo server", url: "https://discord.com/", icon: "fa-discord", brand: "#5865f2", cta: "Join server",              // sits in the bottom card, next to Spotify
       blurb: "Late-night gaming, anime talk and build logs. Pull up." }
   ],
   // Spotify card. The owner can also change all of this from the page (✎ Customize).
@@ -1412,7 +1432,7 @@ const OnceFx = (() => {
     const g = grid.getBoundingClientRect(), ox = g.left + g.width / 2, oy = g.top + Math.min(g.height, 360) / 2;
     cards.forEach((c, i) => {
       const r = c.getBoundingClientRect(), dx = ox - (r.left + r.width / 2), dy = oy - (r.top + r.height / 2);
-      const base = CONFIG.socials.find(x => x.id === c.dataset.soc) || {}, b = String(base.brand || "");
+      const base = CONFIG.socials.find(x => x.id === c.dataset.soc) || {}, b = String(base.brand || c.dataset.glow || "");
       const glow = b.startsWith("#") ? b : "#d62976"; c.style.setProperty("--glow", glow);
       const tilt = (i % 2 ? 1 : -1) * (6 + i * 3), delay = 120 + i * 150;
       c.animate([
@@ -1504,13 +1524,35 @@ function socialView() {
     instagram: ig && { handle: oi.handle || ig.handle, url: safeUrl(oi.url, ig.url), posts: ig.posts.map((p, i) => { const op = (oi.posts || [])[i] || {}; const im = M["ig" + i]; return { img: im || p.img, cap: op.cap !== undefined ? op.cap : p.cap, link: safeUrl(op.link, ""), credit: im ? null : p }; }) },
     snapchat: sc && { handle: os.handle || sc.handle, url: safeUrl(os.url, sc.url), score: num(os.score, sc.score), streak: num(os.streak, sc.streak),
       stories: sc.stories.map((st, i) => { const o = (os.stories || [])[i] || {}; return { img: M["sc" + i] || st.img, cap: o.cap !== undefined ? o.cap : st.cap, when: o.when || st.when }; }) },
-    x: xs && { handle: ox.handle || xs.handle, url: safeUrl(ox.url, xs.url), img: M.x0 || xs.post.img, text: ox.text !== undefined ? ox.text : xs.post.text, when: ox.when || xs.post.when, link: safeUrl(ox.link, "") },
+    x: xs && { avatar: xs.avatar, handle: ox.handle || xs.handle, url: safeUrl(ox.url, xs.url), img: M.x0 || xs.post.img, text: ox.text !== undefined ? ox.text : xs.post.text, when: ox.when || xs.post.when, link: safeUrl(ox.link, "") },
     spotify: { ...sp, url: safeUrl(sp.url, CONFIG.spotify.url), cover: M.spCover || CONFIG.spotify.cover, accent: /^#[0-9a-f]{6}$/i.test(sp.accent || "") ? sp.accent : CONFIG.spotify.accent, tracks: parseTracks(sp.tracks) }
   };
 }
+// Spotify + Discord: one card at the bottom, side by side, half each
+function duoCard(V, ids) {
+  const halves = ids.map(id => CONFIG.socials.find(s => s.id === id)).filter(Boolean).map(base => {
+    if (base.id === "spotify") {
+      const v = V.spotify;
+      return `<section class="duo-half" data-half="spotify" style="--brand:${v.accent};--sp:${v.accent};--sp-ink:${readableOn(v.accent)}">
+        <div class="soc-h">${brandIcon({ ...base, brand: v.accent })}<div class="soc-id"><b>${esc(base.label)}</b><span>${esc(v.title)}</span></div><button class="ed-chip owner-only" type="button" data-edit="spotify" aria-label="Customize Spotify">✎</button></div>
+        <div class="sp-mini"><img class="sp-cover" src="${esc(v.cover)}" alt="Playlist cover"><div style="min-width:0"><b class="sp-n">${esc(v.playlist)}</b><span class="sp-a">${esc(v.artist)}</span><div class="bars"><i></i><i></i><i></i><i></i><i></i></div></div></div>
+        <div class="duo-cta"><button class="btn" type="button" data-np style="--brand:var(--sp);color:var(--sp-ink)">Play here</button><a class="btn ghost" href="${esc(v.url)}" target="_blank" rel="noopener">${esc(base.cta)}</a></div>
+      </section>`;
+    }
+    return `<section class="duo-half" data-half="${base.id}" style="--brand:${base.brand}">
+        <div class="soc-h">${brandIcon(base)}<div class="soc-id"><b>${esc(base.label)}</b><span>${esc(base.handle || "")}</span></div></div>
+        ${base.blurb ? `<p class="duo-blurb">${esc(base.blurb)}</p>` : ""}
+        <div class="duo-cta"><a class="btn" href="${esc(base.url)}" target="_blank" rel="noopener">${esc(base.cta)}</a></div>
+      </section>`;
+  });
+  if (!halves.length) return "";
+  const sp = V.spotify ? V.spotify.accent : "#1ed760", dc = (CONFIG.socials.find(s => s.id === "discord") || {}).brand || "#5865f2";
+  return `<article class="soc soc-duo${halves.length < 2 ? " solo" : ""}" data-soc="duo" data-glow="${esc(sp)}" style="--brand:linear-gradient(90deg,${sp} 0 50%,${dc} 50% 100%)">${halves.join("")}</article>`;
+}
 function renderSocials() {
   const V = socialView();
-  $("#socGrid").innerHTML = CONFIG.socials.map(base => {
+  const DUO = ["spotify", "discord"];   // these two share one card at the bottom, half each
+  $("#socGrid").innerHTML = CONFIG.socials.filter(b => !DUO.includes(b.id)).map(base => {
     let s = { ...base }, body = "", ctaUrl = base.url, extraStyle = "";
     if (base.id === "instagram") {
       const v = V.instagram; s.handle = v.handle; ctaUrl = v.url;
@@ -1519,26 +1561,18 @@ function renderSocials() {
     }
     if (base.id === "x") {
       const v = V.x; s.handle = v.handle; ctaUrl = v.url;
-      body = `<div class="xpost"><div class="xh"><img src="${esc(Custom.media.avatar || CONFIG.avatar)}" alt=""><div style="min-width:0"><b>${esc(CONFIG.name)}</b> <span>${esc(v.handle)} · ${esc(v.when)}</span></div></div>${v.text ? `<p>${esc(v.text)}</p>` : ""}<a class="ximg" href="${esc(v.link || v.url)}" target="_blank" rel="noopener"><img src="${esc(v.img)}" alt="${esc(v.text || "Post image")}" loading="lazy"></a><div class="xa" aria-hidden="true">${X_ICONS.map(p => `<svg viewBox="0 0 24 24">${p}</svg>`).join("")}</div></div>`;
+      body = `<div class="xpost"><div class="xh"><img src="${esc(v.avatar || Custom.media.avatar || CONFIG.avatar)}" alt=""><div style="min-width:0"><b>${esc(CONFIG.name)}</b> <span>${esc(v.handle)} · ${esc(v.when)}</span></div></div>${v.text ? `<p>${esc(v.text)}</p>` : ""}<a class="ximg" href="${esc(v.link || v.url)}" target="_blank" rel="noopener"><img src="${esc(v.img)}" alt="${esc(v.text || "Post image")}" loading="lazy"></a><div class="xa" aria-hidden="true">${X_ICONS.map(p => `<svg viewBox="0 0 24 24">${p}</svg>`).join("")}</div></div>`;
     }
     if (base.id === "snapchat") {
       const v = V.snapchat; s.handle = v.handle; ctaUrl = v.url;
       body = `<div class="snap"><div class="snap-stats"><span>👻 <b>${v.score.toLocaleString("en-IN")}</b> Snapscore</span><span>🔥 <b>${v.streak.toLocaleString("en-IN")}</b> day streak</span></div>` +
         `<div class="snap-row">${v.stories.map((st, i) => `<button class="story${Stories.seen(i) ? " seen" : ""}" type="button" data-story="${i}" aria-label="Watch story: ${esc(st.cap || "story " + (i + 1))}"><img src="${esc(st.img)}" alt="" loading="lazy"><i>${esc(st.when)}</i>${st.cap ? `<span>${esc(st.cap)}</span>` : ""}</button>`).join("")}</div></div>`;
     }
-    if (base.id === "spotify") {
-      const v = V.spotify; s.handle = v.title; ctaUrl = v.url; extraStyle = `;--sp:${v.accent};--sp-ink:${readableOn(v.accent)}`;
-      body = `<div class="sp-top"><img class="sp-cover" src="${esc(v.cover)}" alt="Playlist cover"><div style="min-width:0"><span class="sp-k">${esc(String(v.title || "").toUpperCase())}</span><b class="sp-n">${esc(v.playlist)}</b><span class="sp-a">${esc(v.artist)}</span><div class="bars"><i></i><i></i><i></i><i></i><i></i></div></div></div>` +
-        (v.subtitle ? `<p class="sp-sub">${esc(v.subtitle)}</p>` : "") +
-        (v.tracks.length ? `<ol class="tracks">${v.tracks.map((t, i) => `<li><span class="n">${i + 1}</span><span class="t">${esc(t.title)}${t.artist ? `<small>${esc(t.artist)}</small>` : ""}</span></li>`).join("")}</ol>` : "") +
-        `<button class="btn" type="button" data-np style="--brand:var(--sp);color:var(--sp-ink);align-self:flex-start">Play here</button>`;
-    }
-    if (base.blurb) body = `<div class="dc"><p>${esc(base.blurb)}</p></div>`;
     const editable = ["instagram", "spotify", "x", "snapchat"].includes(base.id);
     return `<article class="soc ${base.width || ""}" data-soc="${base.id}" style="--brand:${base.brand}${extraStyle}">
       <div class="soc-h">${brandIcon(base)}<div class="soc-id"><b>${esc(base.label)}</b><span>${esc(s.handle)}</span></div>${editable ? `<button class="ed-chip owner-only" type="button" data-edit="${base.id}" aria-label="Customize ${esc(base.label)}">✎</button>` : ""}<a class="btn" href="${esc(ctaUrl)}" target="_blank" rel="noopener" style="--brand:${base.id === "x" ? "#333" : base.id === "spotify" ? "var(--sp)" : (base.brand.startsWith("linear") ? "#d62976" : base.brand)}${base.id === "spotify" ? ";color:var(--sp-ink)" : base.id === "snapchat" ? ";color:#111" : ""}">${esc(base.cta)}</a></div>
       ${body}</article>`;
-  }).join("");
+  }).join("") + duoCard(V, DUO);
   $$("#socGrid [data-np]").forEach(b => b.addEventListener("click", () => { Snd.fx("tick"); Snd.toggle(); }));
   $$("#socGrid [data-edit]").forEach(b => b.addEventListener("click", () => { Snd.fx("tick"); Editor.open(b.dataset.edit); }));
   $$("#socGrid [data-story]").forEach(b => b.addEventListener("click", () => { Snd.fx("tick"); Stories.open(+b.dataset.story); }));
