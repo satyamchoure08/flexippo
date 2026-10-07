@@ -771,7 +771,24 @@ body.powered .hero{animation:aura 2.4s ease-out}
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
 }
 </style>
-<style>[hidden]{display:none!important}</style>
+<style>[hidden]{display:none!important}</style><style id="auth-css">
+.auth-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:14px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-family:var(--f-body);font-weight:700;font-size:14px;cursor:pointer;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 8px 24px var(--shadow);transition:transform .15s}
+.auth-btn:hover{transform:translateY(-2px)}
+.auth-modal{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(5,3,16,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.auth-card{position:relative;width:100%;max-width:380px;padding:26px 22px 22px;border-radius:22px;background:var(--bg2);border:1px solid var(--line);box-shadow:0 24px 60px var(--shadow);color:var(--ink);font-family:var(--f-body)}
+.auth-x{position:absolute;top:10px;right:12px;width:34px;height:34px;border:0;border-radius:50%;background:transparent;color:var(--mute);font-size:22px;cursor:pointer}
+.auth-tabs{display:flex;gap:6px;margin-bottom:16px;padding:4px;border-radius:999px;background:var(--panel2)}
+.auth-tab{flex:1;padding:9px 0;border:0;border-radius:999px;background:transparent;color:var(--mute);font-weight:700;font-size:14px;cursor:pointer}
+.auth-tab.on{background:linear-gradient(135deg,var(--pink),var(--violet));color:#fff}
+.auth-card label{display:block;margin:12px 0 6px;font-size:13px;font-weight:700;color:var(--mute)}
+.auth-card input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:16px;font-family:inherit;box-sizing:border-box}
+.auth-card input:focus{outline:2px solid var(--cyan);outline-offset:1px}
+.auth-go{width:100%;margin-top:18px;padding:13px;border:0;border-radius:14px;background:linear-gradient(135deg,var(--pink),var(--violet));color:#fff;font-weight:800;font-size:15px;cursor:pointer}
+.auth-go:disabled{opacity:.6;cursor:wait}
+.auth-msg{min-height:20px;margin:12px 0 0;font-size:13px;line-height:1.4;color:var(--gold)}
+.auth-msg.ok{color:var(--cyan)}
+</style>
+
 </head>
 <body>
 
@@ -814,6 +831,7 @@ body.powered .hero{animation:aura 2.4s ease-out}
     </div>
     <div class="wrap hero-top">
       <a class="brand" id="brand" href="#get-yours" aria-label="flexippo.com: get your own website"><span class="brand-mark" aria-hidden="true">F</span><span class="brand-word">flex<em>ippo</em><small>.com</small></span></a>
+      <button class="auth-btn" id="authBtn" type="button">Log in</button>
     </div>
     <div class="wrap hero-in">
       <div class="name-wrap"><h1 class="name" id="name" data-text="KAI">KAI</h1><span class="taps" id="taps" aria-hidden="true">×1</span></div>
@@ -1027,6 +1045,23 @@ body.powered .hero{animation:aura 2.4s ease-out}
   </div>
 </div>
 <div class="egg" id="egg" aria-hidden="true"><div class="rays"></div><div class="t"><b>限界突破</b><span>LIMIT BREAK!</span></div></div>
+<div class="auth-modal" id="authModal" role="dialog" aria-modal="true" aria-label="Log in or sign up" hidden>
+  <div class="auth-card">
+    <button class="auth-x" id="authClose" type="button" aria-label="Close">&times;</button>
+    <div class="auth-tabs">
+      <button class="auth-tab on" id="tabLogin" type="button">Log in</button>
+      <button class="auth-tab" id="tabSignup" type="button">Sign up</button>
+    </div>
+    <form id="authForm" novalidate>
+      <label for="authEmail">Email</label>
+      <input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com" required>
+      <label for="authPass">Password</label>
+      <input id="authPass" type="password" autocomplete="current-password" placeholder="At least 6 characters" minlength="6" required>
+      <button class="auth-go" id="authGo" type="submit">Log in</button>
+      <p class="auth-msg" id="authMsg" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -2354,6 +2389,77 @@ function boot() {
 }
 boot();
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ===== LOGIN & SIGN UP (Supabase) =====
+   Paste your two Supabase values below (Project URL and anon public key).
+   The anon key is safe to put on a public site. */
+const AUTH_CONFIG = {
+  supabaseUrl: "https://knmjxdnzttyacdtktbdl.supabase.co",
+  supabaseKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtubWp4ZG56dHR5YWNkdGt0YmRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzMjg5MTcsImV4cCI6MjEwNjkwNDkxN30.rEWcpL0OFyNhLAFLUuTWpx47uPquP40vcQz3GEqNvgE"
+};
+(function () {
+  const $id = (x) => document.getElementById(x);
+  const modal = $id("authModal"), form = $id("authForm"), msg = $id("authMsg");
+  const btn = $id("authBtn"), go = $id("authGo"), pass = $id("authPass");
+  let mode = "login", user = null, sb = null;
+  const ready = AUTH_CONFIG.supabaseUrl.startsWith("https://") && window.supabase;
+  if (ready) sb = window.supabase.createClient(AUTH_CONFIG.supabaseUrl, AUTH_CONFIG.supabaseKey);
+
+  function say(t, ok) { msg.textContent = t || ""; msg.className = "auth-msg" + (ok ? " ok" : ""); }
+  function setMode(m) {
+    mode = m;
+    $id("tabLogin").classList.toggle("on", m === "login");
+    $id("tabSignup").classList.toggle("on", m === "signup");
+    go.textContent = m === "login" ? "Log in" : "Create account";
+    pass.autocomplete = m === "login" ? "current-password" : "new-password";
+    say("");
+  }
+  function show() { modal.hidden = false; setTimeout(() => $id("authEmail").focus(), 50); }
+  function hide() { modal.hidden = true; say(""); }
+  function paint() { btn.textContent = user ? "Log out" : "Log in"; }
+
+  btn.addEventListener("click", async () => {
+    if (user && sb) { await sb.auth.signOut(); user = null; paint(); if (window.toast) toast("Logged out"); }
+    else { setMode("login"); show(); }
+  });
+  $id("authClose").addEventListener("click", hide);
+  modal.addEventListener("click", (e) => { if (e.target === modal) hide(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !modal.hidden) hide(); });
+  $id("tabLogin").addEventListener("click", () => setMode("login"));
+  $id("tabSignup").addEventListener("click", () => setMode("signup"));
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = $id("authEmail").value.trim(), password = pass.value;
+    if (!sb) { say("Login is not switched on yet. The site owner still needs to connect Supabase."); return; }
+    if (!email || !email.includes("@")) { say("Please type a real email."); return; }
+    if (password.length < 6) { say("Password needs at least 6 characters."); return; }
+    go.disabled = true; say("One moment...", true);
+    try {
+      if (mode === "signup") {
+        const { data, error } = await sb.auth.signUp({ email, password });
+        if (error) throw error;
+        if (data.session) { user = data.user; paint(); hide(); if (window.toast) toast("Welcome! Account created."); }
+        else say("Account created! Check your email and tap the confirm link, then log in.", true);
+      } else {
+        const { data, error } = await sb.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        user = data.user; paint(); hide(); if (window.toast) toast("Welcome back!");
+      }
+    } catch (err) { say(err.message || "Something went wrong. Try again."); }
+    go.disabled = false;
+  });
+
+  if (sb) {
+    sb.auth.getSession().then(({ data }) => { user = data.session ? data.session.user : null; paint(); });
+    sb.auth.onAuthStateChange((_ev, session) => { user = session ? session.user : null; paint(); });
+  }
+})();
+</script>
+
+
 
 </body>
 </html>
