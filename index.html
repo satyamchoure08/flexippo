@@ -776,23 +776,131 @@ body.powered .hero{animation:aura 2.4s ease-out}
 }
 </style>
 <style>[hidden]{display:none!important}</style><style id="auth-css">
-.auth-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:14px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-family:var(--f-body);font-weight:700;font-size:14px;cursor:pointer;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 8px 24px var(--shadow);transition:transform .15s}
+/* ===== accounts ===== */
+.auth-btn{display:inline-flex;align-items:center;gap:9px;max-width:min(58vw,260px);min-height:44px;padding:5px 15px 5px 5px;border-radius:14px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-family:var(--f-body);font-weight:700;font-size:14px;cursor:pointer;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 8px 24px var(--shadow);transition:transform .15s}
+.auth-btn.out{padding:10px 18px}
 .auth-btn:hover{transform:translateY(-2px)}
+.auth-btn span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.av{flex:none;border-radius:50%;object-fit:cover;background:var(--panel2)}
+.av0{display:inline-grid;place-items:center;color:#fff;font-family:var(--f-display);line-height:1;background:linear-gradient(135deg,var(--a1,#ff2e88),var(--a2,#8b5cff))}
+.acc-av{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--pink)}
 .auth-modal{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(5,3,16,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
-.auth-card{position:relative;width:100%;max-width:380px;padding:26px 22px 22px;border-radius:22px;background:var(--bg2);border:1px solid var(--line);box-shadow:0 24px 60px var(--shadow);color:var(--ink);font-family:var(--f-body)}
-.auth-x{position:absolute;top:10px;right:12px;width:34px;height:34px;border:0;border-radius:50%;background:transparent;color:var(--mute);font-size:22px;cursor:pointer}
-.auth-tabs{display:flex;gap:6px;margin-bottom:16px;padding:4px;border-radius:999px;background:var(--panel2)}
-.auth-tab{flex:1;padding:9px 0;border:0;border-radius:999px;background:transparent;color:var(--mute);font-weight:700;font-size:14px;cursor:pointer}
+.auth-card{position:relative;width:100%;max-width:390px;max-height:calc(100dvh - 32px);overflow:auto;padding:24px 22px 22px;border-radius:22px;background:var(--bg2);border:1px solid var(--line);box-shadow:0 24px 60px var(--shadow);color:var(--ink);font-family:var(--f-body)}
+.auth-x{position:absolute;top:10px;right:12px;width:36px;height:36px;border:0;border-radius:50%;background:transparent;color:var(--mute);font-size:24px;cursor:pointer}
+.auth-x:hover{color:var(--ink);background:var(--panel)}
+.auth-h{margin:0 34px 6px 0;font-family:var(--f-display);font-weight:400;font-size:23px;line-height:1.15}
+.auth-sub{margin:0 0 16px;color:var(--mute);font-size:14px;line-height:1.45}
+.auth-step{display:inline-block;margin-bottom:8px;padding:3px 10px;border-radius:999px;background:color-mix(in srgb,var(--pink) 18%,transparent);color:var(--pink);font-family:var(--f-hud);font-size:11px;letter-spacing:.2em}
+.auth-tabs{display:flex;gap:6px;margin-bottom:6px;padding:4px;border-radius:999px;background:var(--panel2)}
+.auth-tab{flex:1;padding:10px 0;border:0;border-radius:999px;background:transparent;color:var(--mute);font-weight:700;font-size:14px;cursor:pointer}
 .auth-tab.on{background:linear-gradient(135deg,var(--pink),var(--violet));color:#fff}
-.auth-card label{display:block;margin:12px 0 6px;font-size:13px;font-weight:700;color:var(--mute)}
+.auth-card label{display:block;margin:14px 0 6px;font-size:13px;font-weight:700;color:var(--mute)}
 .auth-card input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:16px;font-family:inherit;box-sizing:border-box}
 .auth-card input:focus{outline:2px solid var(--cyan);outline-offset:1px}
 .auth-go{width:100%;margin-top:18px;padding:13px;border:0;border-radius:14px;background:linear-gradient(135deg,var(--pink),var(--violet));color:#fff;font-weight:800;font-size:15px;cursor:pointer}
 .auth-go:disabled{opacity:.6;cursor:wait}
-.auth-msg{min-height:20px;margin:12px 0 0;font-size:13px;line-height:1.4;color:var(--gold)}
+.auth-link{display:block;margin:12px auto 0;padding:4px 8px;border:0;background:none;color:var(--mute);font:inherit;font-size:13px;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.auth-link:hover{color:var(--ink)}
+.auth-msg{min-height:20px;margin:12px 0 0;font-size:13px;line-height:1.45;color:var(--gold)}
 .auth-msg.ok{color:var(--cyan)}
+.u-field{display:flex;align-items:center;border-radius:12px;border:1px solid var(--line);background:var(--panel);overflow:hidden}
+.u-field span{padding-left:12px;color:var(--mute);font-family:var(--f-hud);font-size:13px;white-space:nowrap}
+.auth-card .u-field input{min-width:0;border:0;border-radius:0;background:transparent;padding-left:1px;outline:none}
+.u-field:focus-within{outline:2px solid var(--cyan);outline-offset:1px}
+.u-hint{display:block;margin-top:7px;font-size:12px;color:var(--mute);overflow-wrap:anywhere}
+.u-hint.ok{color:var(--cyan)}
+.u-hint.bad{color:var(--gold)}
+.acc-head{display:flex;align-items:center;gap:14px;margin:2px 36px 16px 0}
+.acc-head div{min-width:0}
+.acc-head b{display:block;font-size:18px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.acc-head small{color:var(--mute);font-family:var(--f-hud);font-size:13px}
+.acc-lbl{display:block;margin-bottom:6px;font-family:var(--f-hud);font-size:11px;letter-spacing:.2em;color:var(--mute)}
+.acc-link,.chat-linkbox{display:flex;gap:8px}
+.acc-link{margin-bottom:14px}
+.acc-link input,.chat-linkbox input{flex:1;min-width:0;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-family:var(--f-hud);font-size:13px}
+.auth-mini{flex:none;padding:0 16px;min-height:40px;border-radius:12px;border:0;background:var(--pink);color:#fff;font-weight:800;font-size:14px;cursor:pointer}
+.acc-btns{display:grid;gap:8px}
+.acc-b{display:flex;align-items:center;gap:12px;width:100%;padding:13px 14px;border-radius:14px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font:inherit;font-weight:700;font-size:15px;text-align:left;cursor:pointer;transition:border-color .15s,transform .15s}
+.acc-b span{width:22px;text-align:center}
+.acc-b:hover{border-color:var(--pink);transform:translateX(2px)}
+.acc-b.out{justify-content:center;margin-top:4px;color:var(--mute);font-weight:600}
+/* buttons under the big name */
+.page-acts{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:8px}
+.page-acts:empty{display:none}
+.pa-b{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:11px 20px;border-radius:999px;border:0;background:linear-gradient(135deg,var(--pink),var(--violet));color:#fff;font-family:var(--f-body);font-weight:800;font-size:15px;cursor:pointer;box-shadow:0 10px 26px color-mix(in srgb,var(--pink) 35%,transparent);transition:transform .15s}
+.pa-b:hover{transform:translateY(-2px)}
+.pa-b.ghost{background:var(--panel);color:var(--ink);border:1px solid var(--line);box-shadow:none;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.pa-miss{margin:0;padding:11px 15px;border-radius:14px;background:var(--panel);border:1px solid var(--line);font-size:14px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+/* chat */
+.chat-fab{position:fixed;left:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:81;width:58px;height:58px;padding:0;border-radius:50%;border:0;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,var(--pink),var(--violet));box-shadow:0 12px 30px color-mix(in srgb,var(--pink) 42%,transparent),0 0 0 3px color-mix(in srgb,var(--bg) 75%,transparent);cursor:pointer;transform:translateY(160%);transition:transform .5s cubic-bezier(.2,1.2,.4,1)}
+body.entered .chat-fab{transform:none}
+.chat-fab:hover{transform:translateY(-3px)}
+.chat-fab svg{width:27px;height:27px}
+.chat-fab[aria-expanded="true"]{background:var(--ink);color:var(--bg)}
+.chat-badge{position:absolute;top:-5px;right:-5px;min-width:23px;height:23px;padding:0 6px;border-radius:999px;background:var(--gold);color:#1a0b00;font:800 12px/23px var(--f-body);text-align:center;box-shadow:0 0 0 2px var(--bg);animation:badgePop .35s cubic-bezier(.2,1.6,.4,1)}
+@keyframes badgePop{from{transform:scale(.3)}to{transform:none}}
+html.chat-lock{overflow:hidden}
+.chat{position:fixed;left:12px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:121;width:min(392px,calc(100vw - 24px));height:min(640px,calc(100dvh - 108px));display:flex;flex-direction:column;border-radius:22px;background:var(--bg);color:var(--ink);border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.5);overflow:hidden;font-family:var(--f-body);animation:chatIn .22s ease-out}
+@keyframes chatIn{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+@media (max-width:600px){.chat{left:0;right:0;top:0;bottom:0;width:auto;height:auto;border-radius:0;border:0}}
+.chat-view{position:relative;display:flex;flex-direction:column;flex:1;min-height:0}
+.chat-h{display:flex;align-items:center;gap:8px;padding:12px 12px 12px 16px;padding-top:max(12px,env(safe-area-inset-top,0px));border-bottom:1px solid var(--line);background:var(--bg2)}
+.chat-t{flex:1;font-family:var(--f-display);font-weight:400;font-size:21px}
+.chat-ic{width:40px;height:40px;flex:none;padding:0;border-radius:50%;border:1px solid var(--line);background:var(--panel2);color:var(--ink);display:grid;place-items:center;font-size:17px;line-height:1;cursor:pointer}
+.chat-ic:hover{border-color:var(--pink)}
+#chatBack{font-size:26px;padding-bottom:3px}
+.chat-search{padding:12px 14px 6px}
+.chat-search input{width:100%;padding:12px 15px;border-radius:14px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font:inherit;font-size:16px}
+.chat-search input:focus{outline:2px solid var(--cyan);outline-offset:1px}
+.chat-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.chat-row{display:flex;align-items:center;gap:12px;width:100%;padding:10px 16px;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.chat-row:hover,.chat-row:focus-visible{background:var(--panel)}
+.cr-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.cr-top,.cr-bot{display:flex;align-items:center;gap:8px;min-width:0}
+.cr-top b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:15px}
+.cr-top time{flex:none;font-size:12px;color:var(--mute);font-family:var(--f-hud)}
+.cr-last{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--mute);font-size:14px}
+.chat-row.unread .cr-last{color:var(--ink);font-weight:700}
+.cr-n{flex:none;min-width:21px;height:21px;padding:0 6px;border-radius:999px;background:var(--pink);color:#fff;font:800 11px/21px var(--f-body);font-style:normal;text-align:center}
+.chat-sec{margin:0;padding:12px 16px 4px;font-family:var(--f-hud);font-size:11px;letter-spacing:.2em;color:var(--mute)}
+.chat-empty{margin:0;padding:26px 22px 14px;text-align:center;color:var(--mute);font-size:14px;line-height:1.5}
+.chat-empty b{display:block;margin-bottom:6px;color:var(--ink);font-size:16px}
+.chat-linkbox{padding:0 18px 18px}
+.chat-who{flex:1;min-width:0;display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none;border-radius:12px}
+.chat-who-t{min-width:0}
+.chat-who b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:15px}
+.chat-who small{display:block;color:var(--mute);font-family:var(--f-hud);font-size:12px}
+.chat-msgs{display:flex;flex-direction:column;gap:5px;padding:14px 14px 10px}
+.bub{max-width:80%;padding:9px 13px 6px;border-radius:19px;font-size:15px;line-height:1.38;white-space:pre-wrap;overflow-wrap:anywhere}
+.bub.them{align-self:flex-start;background:var(--panel);border:1px solid var(--line);border-bottom-left-radius:6px}
+.bub.me{align-self:flex-end;background:linear-gradient(135deg,var(--pink),var(--violet));color:#fff;border-bottom-right-radius:6px}
+.bub time{display:block;margin-top:3px;font-size:10.5px;opacity:.72;text-align:right;font-family:var(--f-hud)}
+.bub.pending{opacity:.6}
+.chat-day{align-self:center;margin:10px 0 4px;padding:3px 11px;border-radius:999px;background:var(--panel2);color:var(--mute);font-size:11px;font-family:var(--f-hud);letter-spacing:.12em}
+.chat-seen{align-self:flex-end;margin:-2px 6px 4px;font-size:11px;color:var(--mute)}
+.chat-older{align-self:center;margin:2px 0 8px;color:var(--ink);cursor:pointer}
+.chat-note{margin:0;padding:9px 16px;font-size:13px;line-height:1.4;color:var(--gold);background:var(--bg2);border-top:1px solid var(--line)}
+.chat-send{display:flex;align-items:flex-end;gap:8px;padding:10px 12px;padding-bottom:max(10px,env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);background:var(--bg2)}
+.chat-send textarea{flex:1;min-height:44px;max-height:120px;resize:none;padding:11px 15px;border-radius:22px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font:inherit;font-size:16px;line-height:1.35}
+.chat-send textarea:focus{outline:2px solid var(--cyan);outline-offset:1px}
+.chat-send textarea:disabled{opacity:.55}
+.chat-go{width:44px;height:44px;flex:none;padding:0;border-radius:50%;border:0;background:linear-gradient(135deg,var(--pink),var(--violet));color:#fff;display:grid;place-items:center;cursor:pointer}
+.chat-go svg{width:20px;height:20px;margin-left:2px}
+.chat-go:disabled{opacity:.4;cursor:default}
+.chat-menu{position:absolute;right:58px;top:58px;z-index:3;display:grid;min-width:180px;padding:6px;border-radius:14px;background:var(--bg);border:1px solid var(--line);box-shadow:0 18px 40px rgba(0,0,0,.4)}
+.chat-menu button{display:block;width:100%;padding:11px 12px;border:0;border-radius:10px;background:none;color:var(--ink);font:inherit;font-size:14px;text-align:left;cursor:pointer}
+.chat-menu button:hover{background:var(--panel)}
+#chatBlock{color:var(--gold)}
+.chat-gate{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:30px 26px;text-align:center}
+.chat-gate b{font-size:19px}
+.chat-gate p{margin:0 0 6px;color:var(--mute);font-size:14px;line-height:1.5}
+.chat-gate-ic{font-size:44px;line-height:1}
+/* chat sits above the falling petals; little notices sit above the chat */
+.toast{z-index:130}
+/* long names shrink to fit the screen */
+.name{font-size:min(clamp(54px,10vw,128px),calc(92vw / (var(--len,3) * .96)))}
+.fld select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);font:inherit;font-size:15px}
 </style>
-
 </head>
 <body>
 
@@ -850,6 +958,7 @@ body.powered .hero{animation:aura 2.4s ease-out}
           <div class="seg"><strong id="cd-s">00</strong><span>s</span></div>
         </div>
       </div>
+      <div class="page-acts" id="pageActs"></div>
     </div>
   </header>
 
@@ -1007,7 +1116,7 @@ body.powered .hero{animation:aura 2.4s ease-out}
 
 <div class="ed" id="editor" role="dialog" aria-modal="true" aria-labelledby="edTitle" hidden>
   <div class="ed-box">
-    <div class="ed-head"><div style="display:flex;flex-direction:column;gap:10px"><h3 id="edTitle">Customize your page</h3><div id="edTabs" role="group" aria-label="Section"><button class="chip" type="button" data-tab="spotify">Spotify</button><button class="chip" type="button" data-tab="instagram">Instagram</button><button class="chip" type="button" data-tab="snapchat">Snapchat</button><button class="chip" type="button" data-tab="x">X</button><button class="chip" type="button" data-tab="collection">Collection</button></div></div><button class="ed-x" id="edClose" type="button" aria-label="Close">✕</button></div>
+    <div class="ed-head"><div style="display:flex;flex-direction:column;gap:10px"><h3 id="edTitle">Customize your page</h3><div id="edTabs" role="group" aria-label="Section"><button class="chip" type="button" data-tab="profile">Profile</button><button class="chip" type="button" data-tab="spotify">Spotify</button><button class="chip" type="button" data-tab="instagram">Instagram</button><button class="chip" type="button" data-tab="snapchat">Snapchat</button><button class="chip" type="button" data-tab="x">X</button><button class="chip" type="button" data-tab="discord">Discord</button><button class="chip" type="button" data-tab="contact">Contact</button><button class="chip" type="button" data-tab="collection">Collection</button></div></div><button class="ed-x" id="edClose" type="button" aria-label="Close">✕</button></div>
     <div id="edBody"></div>
     <div class="ed-foot"><small id="edNote" aria-live="polite"></small><div class="row"><button class="btn ghost" type="button" id="edCancel">Cancel</button><button class="btn" type="button" id="edSave">Save</button></div></div>
   </div>
@@ -1049,25 +1158,102 @@ body.powered .hero{animation:aura 2.4s ease-out}
   </div>
 </div>
 <div class="egg" id="egg" aria-hidden="true"><div class="rays"></div><div class="t"><b>限界突破</b><span>LIMIT BREAK!</span></div></div>
-<div class="auth-modal" id="authModal" role="dialog" aria-modal="true" aria-label="Log in or sign up" hidden>
+<div class="auth-modal" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authTitle" hidden>
   <div class="auth-card">
     <button class="auth-x" id="authClose" type="button" aria-label="Close">&times;</button>
-    <div class="auth-tabs">
-      <button class="auth-tab on" id="tabLogin" type="button">Log in</button>
-      <button class="auth-tab" id="tabSignup" type="button">Sign up</button>
+    <div class="auth-view" data-view="auth">
+      <h3 class="auth-h" id="authTitle">Welcome back</h3>
+      <p class="auth-sub" id="authSub">Log in to edit your page and chat with friends.</p>
+      <div class="auth-tabs" role="tablist">
+        <button class="auth-tab on" id="tabLogin" type="button" role="tab" aria-selected="true">Log in</button>
+        <button class="auth-tab" id="tabSignup" type="button" role="tab" aria-selected="false">Sign up</button>
+      </div>
+      <form id="authForm" novalidate>
+        <label for="authEmail">Email</label>
+        <input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com" required>
+        <label for="authPass">Password</label>
+        <input id="authPass" type="password" autocomplete="current-password" placeholder="At least 6 characters" minlength="6" required>
+        <button class="auth-go" id="authGo" type="submit">Log in</button>
+        <button class="auth-link" id="authForgot" type="button">Forgot password?</button>
+        <p class="auth-msg" id="authMsg" role="status" aria-live="polite"></p>
+      </form>
     </div>
-    <form id="authForm" novalidate>
-      <label for="authEmail">Email</label>
-      <input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com" required>
-      <label for="authPass">Password</label>
-      <input id="authPass" type="password" autocomplete="current-password" placeholder="At least 6 characters" minlength="6" required>
-      <button class="auth-go" id="authGo" type="submit">Log in</button>
-      <p class="auth-msg" id="authMsg" role="status" aria-live="polite"></p>
-    </form>
+    <div class="auth-view" data-view="forgot" hidden>
+      <h3 class="auth-h">Reset your password</h3>
+      <p class="auth-sub">We'll email you a link to choose a new one.</p>
+      <form id="forgotForm" novalidate>
+        <label for="forgotEmail">Email</label>
+        <input id="forgotEmail" type="email" autocomplete="email" placeholder="you@example.com">
+        <button class="auth-go" id="forgotGo" type="submit">Send reset link</button>
+        <button class="auth-link" id="forgotBack" type="button">← Back to log in</button>
+        <p class="auth-msg" id="forgotMsg" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+    <div class="auth-view" data-view="newpass" hidden>
+      <h3 class="auth-h">Choose a new password</h3>
+      <p class="auth-sub">Type it once. You'll use it to log in from now on.</p>
+      <form id="newPassForm" novalidate>
+        <label for="newPass">New password</label>
+        <input id="newPass" type="password" autocomplete="new-password" placeholder="At least 6 characters" minlength="6">
+        <button class="auth-go" id="newPassGo" type="submit">Save password</button>
+        <p class="auth-msg" id="newPassMsg" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+    <div class="auth-view" data-view="setup" hidden>
+      <span class="auth-step">LAST STEP</span>
+      <h3 class="auth-h">Claim your page</h3>
+      <p class="auth-sub">Pick a username. It becomes your link, and it's how friends find you in chat.</p>
+      <form id="setupForm" novalidate autocomplete="off">
+        <label for="setupUser">Username</label>
+        <div class="u-field"><span aria-hidden="true">flexippo.com/?u=</span><input id="setupUser" maxlength="20" placeholder="yourname" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="text"></div>
+        <small class="u-hint" id="setupHint" aria-live="polite">3 to 20 letters, numbers or _</small>
+        <label for="setupName">Your name</label>
+        <input id="setupName" maxlength="24" placeholder="e.g. Rahul" autocomplete="nickname">
+        <button class="auth-go" id="setupGo" type="submit">Create my page</button>
+        <p class="auth-msg" id="setupMsg" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+    <div class="auth-view" data-view="menu" hidden>
+      <div class="acc-head" id="accHead"></div>
+      <span class="acc-lbl">YOUR LINK</span>
+      <div class="acc-link"><input id="accLink" readonly aria-label="Your page link"><button class="auth-mini" id="accCopy" type="button">Copy</button></div>
+      <div class="acc-btns">
+        <button class="acc-b" id="accMine" type="button"><span aria-hidden="true">🏠</span> My page</button>
+        <button class="acc-b" id="accEdit" type="button"><span aria-hidden="true">✎</span> Edit my page</button>
+        <button class="acc-b" id="accChats" type="button"><span aria-hidden="true">💬</span> Chats</button>
+        <button class="acc-b" id="accHome" type="button"><span aria-hidden="true">✦</span> flexippo home</button>
+        <button class="acc-b out" id="accOut" type="button">Log out</button>
+      </div>
+    </div>
   </div>
 </div>
+<button class="chat-fab" id="chatFab" type="button" aria-label="Open chats" aria-expanded="false" aria-controls="chat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 11.6a8.4 8.4 0 0 1-12.2 7.5L3.5 20.5l1.4-4.6a8.4 8.4 0 1 1 15.6-4.3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="8.6" cy="11.6" r="1.25" fill="currentColor"/><circle cx="12.3" cy="11.6" r="1.25" fill="currentColor"/><circle cx="16" cy="11.6" r="1.25" fill="currentColor"/></svg><b class="chat-badge" id="chatBadge" hidden>0</b></button>
+<section class="chat" id="chat" aria-label="Chats" hidden>
+  <div class="chat-view" data-view="list">
+    <header class="chat-h"><b class="chat-t">Chats</b><button class="chat-ic" type="button" data-close aria-label="Close chats">✕</button></header>
+    <div class="chat-search"><input id="chatQ" type="search" placeholder="Find people by username or name" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="30" aria-label="Find people"></div>
+    <div class="chat-scroll" id="chatList"></div>
+  </div>
+  <div class="chat-view" data-view="thread" hidden>
+    <header class="chat-h">
+      <button class="chat-ic" id="chatBack" type="button" aria-label="Back to chats">‹</button>
+      <a class="chat-who" id="chatWho" href="#"><span id="chatAvatar"></span><span class="chat-who-t"><b id="chatName"></b><small id="chatUser"></small></span></a>
+      <button class="chat-ic" id="chatMore" type="button" aria-label="More options" aria-haspopup="true" aria-expanded="false">⋯</button>
+      <button class="chat-ic" type="button" data-close aria-label="Close chats">✕</button>
+    </header>
+    <div class="chat-menu" id="chatMenu" hidden><button id="chatView" type="button">View their page</button><button id="chatBlock" type="button">Block</button></div>
+    <div class="chat-scroll chat-msgs" id="chatMsgs" aria-live="polite"></div>
+    <p class="chat-note" id="chatNote" hidden></p>
+    <form class="chat-send" id="chatForm"><textarea id="chatInput" rows="1" maxlength="2000" placeholder="Message…" aria-label="Your message"></textarea><button class="chat-go" id="chatGo" type="submit" aria-label="Send"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l16-8-6 16-2.5-6.5z" fill="currentColor"/></svg></button></form>
+  </div>
+  <div class="chat-view" data-view="gate" hidden>
+    <header class="chat-h"><b class="chat-t">Chats</b><button class="chat-ic" type="button" data-close aria-label="Close chats">✕</button></header>
+    <div class="chat-gate" id="chatGate"></div>
+  </div>
+</section>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* =====================================================================
    EDIT THIS PART: everything on the page comes from CONFIG.
@@ -1099,6 +1285,7 @@ const CONFIG = {
             "how is this even real", "saving this for my vision board ✨"]
   },
   siteUrl: "https://flexippo.com",   // your site link: shown in the share box, link previews and QR code
+  homeProfile: "",                   // optional: your flexippo username. Then this main page shows the page you edit online
   song: { src: "assets/theme.mp3", title: "Anime Cyberpunk", artist: "HitsLab" },
   // Contact section: fill in "value" for any of these and it turns on by itself. Leave "" to keep it greyed out.
   contact: [
@@ -1159,6 +1346,7 @@ const CONFIG = {
   // comment pinned on a photo (photo id: commenter)
   pins: { "figurine": "midnight.gamer", "tuxedo-cat": "aura.farmer" }
 };
+const BASE = JSON.parse(JSON.stringify(CONFIG));   // the defaults above. Every person's page starts from these.
 
 /* ===================================================================== */
 const $ = (s, r = document) => r.querySelector(s);
@@ -1173,6 +1361,164 @@ const RAR = { mythic: { label: "MYTHIC", w: 5000, c: "var(--r-mythic)", order: 0
 let toastT;
 function toast(msg) { const t = $("#toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("on"), 2600); }
 function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+
+/* ======================= ACCOUNTS + ONLINE PAGES (Supabase) ======================= */
+// The publishable (anon) key is meant to be public. The database rules decide who can read or change what.
+const SUPA = { url: "https://knmjxdnzttyacdtktbdl.supabase.co", key: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtubWp4ZG56dHR5YWNkdGt0YmRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzMjg5MTcsImV4cCI6MjEwNjkwNDkxN30.rEWcpL0OFyNhLAFLUuTWpx47uPquP40vcQz3GEqNvgE" };
+const MEDIA_PREFIX = SUPA.url + "/storage/v1/object/public/media/";
+const FLEX_AVATAR = "assets/flexippo-avatar.png";
+const BASE_TITLE = document.title;
+// password-reset links come back with these in the address (read them before Supabase tidies the address)
+const AUTH_RECOVERY = /type=recovery/.test(location.hash);
+const AUTH_HASH_ERROR = (() => { try { const m = /error_description=([^&]+)/.exec(location.hash); return m ? decodeURIComponent(m[1].replace(/\+/g, " ")) : ""; } catch (e) { return ""; } })();
+// flexippo.com/?u=username opens that person's page
+const PAGE_U = (() => { try { const u = String(new URLSearchParams(location.search).get("u") || "").trim().replace(/^@/, "").toLowerCase(); return /^[a-z0-9_]{3,20}$/.test(u) ? u : ""; } catch (e) { return ""; } })();
+const pageKey = k => (PAGE_U ? k + "@" + PAGE_U : k);   // keeps each page's guestbook + likes apart on this device
+if (PAGE_U) {   // until their page loads, show their username instead of the main page's name
+  Object.assign(CONFIG, { name: PAGE_U, heroName: PAGE_U.toUpperCase().slice(0, 14), kana: "@" + PAGE_U, avatar: FLEX_AVATAR, birthday: "",
+    ticker: [PAGE_U.toUpperCase(), "WELCOME TO MY PAGE", "限界突破", "FLEXIPPO.COM"], contact: BASE.contact.map(c => ({ ...c, value: "", url: "" })) });
+}
+function cleanSettings(s) {
+  s = s && typeof s === "object" && !Array.isArray(s) ? JSON.parse(JSON.stringify(s)) : {};
+  if (Array.isArray(s.collection)) s.collection = s.collection.filter(it => it && typeof it === "object").slice(0, 30).map(it => {
+    ["img", "icon", "logo"].forEach(k => { if (it[k] && !/^assets\/[\w./-]+$/.test(String(it[k]))) it[k] = ""; });
+    it.id = String(it.id || "").replace(/[^\w-]/g, "").slice(0, 40) || "c" + seedOfText(JSON.stringify(it)).toString(36);
+    return it;
+  });
+  return s;
+}
+function seedOfText(t) { let h = 5381; for (const c of String(t)) h = (h * 33) ^ c.charCodeAt(0); return h >>> 0; }
+function cleanMedia(m) {   // only our own photo storage (or the site's own images) may show up on a page
+  const out = {};
+  if (m && typeof m === "object") for (const k in m) { const v = m[k]; if (typeof v === "string" && (v.startsWith(MEDIA_PREFIX) || /^assets\/[\w./-]+$/.test(v))) out[k] = v; }
+  return out;
+}
+const Cloud = (() => {
+  let sb = null;
+  try { if (window.supabase && typeof window.supabase.createClient === "function") sb = window.supabase.createClient(SUPA.url, SUPA.key); } catch (e) { sb = null; }
+  let user = null, me = null, notSetUp = false, started = false, readyFn;
+  const ready = new Promise(r => { readyFn = r; });
+  const subs = [];
+  const emit = why => subs.forEach(f => { try { f(why); } catch (e) { console.error(e); } });
+  const isMissing = e => !!e && (e.code === "42P01" || e.code === "PGRST205" || e.code === "PGRST202" || /schema cache|does not exist/i.test(e.message || ""));
+  const fail = e => { if (isMissing(e)) notSetUp = true; throw e; };
+  async function loadMe() {
+    me = null;
+    if (!sb || !user) return null;
+    const { data, error } = await sb.from("profiles").select("id,username,display_name,avatar_url").eq("id", user.id).maybeSingle();
+    if (error) fail(error);
+    me = data || null; return me;
+  }
+  async function init() {
+    if (started) return ready;
+    started = true;
+    if (!sb) { readyFn(); return ready; }
+    const slow = setTimeout(readyFn, 6000);     // never leave the page waiting on a slow connection
+    try { const { data } = await sb.auth.getSession(); user = data && data.session ? data.session.user : null; } catch (e) { user = null; }
+    try { await loadMe(); } catch (e) {}
+    clearTimeout(slow); readyFn(); emit("init");
+    sb.auth.onAuthStateChange((ev, session) => {
+      const was = user ? user.id : null; user = session ? session.user : null; const now = user ? user.id : null;
+      setTimeout(async () => {                   // Supabase asks us not to call it from inside this callback
+        if (ev === "PASSWORD_RECOVERY") emit("recovery");
+        if (now !== was) { try { await loadMe(); } catch (e) {} emit("auth"); }
+      }, 0);
+    });
+    return ready;
+  }
+  const pathOf = url => (typeof url === "string" && url.startsWith(MEDIA_PREFIX) ? decodeURIComponent(url.slice(MEDIA_PREFIX.length).split("?")[0]) : "");
+  async function upload(key, dataUrl) {
+    const blob = await (await fetch(dataUrl)).blob();
+    const type = /^image\/(png|webp|gif)$/.test(blob.type) ? blob.type : "image/jpeg";
+    const ext = { "image/png": "png", "image/webp": "webp", "image/gif": "gif" }[type] || "jpg";
+    const safe = String(key).replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 60) || "photo";
+    const path = `${user.id}/${safe}-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}.${ext}`;
+    const { error } = await sb.storage.from("media").upload(path, blob, { contentType: type, cacheControl: "31536000", upsert: false });
+    if (error) throw error;
+    return sb.storage.from("media").getPublicUrl(path).data.publicUrl;
+  }
+  const COLS = "id,username,display_name,avatar_url,settings,media,updated_at";
+  async function saveMyPage(settings, oldMedia, pend, displayName) {
+    if (!sb || !user) throw new Error("not_logged_in");
+    const media = { ...(oldMedia || {}) }, gone = [];
+    await Promise.all(Object.keys(pend || {}).map(async k => {
+      const v = pend[k], old = pathOf(media[k]);
+      if (v && /^data:image\//.test(v)) media[k] = await upload(k, v);
+      else if (v && String(v).startsWith(MEDIA_PREFIX)) media[k] = v;
+      else delete media[k];
+      if (old) gone.push(old);
+    }));
+    const patch = { settings, media, avatar_url: media.avatar && /^https:\/\//.test(media.avatar) ? media.avatar : null };
+    if (typeof displayName === "string" && displayName.trim()) patch.display_name = displayName.trim().slice(0, 40);
+    const { data, error } = await sb.from("profiles").update(patch).eq("id", user.id).select(COLS).single();
+    if (error) fail(error);
+    if (me) { me.display_name = data.display_name; me.avatar_url = data.avatar_url; }
+    const still = new Set(Object.values(data.media || {}).map(pathOf));
+    const old = gone.filter(p => p.startsWith(user.id + "/") && !still.has(p));
+    if (old.length) sb.storage.from("media").remove(old).then(() => {}, () => {});
+    emit("me");
+    return data;
+  }
+  async function rpc(fn, args) { const { data, error } = await sb.rpc(fn, args || {}); if (error) fail(error); return data; }
+  async function refresh() {
+    if (!sb) return null;
+    try { const { data } = await sb.auth.getSession(); user = data && data.session ? data.session.user : null; } catch (e) { user = null; }
+    try { await loadMe(); } catch (e) {}
+    emit("auth"); return me;
+  }
+  return {
+    init, ready, refresh,
+    get sb() { return sb; }, get user() { return user; }, get me() { return me; }, get notSetUp() { return notSetUp; },
+    on(f) { subs.push(f); },
+    shareLink: u => BASE.siteUrl.replace(/\/+$/, "") + "/?u=" + u,
+    async getProfile(username) {
+      const { data, error } = await sb.from("profiles").select(COLS).eq("username", username).maybeSingle();
+      if (error) fail(error); return data;
+    },
+    async getPerson(id) {
+      const { data, error } = await sb.from("profiles").select("id,username,display_name,avatar_url").eq("id", id).maybeSingle();
+      if (error) fail(error); return data;
+    },
+    async usernameFree(u) {
+      const { data, error } = await sb.from("profiles").select("id").eq("username", u).maybeSingle();
+      if (error) fail(error); return !data;
+    },
+    async createMe(username, displayName) {
+      const { data, error } = await sb.from("profiles").insert({ id: user.id, username, display_name: displayName }).select("id,username,display_name,avatar_url").single();
+      if (error) fail(error);
+      me = data; notSetUp = false; emit("me"); return data;
+    },
+    saveMyPage,
+    async iBlocked(other) {
+      const { data, error } = await sb.from("blocks").select("blocked_id").eq("blocked_id", other).maybeSingle();
+      if (error) fail(error); return !!data;
+    },
+    conversations: () => rpc("my_conversations"),
+    thread: (other, beforeId) => rpc("get_thread", { p_other: other, p_before_id: beforeId || null, p_limit: 50 }),
+    send: (to, body) => rpc("send_message", { p_to: to, p_body: body }),
+    markRead: other => rpc("mark_read", { p_other: other }),
+    setBlock: (other, on) => rpc("set_block", { p_other: other, p_block: !!on }),
+    search: q => rpc("search_profiles", { p_q: q })
+  };
+})();
+// turn Supabase / network errors into plain words
+function friendlyError(e) {
+  const m = String((e && (e.message || e.error_description || e.msg)) || e || "");
+  if (/failed to fetch|networkerror|load failed|network request failed/i.test(m)) return "No connection. Check your internet and try again.";
+  if (/invalid login credentials/i.test(m)) return "Wrong email or password.";
+  if (/email not confirmed/i.test(m)) return "Confirm your email first: tap the link we sent you.";
+  if (/already registered|already been registered|user already exists/i.test(m)) return "That email already has an account. Try logging in.";
+  if (/password should be|weak password|password is too/i.test(m)) return "Pick a longer password (at least 6 characters).";
+  if (/rate limit|too many requests|for security purposes/i.test(m)) return "Too many tries. Wait a minute and try again.";
+  if (/unable to validate email|invalid email|email address .*invalid/i.test(m)) return "That email doesn't look right.";
+  if (/signups? (are )?not allowed|signup is disabled/i.test(m)) return "New sign-ups are turned off right now.";
+  if (/payload too large|exceeded the maximum|entity too large|too large/i.test(m)) return "That photo is too big. Try a smaller one.";
+  if (/mime type|invalid_mime/i.test(m)) return "That photo type isn't supported. Use JPG or PNG.";
+  if (/bucket not found/i.test(m)) return "Photo storage isn't set up yet.";
+  if (/jwt expired|invalid jwt|not_logged_in|refresh token/i.test(m)) return "You were logged out. Log in again.";
+  if (Cloud.notSetUp) return "Accounts are still being set up. Try again in a bit.";
+  return m || "Something went wrong. Try again.";
+}
 
 /* ======================= SOUND ENGINE ======================= */
 const Snd = (() => {
@@ -1284,8 +1630,8 @@ const Store = (() => {
   let db = null, uid = null, mode = "local";
   const vid = LS.get("vid", null) || (() => { const v = "v" + Math.random().toString(36).slice(2, 10); LS.set("vid", v); return v; })();
   const listeners = { reactions: [], guestbook: [] };
-  let mine = LS.get("mine", {});           // {itemId: ["fire", ...]}
-  let localGb = LS.get("gb", []);          // messages kept on this device
+  let mine = LS.get(pageKey("mine"), {});           // {itemId: ["fire", ...]}
+  let localGb = LS.get(pageKey("gb"), []);          // messages kept on this device
   let totals = {}, shared = false;
   function emit(k, v) { listeners[k].forEach(f => f(v)); }
   function localTotals() { const t = {}; for (const id in mine) { t[id] = {}; mine[id].forEach(e => t[id][e] = 1); } return t; }
@@ -1305,7 +1651,7 @@ const Store = (() => {
     try {
       db.collection("reactions").limit(1000).onSnapshot(s => {
         const t = {};
-        s.docs.forEach(d => { const r = (d.data() || {}).r || {}; for (const id in r) { (r[id] || []).forEach(e => { t[id] = t[id] || {}; t[id][e] = (t[id][e] || 0) + 1; }); } if (uid && d.id === uid) { mine = JSON.parse(JSON.stringify(r)); LS.set("mine", mine); } });
+        s.docs.forEach(d => { const r = (d.data() || {}).r || {}; for (const id in r) { (r[id] || []).forEach(e => { t[id] = t[id] || {}; t[id][e] = (t[id][e] || 0) + 1; }); } if (uid && d.id === uid) { mine = JSON.parse(JSON.stringify(r)); LS.set(pageKey("mine"), mine); } });
         totals = t; emit("reactions", { totals, mine });
       }, () => {});
     } catch (e) {}
@@ -1322,7 +1668,7 @@ const Store = (() => {
   async function react(id, emoji) {
     const set = new Set(mine[id] || []); const on = !set.has(emoji);
     on ? set.add(emoji) : set.delete(emoji);
-    mine = { ...mine, [id]: [...set] }; LS.set("mine", mine);
+    mine = { ...mine, [id]: [...set] }; LS.set(pageKey("mine"), mine);
     if (mode === "db" && uid) {
       const t = JSON.parse(JSON.stringify(totals)); t[id] = t[id] || {}; t[id][emoji] = Math.max(0, (t[id][emoji] || 0) + (on ? 1 : -1));
       totals = t; emit("reactions", { totals, mine });
@@ -1336,14 +1682,14 @@ const Store = (() => {
     if (mode === "db") {
       try { await db.collection("guestbook").add(entry); return "shared"; } catch (e) {}
     }
-    entry.id = "local-" + entry.at; localGb = [entry, ...localGb].slice(0, 80); LS.set("gb", localGb);
+    entry.id = "local-" + entry.at; localGb = [entry, ...localGb].slice(0, 80); LS.set(pageKey("gb"), localGb);
     emit("guestbook", localGb.slice());
     return "local";
   }
   async function unsign(ids) {
     const gone = new Set(ids);
     if (mode === "db") { for (const id of ids) { if (!String(id).startsWith("local-")) { try { await db.doc("guestbook/" + id).delete(); } catch (e) {} } } }
-    localGb = localGb.filter(m => !gone.has(m.id)); LS.set("gb", localGb);
+    localGb = localGb.filter(m => !gone.has(m.id)); LS.set(pageKey("gb"), localGb);
     if (mode !== "db") emit("guestbook", localGb.slice());
     else emit("guestbook", (lastGb || []).filter(m => !gone.has(m.id || m.at)));
   }
@@ -1407,9 +1753,9 @@ const FX = (() => {
 })();
 
 /* ======================= SKINS ======================= */
-function applySkin(s, announce) {
+function applySkin(s, announce, keep) {
   if (!["night", "sakura", "fire"].includes(s)) s = "night";
-  document.documentElement.dataset.skin = s; LS.set("skin", s);
+  document.documentElement.dataset.skin = s; if (!keep) LS.set("skin", s);
   $$(".skin").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.skin === s)));
   FX.refill();
   if (announce) { Snd.fx("whoosh"); toast({ night: "Neon Tokyo Night", sakura: "Sakura Day", fire: "Shonen Fire" }[s] + " activated"); }
@@ -1535,7 +1881,7 @@ const OnceFx = (() => {
 
 /* ======================= HERO ======================= */
 function renderName() {
-  const HN = CONFIG.heroName || CONFIG.name; const h = $("#name"); h.dataset.text = HN; h.innerHTML = [...HN].map((c, i) => `<span style="--i:${i}">${esc(c)}</span>`).join("");
+  const HN = CONFIG.heroName || CONFIG.name; const h = $("#name"); h.dataset.text = HN; h.style.setProperty("--len", Math.max(3, [...HN].length)); h.innerHTML = [...HN].map((c, i) => `<span style="--i:${i}">${esc(c)}</span>`).join("");
   $("#kana").textContent = CONFIG.kana; $("#footName").textContent = CONFIG.name;
   $("#introKick").textContent = CONFIG.name; $("#introAv").src = CONFIG.avatar;
   if (CONFIG.cover) document.documentElement.style.setProperty("--intro-img", `url("${CONFIG.cover}")`);
@@ -1552,13 +1898,15 @@ function startTyping() {
   };
   setTimeout(loop, 700);
 }
+function hasBirthday() { return BDAY_RE.test(CONFIG.birthday || ""); }
 function nextBirthday() {
   const [m, d] = CONFIG.birthday.split("-").map(Number); const now = new Date();
   let t = new Date(now.getFullYear(), m - 1, d); const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   if (t < today) t = new Date(now.getFullYear() + 1, m - 1, d); return t;
 }
-function isBirthday() { const [m, d] = CONFIG.birthday.split("-").map(Number); const n = new Date(); return n.getMonth() === m - 1 && n.getDate() === d; }
+function isBirthday() { if (!hasBirthday()) return false; const [m, d] = CONFIG.birthday.split("-").map(Number); const n = new Date(); return n.getMonth() === m - 1 && n.getDate() === d; }
 function tickCountdown() {
+  const box = $("#countBox"); box.hidden = !hasBirthday(); if (box.hidden) return;
   const t = nextBirthday(); $("#bdayDate").textContent = t.toLocaleDateString(undefined, { day: "numeric", month: "short" }).toUpperCase();
   if (isBirthday()) { $("#segs").innerHTML = '<div class="bday-now">🎉 IT\'S MY BIRTHDAY 🎉</div>'; return; }
   let s = Math.max(0, Math.floor((t - new Date()) / 1000));
@@ -1588,7 +1936,7 @@ function safeUrl(u, fallback) { u = String(u || "").trim(); return /^https?:\/\/
 function readableOn(hex) { const m = /^#?([0-9a-f]{6})$/i.exec(hex || ""); if (!m) return "#06210f"; const n = parseInt(m[1], 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255; return (0.299 * r + 0.587 * g + 0.114 * b) > 150 ? "#0b0b0b" : "#ffffff"; }
 function parseTracks(list) { return (list || []).map(t => String(t).trim()).filter(Boolean).slice(0, 6).map(t => { const p = t.split(/\s+[—–-]\s+/); return { title: p[0], artist: p.slice(1).join(" - ") }; }); }
 const VERIFIED = `<svg class="vf" viewBox="0 0 24 24" role="img" aria-label="Verified"><path d="M12.00 1.00 L14.41 3.02 L17.50 2.47 L18.58 5.42 L21.53 6.50 L20.98 9.59 L23.00 12.00 L20.98 14.41 L21.53 17.50 L18.58 18.58 L17.50 21.53 L14.41 20.98 L12.00 23.00 L9.59 20.98 L6.50 21.53 L5.42 18.58 L2.47 17.50 L3.02 14.41 L1.00 12.00 L3.02 9.59 L2.47 6.50 L5.42 5.42 L6.50 2.47 L9.59 3.02Z" fill="#1d9bf0" stroke="#1d9bf0" stroke-width="1.6" stroke-linejoin="round"/><path d="M7.6 12.4l3 3 5.8-6.4" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-function pfpHtml() { return `<i class="pfp" aria-hidden="true"><img src="assets/flexippo-pfp.png" alt="" width="24" height="24" loading="lazy" draggable="false"></i>`; }
+function pfpHtml() { const a = Custom.target && !Custom.isHome && Custom.media && Custom.media.avatar; return `<i class="pfp" aria-hidden="true"><img src="${esc(a || "assets/flexippo-pfp.png")}" alt="" width="24" height="24" loading="lazy" draggable="false"></i>`; }
 function brandIcon(s) { return `<span class="soc-ic" style="background:${s.brand}" aria-hidden="true"><i class="fa-brands ${s.icon}"></i><span class="fb">${esc(s.label.charAt(0))}</span></span>`; }
 const X_ICONS = ['<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"/>', '<path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/>', '<path d="M12 21s-7-4.4-9.3-9A5.3 5.3 0 0 1 12 6.3 5.3 5.3 0 0 1 21.3 12C19 16.6 12 21 12 21z"/>', '<path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/>'];
 // everything the owner can change, merged over CONFIG
@@ -1703,18 +2051,33 @@ const Stories = (() => {
 })();
 
 /* ======================= OWNER CUSTOMIZATION ======================= */
-// Shared for every visitor when the page has a database; otherwise saved in this browser.
+// On someone's page (flexippo.com/?u=name) everything they change is saved to their account,
+// so it shows for everyone, on every device. Opened from the computer, edits save in this browser.
 const Custom = (() => {
-  let db = null, owner = false, shared = false;
+  let db = null, owner = false, shared = false, cloud = false, target = null, isHome = false, missing = "", failed = false, loaded = false, lastError = null;
   let settings = LS.get("custom", {}) || {}, media = LS.get("customMedia", {}) || {};
   const subs = [];
-  const emit = () => subs.forEach(f => { try { f(); } catch (e) {} });
+  const emit = () => subs.forEach(f => { try { f(); } catch (e) { console.error(e); } });
+  const wanted = () => PAGE_U || String(CONFIG.homeProfile || "").trim().replace(/^@/, "").toLowerCase();
+  const syncOwner = () => { owner = !!(cloud && target && Cloud.user && Cloud.user.id === target.id); };
   async function init() {
+    const u = wanted();
+    if (u && Cloud.sb) {
+      cloud = true; shared = true; isHome = !PAGE_U; settings = {}; media = {};
+      await Cloud.init();
+      try { target = await Cloud.getProfile(u); } catch (e) { target = null; lastError = e; failed = !!PAGE_U; }
+      if (target) { settings = cleanSettings(target.settings); media = cleanMedia(target.media); }
+      else if (PAGE_U && !failed) missing = u;
+      syncOwner();
+      Cloud.on(why => { if (why === "auth" || why === "me" || why === "init") { const was = owner; syncOwner(); if (was !== owner) apply(); } });
+      return apply();
+    }
+    if (PAGE_U) { failed = true; settings = {}; media = {}; return apply(); }   // accounts couldn't load (no internet?)
     const hasClaude = window.claude && typeof window.claude.use === "function";
-    if (!hasClaude) { owner = location.protocol === "file:" || location.hash === "#edit"; return apply(); }
+    if (!hasClaude) { owner = location.protocol === "file:"; return apply(); }
     try {
-      const [d, u] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
-      if (u) { try { owner = !!(await u.isOwner()); } catch (e) {} }
+      const [d, u2] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+      if (u2) { try { owner = !!(await u2.isOwner()); } catch (e) {} }
       if (d) {
         db = d; shared = true; settings = {}; media = {};
         db.doc("site/settings").onSnapshot(sn => { settings = sn.exists ? JSON.parse(JSON.stringify(sn.data() || {})) : {}; emit(); }, () => {});
@@ -1723,8 +2086,22 @@ const Custom = (() => {
     } catch (e) {}
     apply();
   }
-  function apply() { document.body.classList.toggle("is-owner", owner); emit(); }
+  function apply() {
+    loaded = true;
+    document.body.classList.toggle("is-owner", owner);
+    document.body.classList.toggle("on-page", !!target && !isHome);
+    emit();
+  }
   async function save(next, pend) {
+    if (cloud) {
+      if (!owner || !target) { lastError = new Error("not_owner"); return "error"; }
+      try {
+        const nm = String(((next || {}).profile || {}).name || "").trim();
+        const row = await Cloud.saveMyPage(next, media, pend, nm || target.display_name || target.username);
+        target = { ...target, ...row }; settings = cleanSettings(row.settings); media = cleanMedia(row.media); lastError = null;
+        emit(); return "cloud";
+      } catch (e) { lastError = e; return "error"; }
+    }
     if (shared && db) {
       try {
         for (const k in pend) { const ref = db.doc("media/" + k); if (pend[k]) await ref.set({ data: pend[k], at: Date.now() }); else await ref.delete(); }
@@ -1738,8 +2115,75 @@ const Custom = (() => {
     emit();
     return ok ? "local" : "full";
   }
-  return { init, save, on(f) { subs.push(f); }, get settings() { return settings; }, get media() { return media; }, get owner() { return owner; }, get shared() { return shared; } };
+  return {
+    init, save, on(f) { subs.push(f); },
+    get settings() { return settings; }, get media() { return media; }, get owner() { return owner; }, get shared() { return shared; },
+    get cloud() { return cloud; }, get target() { return target; }, get isHome() { return isHome; }, get missing() { return missing; }, get failed() { return failed; }, get loaded() { return loaded; }, get lastError() { return lastError; }
+  };
 })();
+
+/* ======================= PROFILE BASICS (name, photos, birthday, theme, contact) ======================= */
+// Each page starts from the defaults in CONFIG; the owner's saved choices go on top.
+const clip = (v, n) => (typeof v === "string" ? v.trim().slice(0, n) : "");
+function cleanList(v, max, len) {
+  const a = (Array.isArray(v) ? v : typeof v === "string" ? v.split("\n") : []).map(x => clip(String(x || ""), len)).filter(Boolean).slice(0, max);
+  return a.length ? a : null;
+}
+const BDAY_RE = /^(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
+const CONTACT_LINK = {
+  x: v => (/^[A-Za-z0-9_]{1,15}$/.test(v) ? "https://x.com/" + v : ""),
+  instagram: v => (/^[A-Za-z0-9_.]{1,30}$/.test(v) ? "https://www.instagram.com/" + v + "/" : ""),
+  gmail: v => (/^[^\s@<>"']+@[^\s@<>"']+\.[A-Za-z]{2,}$/.test(v) ? "mailto:" + v : ""),
+  snapchat: v => (/^[A-Za-z0-9_.-]{2,30}$/.test(v) ? "https://www.snapchat.com/add/" + v : ""),
+  whatsapp: v => { const d = v.replace(/\D/g, ""); return d.length >= 8 && d.length <= 15 ? "https://wa.me/" + d : ""; },
+  discord: v => (/^https:\/\/(www\.)?(discord\.gg|discord\.com)\/\S+$/i.test(v) ? v : "")
+};
+function contactFor(base, val, userPage) {
+  if (val === undefined || val === null) return userPage ? { ...base, value: "", url: "" } : { ...base };
+  const v = String(val).trim().replace(/^@/, "").slice(0, 80);
+  const url = v ? (CONTACT_LINK[base.id] || (() => ""))(v) : "";
+  return { ...base, value: base.id === "whatsapp" && url ? "+" + v.replace(/\D/g, "") : v, url };
+}
+let skinTouched = false;
+function applyBasics() {
+  const S = Custom.settings || {}, M = Custom.media || {}, T = Custom.target;
+  const P = S.profile && typeof S.profile === "object" ? S.profile : {};
+  const userPage = !!T && !Custom.isHome;
+  const name = clip(P.name, 24) || (userPage ? T.display_name || T.username : BASE.name);
+  CONFIG.name = name;
+  CONFIG.heroName = clip(P.heroName, 14) || (userPage ? name.toUpperCase().slice(0, 14) : BASE.heroName);
+  CONFIG.kana = typeof P.kana === "string" ? clip(P.kana, 30) : userPage ? "@" + T.username : BASE.kana;
+  CONFIG.titles = cleanList(P.titles, 6, 40) || BASE.titles;
+  CONFIG.birthday = typeof P.birthday === "string" ? P.birthday.trim() : userPage ? "" : BASE.birthday;
+  CONFIG.avatar = M.avatar || (userPage ? FLEX_AVATAR : BASE.avatar);
+  CONFIG.cover = M.cover || BASE.cover;
+  CONFIG.ticker = cleanList(P.ticker, 8, 30) || (userPage ? [CONFIG.heroName, "WELCOME TO MY PAGE", "限界突破", "FLEXIPPO.COM"] : BASE.ticker);
+  const C = S.contact && typeof S.contact === "object" ? S.contact : {};
+  CONFIG.contact = BASE.contact.map(c => contactFor(c, C[c.id], userPage));
+  const D = S.discord && typeof S.discord === "object" ? S.discord : {};
+  const d = CONFIG.socials.find(s => s.id === "discord"), bd = BASE.socials.find(s => s.id === "discord");
+  if (d && bd) { d.handle = clip(D.handle, 40) || bd.handle; d.url = safeUrl(D.url, bd.url); d.blurb = typeof D.blurb === "string" ? clip(D.blurb, 140) : bd.blurb; }
+  CONFIG.siteUrl = userPage ? Cloud.shareLink(T.username) : BASE.siteUrl;
+  if (!skinTouched && ["night", "sakura", "fire"].includes(P.skin) && document.documentElement.dataset.skin !== P.skin) applySkin(P.skin, false, true);
+  document.title = userPage ? name + " · flexippo" : BASE_TITLE;
+  renderName(); renderTicker(); renderContact(); renderShare(); tickCountdown();
+}
+function renderTicker() {
+  const isJp = t => /[぀-ヿ㐀-鿿＀-￯]/.test(t);   // Japanese letters
+  const one = "<span>" + CONFIG.ticker.concat(CONFIG.ticker).map(t => (isJp(t) ? `<b class="jp">${esc(t)}</b>` : esc(t)) + " ✦").join("</span><span>") + "</span>";
+  $("#tickerTrack").innerHTML = one + one;
+}
+function renderContact() {
+  const mail = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>';
+  $("#ctGrid").innerHTML = CONFIG.contact.map(c => {
+    const link = !!(c.value && c.url), plain = !!c.value && !c.url;
+    const ic = `<span class="soc-ic" style="background:${c.brand};${c.id === "snapchat" ? "color:#111" : ""}" aria-hidden="true">${c.icon ? `<i class="fa-brands ${c.icon}"></i>` : mail}</span>`;
+    const t = `<span class="cnt-t">${c.value ? esc(c.value) : "Coming soon"}</span>`;
+    if (link) return `<a class="cnt" href="${esc(c.url)}" target="_blank" rel="noopener" aria-label="${esc(c.label)}: ${esc(c.value)}">${ic}${t}</a>`;
+    if (plain) return `<div class="cnt" aria-label="${esc(c.label)}: ${esc(c.value)}">${ic}${t}</div>`;
+    return `<div class="cnt off" aria-label="${esc(c.label)}: not added yet">${ic}${t}</div>`;
+  }).join("");
+}
 
 function shrinkImage(file, max = 720, maxBytes = 220000) {
   return new Promise((res, rej) => {
@@ -1760,7 +2204,7 @@ function shrinkImage(file, max = 720, maxBytes = 220000) {
 }
 
 const Editor = (() => {
-  let pend = {}, tab = "spotify", colWork = [];
+  let pend = {}, tab = "profile", colWork = [];
   const newId = () => "c" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   const mediaOf = k => (Object.prototype.hasOwnProperty.call(pend, k) ? pend[k] : (Custom.media || {})[k]) || "";
   function colRow(it, i, n) {
@@ -1827,7 +2271,22 @@ const Editor = (() => {
   function build() {
     const V = socialView(), sp = V.spotify, ig = V.instagram, x = V.x, sc = V.snapchat;
     const rawTracks = (Object.assign({}, CONFIG.spotify, (Custom.settings || {}).spotify || {}).tracks || []).join("\n");
+    const S0 = Custom.settings || {}, P = S0.profile || {}, D = S0.discord || {}, Cs = S0.contact || {};
+    const dc = CONFIG.socials.find(s => s.id === "discord") || {};
+    const cv = id => { const c = CONFIG.contact.find(x => x.id === id) || {}; return Cs[id] !== undefined ? String(Cs[id]) : String(c.value || "").replace(/^\+/, ""); };
+    const skinNow = ["night", "sakura", "fire"].includes(P.skin) ? P.skin : (document.documentElement.dataset.skin || "night");
     $("#edBody").innerHTML = `
+      <section data-pane="profile">
+        ${txt("e-p-name", "YOUR NAME", P.name !== undefined ? P.name : CONFIG.name, 24, "text", "e.g. Rahul")}
+        ${txt("e-p-hero", "BIG NAME AT THE TOP (UP TO 14 LETTERS)", P.heroName !== undefined ? P.heroName : CONFIG.heroName, 14, "text", "e.g. RAHUL")}
+        ${txt("e-p-kana", "SMALL LINE UNDER THE NAME", P.kana !== undefined ? P.kana : CONFIG.kana, 30, "text", "e.g. ラフル or @rahul")}
+        <div class="fld"><label for="e-p-titles">TYPING LINES (ONE PER LINE, UP TO 6)</label><textarea id="e-p-titles" maxlength="300">${esc(CONFIG.titles.join("\n"))}</textarea></div>
+        ${imgField("avatar", "PROFILE PICTURE", CONFIG.avatar)}
+        ${imgField("cover", "BIG TOP PHOTO", CONFIG.cover)}
+        ${txt("e-p-bday", "BIRTHDAY AS MONTH-DAY, LIKE 11-20 (EMPTY HIDES THE COUNTDOWN)", P.birthday !== undefined ? P.birthday : CONFIG.birthday, 5, "text", "11-20")}
+        <div class="fld"><label for="e-p-skin">THEME</label><select id="e-p-skin">${[["night", "Neon Tokyo Night"], ["sakura", "Sakura Day"], ["fire", "Shonen Fire"]].map(([k, l]) => `<option value="${k}"${k === skinNow ? " selected" : ""}>${l}</option>`).join("")}</select></div>
+        <div class="fld"><label for="e-p-ticker">MOVING STRIP WORDS (ONE PER LINE, UP TO 8)</label><textarea id="e-p-ticker" maxlength="300">${esc(CONFIG.ticker.join("\n"))}</textarea></div>
+      </section>
       <section data-pane="spotify">
         ${txt("e-sp-title", "CARD TITLE", sp.title, 30, "text", "On repeat")}
         ${txt("e-sp-sub", "ONE-LINE MOOD", sp.subtitle, 70, "text", "What I'm playing this week")}
@@ -1858,29 +2317,47 @@ const Editor = (() => {
         ${txt("e-sc-k", "STREAK (DAYS)", String(sc.streak), 6, "text", "365")}
         ${sc.stories.map((st, i) => `<div class="ed-post"><b>Story ${i + 1}</b>${imgField("sc" + i, "IMAGE (TALL PHOTOS LOOK BEST)", st.img)}${txt("e-sc-c" + i, "CAPTION", st.cap, 60)}${txt("e-sc-w" + i, "TIME LABEL", st.when, 12, "text", "2h")}</div>`).join("")}
       </section>
+      <section data-pane="discord">
+        ${txt("e-d-h", "SERVER OR USERNAME", D.handle !== undefined ? D.handle : dc.handle, 40, "text", "Neon Dojo server")}
+        ${txt("e-d-u", "INVITE LINK", D.url !== undefined ? D.url : dc.url, 300, "url", "https://discord.gg/...")}
+        <div class="fld"><label for="e-d-b">SHORT DESCRIPTION</label><textarea id="e-d-b" maxlength="140">${esc(D.blurb !== undefined ? D.blurb : dc.blurb || "")}</textarea></div>
+      </section>
+      <section data-pane="contact">
+        <p class="hint">Fill in the ones you want people to use. Empty ones show as "Coming soon".</p>
+        ${txt("e-c-instagram", "INSTAGRAM USERNAME", cv("instagram"), 30, "text", "yourname")}
+        ${txt("e-c-x", "X USERNAME", cv("x"), 15, "text", "yourname")}
+        ${txt("e-c-gmail", "EMAIL", cv("gmail"), 80, "text", "you@gmail.com")}
+        ${txt("e-c-snapchat", "SNAPCHAT USERNAME", cv("snapchat"), 30, "text", "yourname")}
+        ${txt("e-c-whatsapp", "WHATSAPP NUMBER WITH COUNTRY CODE", cv("whatsapp"), 20, "text", "919876543210")}
+        ${txt("e-c-discord", "DISCORD INVITE LINK", cv("discord"), 120, "url", "https://discord.gg/...")}
+      </section>
       <section data-pane="collection"></section>`;
     colWork = JSON.parse(JSON.stringify(collectionList()));
     renderCol(); bindCol();
     $$("#edBody [data-file]").forEach(inp => inp.addEventListener("change", async () => {
       const f = inp.files && inp.files[0]; if (!f) return;
-      try { const d = await shrinkImage(f, inp.dataset.file === "spCover" ? 480 : 720); pend[inp.dataset.file] = d; $(`[data-prev="${inp.dataset.file}"]`).src = d; Snd.fx("pop"); }
+      try { const k = inp.dataset.file; const d = await shrinkImage(f, k === "spCover" ? 480 : k === "avatar" ? 400 : k === "cover" ? 1600 : 720, k === "cover" ? 450000 : 220000); pend[inp.dataset.file] = d; $(`[data-prev="${inp.dataset.file}"]`).src = d; Snd.fx("pop"); }
       catch (e) { $("#edNote").textContent = "That file isn't an image we can use. Try a JPG or PNG."; }
     }));
     $$("#edBody [data-reset]").forEach(b => b.addEventListener("click", () => {
       const k = b.dataset.reset; pend[k] = null;
-      const def = k === "spCover" ? CONFIG.spotify.cover : k === "x0" ? CONFIG.socials.find(s => s.id === "x").post.img : k.startsWith("sc") ? CONFIG.socials.find(s => s.id === "snapchat").stories[+k.slice(2)].img : CONFIG.socials.find(s => s.id === "instagram").posts[+k.slice(2)].img;
+      const def = k === "avatar" ? (Custom.target && !Custom.isHome ? FLEX_AVATAR : BASE.avatar) : k === "cover" ? BASE.cover : k === "spCover" ? CONFIG.spotify.cover : k === "x0" ? CONFIG.socials.find(s => s.id === "x").post.img : k.startsWith("sc") ? CONFIG.socials.find(s => s.id === "snapchat").stories[+k.slice(2)].img : CONFIG.socials.find(s => s.id === "instagram").posts[+k.slice(2)].img;
       $(`[data-prev="${k}"]`).src = def; Snd.fx("tick");
     }));
     show(tab);
   }
   function show(t) { tab = t; $$("#edBody [data-pane]").forEach(p => p.hidden = p.dataset.pane !== t); $$("#edTabs [data-tab]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.tab === t))); }
-  function open(t) { pend = {}; tab = t || "spotify"; build(); $("#edNote").textContent = Custom.shared ? "Changes show for everyone who opens your page." : "Changes save in this browser."; el().hidden = false; document.body.classList.add("locked-ed"); setTimeout(() => { const f = $(`#edBody [data-pane="${tab}"] input`); f && f.focus(); }, 30); }
+  function open(t) { pend = {}; tab = t || "profile"; build(); $("#edNote").textContent = Custom.cloud ? "Saved to your account. Log in on any phone or laptop and it's there." : Custom.shared ? "Changes show for everyone who opens your page." : "Changes save in this browser."; el().hidden = false; document.body.classList.add("locked-ed"); setTimeout(() => { const f = $(`#edBody [data-pane="${tab}"] input`); f && f.focus(); }, 30); }
   function close() { el().hidden = true; document.body.classList.remove("locked-ed"); }
   async function save() {
     const v = id => ($("#" + id) || {}).value || "";
+    const lines = (id, max, len) => v(id).split("\n").map(t => t.trim().slice(0, len)).filter(Boolean).slice(0, max);
     const prev = Custom.settings || {};
     const next = {
       ...prev,
+      profile: { name: v("e-p-name").trim().slice(0, 24), heroName: v("e-p-hero").trim().slice(0, 14), kana: v("e-p-kana").trim().slice(0, 30), titles: lines("e-p-titles", 6, 40), birthday: v("e-p-bday").trim(), skin: v("e-p-skin") || "night", ticker: lines("e-p-ticker", 8, 30) },
+      discord: { handle: v("e-d-h").trim().slice(0, 40), url: v("e-d-u").trim(), blurb: v("e-d-b").trim().slice(0, 140) },
+      contact: Object.fromEntries(["instagram", "x", "gmail", "snapchat", "whatsapp", "discord"].map(id => [id, v("e-c-" + id).trim().replace(/^@/, "")])),
       spotify: { title: v("e-sp-title").trim(), subtitle: v("e-sp-sub").trim(), playlist: v("e-sp-pl").trim(), artist: v("e-sp-ar").trim(), url: v("e-sp-url").trim(), accent: v("e-sp-acc"), tracks: v("e-sp-tr").split("\n").map(t => t.trim()).filter(Boolean).slice(0, 6) },
       instagram: { handle: v("e-ig-h").trim(), url: v("e-ig-u").trim(), posts: [0, 1, 2].map(i => ({ cap: v("e-ig-c" + i).trim(), link: v("e-ig-l" + i).trim() })) },
       x: { handle: v("e-x-h").trim(), url: v("e-x-u").trim(), text: v("e-x-t").trim(), when: v("e-x-w").trim(), link: v("e-x-l").trim() },
@@ -1894,12 +2371,17 @@ const Editor = (() => {
     };
     const bad = [["e-sp-url", "Spotify link"], ["e-ig-u", "Instagram link"], ["e-x-u", "X link"], ["e-x-l", "X post link"], ["e-ig-l0", "Post 1 link"], ["e-ig-l1", "Post 2 link"], ["e-ig-l2", "Post 3 link"], ["e-sc-u", "Snapchat link"]].find(([id]) => v(id).trim() && !/^https?:\/\//i.test(v(id).trim()));
     if (bad) { $("#edNote").textContent = bad[1] + " needs to start with https://"; return; }
-    $("#edSave").disabled = true; $("#edNote").textContent = "Saving…";
+    if (v("e-d-u").trim() && !/^https:\/\//i.test(v("e-d-u").trim())) { show("discord"); $("#edNote").textContent = "Discord link needs to start with https://"; return; }
+    if (next.profile.birthday && !BDAY_RE.test(next.profile.birthday)) { show("profile"); $("#edNote").textContent = "Birthday should look like 11-20 (month-day), or leave it empty."; return; }
+    const cBad = { instagram: "Instagram username can only use letters, numbers, dots and _", x: "X username can only use letters, numbers and _ (15 max)", gmail: "That email doesn't look right", snapchat: "Snapchat username doesn't look right", whatsapp: "WhatsApp number: country code + number, digits only (like 919876543210)", discord: "Discord invite should look like https://discord.gg/yourcode" };
+    const cWrong = Object.keys(cBad).find(id => next.contact[id] && !CONTACT_LINK[id](next.contact[id]));
+    if (cWrong) { show("contact"); $("#edNote").textContent = cBad[cWrong]; return; }
+    $("#edSave").disabled = true; $("#edNote").textContent = Object.values(pend).some(Boolean) && Custom.cloud ? "Saving… uploading your photos" : "Saving…";
     const r = await Custom.save(next, pend);
     $("#edSave").disabled = false;
-    if (r === "error") { $("#edNote").textContent = "Couldn't save. Only the page owner can make changes."; return; }
+    if (r === "error") { $("#edNote").textContent = Custom.cloud ? (Cloud.user ? "Couldn't save. " + friendlyError(Custom.lastError) : "Log in again to save your changes.") : "Couldn't save. Only the page owner can make changes."; return; }
     if (r === "full") { $("#edNote").textContent = "This browser is out of space for photos. Remove a few, or use the online version of your page."; return; }
-    Snd.fx("chime"); close(); toast(r === "shared" ? "Saved. Everyone sees the update" : "Saved in this browser");
+    Snd.fx("chime"); close(); toast(r === "cloud" ? "Saved ✓ Your page is updated for everyone" : r === "shared" ? "Saved. Everyone sees the update" : "Saved in this browser");
   }
   function init() {
     $("#edClose").addEventListener("click", () => { Snd.fx("tick"); close(); });
@@ -1938,7 +2420,7 @@ function commentsFor(it) { const gone = removedFor(it); return hypeFor(it).list.
 function commentCount(it) { return Math.max(0, hypeFor(it).comments - removedFor(it).length); }
 function pinnedFor(it) { const who = pinsNow()[it.id]; return who ? commentsFor(it).find(c => c.who === who) || null : null; }
 function itemTitle(it) { return it.type === "uc" ? `${it.amount} ${it.unit}` : (it.meme || it.alt || "My collection"); }
-function ownerName() { return CONFIG.name.charAt(0) + CONFIG.name.slice(1).toLowerCase(); }
+function ownerName() { const n = String(CONFIG.name || ""); return n === n.toUpperCase() ? n.charAt(0) + n.slice(1).toLowerCase() : n; }
 const AV_COLORS = [["#ff2e88", "#8b5cff"], ["#22e4ff", "#2b6bff"], ["#ffc83d", "#ff6a1a"], ["#2bff88", "#0aa9bf"], ["#ff7ab6", "#ff3d3d"], ["#9b5cff", "#22e4ff"]];
 function avatarOf(who) { const [a1, a2] = AV_COLORS[seedOf(who) % AV_COLORS.length]; return `<span class="cm-av" style="--a1:${a1};--a2:${a2}" aria-hidden="true">${esc(who.charAt(0).toUpperCase())}</span>`; }
 function compact(n) {
@@ -2218,15 +2700,21 @@ function setupGuestbook() {
 
 /* ======================= SHARE ======================= */
 function siteLink() { return CONFIG.siteUrl || location.href.split("#")[0]; }
-function setupShare() {
+let qrFor = "";
+function renderShare() {
   const url = siteLink(); $("#linkInput").value = url;
   try { const h = new URL(url).hostname; $("#ogDomain").textContent = h; $$(".og-d").forEach(e => e.textContent = h); } catch (e) {}
-  const ON = CONFIG.heroName || CONFIG.name; $("#ogTitle").textContent = ON.charAt(0) + ON.slice(1).toLowerCase() + "'s Neon Vault"; $$(".og-t").forEach(e => e.textContent = $("#ogTitle").textContent);
-  const box = $("#qr");
+  const ON = CONFIG.heroName || CONFIG.name, title = ON.charAt(0) + ON.slice(1).toLowerCase() + "'s Neon Vault";
+  $("#ogTitle").textContent = title; $$(".og-t").forEach(e => e.textContent = title);
+  if (qrFor === url) return;
+  qrFor = url; const box = $("#qr"); box.innerHTML = "";
   if (window.QRCode) { try { new QRCode(box, { text: url, width: 232, height: 232, colorDark: "#0b0420", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M }); } catch (e) { box.textContent = "QR unavailable"; } }
   else box.innerHTML = '<span style="color:#333;font-size:12px;text-align:center">QR code loads when online</span>';
+}
+function setupShare() {
+  renderShare();
   $("#copyBtn").addEventListener("click", () => {
-    Snd.fx("tick");
+    Snd.fx("tick"); const url = siteLink();
     const ok = () => { $("#copyBtn").textContent = "Copied!"; toast("Link copied"); setTimeout(() => $("#copyBtn").textContent = "Copy", 1600); };
     const fallback = () => { const i = $("#linkInput"); i.focus(); i.select(); toast("Link selected, press copy"); };
     try { navigator.clipboard.writeText(url).then(ok, fallback); } catch (e) { fallback(); }
@@ -2242,7 +2730,7 @@ const GetSite = (() => {
     const lines = ["Hey Flexippo! I want my own website 🔥"];
     if (vibe) lines.push("Vibe: " + vibe.replace(/^\S+\s/, ""));
     if (name) lines.push("Name on site: " + name);
-    lines.push("Saw it on: " + CONFIG.name.charAt(0) + CONFIG.name.slice(1).toLowerCase() + "'s site");
+    lines.push("Saw it on: " + ownerName() + "'s site");
     return lines.join("\n");
   }
   function update() {
@@ -2317,26 +2805,12 @@ function viz() {
 
 /* ======================= BOOT ======================= */
 function boot() {
-  renderName(); renderSocials(); renderVault(); setupGuestbook(); setupShare();
-  Editor.init(); Custom.on(renderSocials); Custom.on(renderVault); Custom.on(() => { if (lastGb.length) renderGuestbook(lastGb); }); Custom.init();
+  renderName(); renderTicker(); renderContact(); renderSocials(); renderVault(); setupGuestbook(); setupShare();
+  Editor.init(); Custom.on(applyBasics); Custom.on(renderSocials); Custom.on(renderVault); Custom.on(() => { if (lastGb.length) renderGuestbook(lastGb); }); Custom.init();
   ["#editSocials", "#editSocials2"].forEach(id => $(id).addEventListener("click", () => { Snd.fx("tick"); Editor.open("spotify"); }));
   $("#editCollection").addEventListener("click", () => { Snd.fx("tick"); Editor.open("collection"); });
-  const isJp = t => /[\u3040-\u30ff\u3400-\u9fff\uff00-\uffef]/.test(t);   // Japanese letters
-  $("#tickerTrack").innerHTML = "<span>" + CONFIG.ticker.concat(CONFIG.ticker).map(t => (isJp(t) ? `<b class="jp">${esc(t)}</b>` : esc(t)) + " ✦").join("</span><span>") + "</span>";
-  $("#tickerTrack").innerHTML += $("#tickerTrack").innerHTML;
   $("#pTitle").textContent = CONFIG.song.title; $("#pArtist").textContent = CONFIG.song.artist;
 
-  // contact section
-  (function () {
-    const mail = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>';
-    $("#ctGrid").innerHTML = CONFIG.contact.map(c => {
-      const on = !!(c.value && c.url);
-      const ic = `<span class="soc-ic" style="background:${c.brand};${c.id === "snapchat" ? "color:#111" : ""}" aria-hidden="true">${c.icon ? `<i class="fa-brands ${c.icon}"></i>` : mail}</span>`;
-      const t = `<span class="cnt-t">${on ? esc(c.value) : "Coming soon"}</span>`;
-      return on ? `<a class="cnt" href="${esc(c.url)}" target="_blank" rel="noopener" aria-label="${esc(c.label)}: ${esc(c.value)}">${ic}${t}</a>`
-                : `<div class="cnt off" aria-label="${esc(c.label)}: not added yet">${ic}${t}</div>`;
-    }).join("");
-  })();
   applySkin(LS.get("skin", CONFIG.defaultSkin)); syncEntryChips();
   document.body.classList.add("locked");
   tickCountdown(); setInterval(tickCountdown, 1000);
@@ -2360,7 +2834,7 @@ function boot() {
   addEventListener("keydown", e => { if ($("#editor").hidden && !$("#intro").classList.contains("gone") && e.key === "Enter" && document.activeElement && !document.activeElement.matches("[data-entry], #enterBtn")) enter(); });
   $$("[data-entry]").forEach(b => b.addEventListener("click", e => { e.stopPropagation(); entryChoice = b.dataset.entry; LS.set("entry", entryChoice); syncEntryChips(); Snd.unlock(); Snd.fx("tick"); }));
   $("#replay").addEventListener("click", () => { Snd.fx("tick"); resetIntro(); setTimeout(enter, 350); });
-  $$(".skin").forEach(b => b.addEventListener("click", () => applySkin(b.dataset.skin, true)));
+  $$(".skin").forEach(b => b.addEventListener("click", () => { skinTouched = true; applySkin(b.dataset.skin, true); }));
   $("#sfxSwitch").addEventListener("click", () => { Snd.setSfx(!Snd.sfxOn); Snd.fx("tick"); });
   $("#pSfx").addEventListener("click", () => { Snd.setSfx(!Snd.sfxOn); Snd.fx("tick"); });
   $("#pPlay").addEventListener("click", () => { Snd.fx("tick"); Snd.toggle(); });
@@ -2395,72 +2869,559 @@ function boot() {
 boot();
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/* ===== LOGIN & SIGN UP (Supabase) =====
-   Paste your two Supabase values below (Project URL and anon public key).
-   The anon key is safe to put on a public site. */
-const AUTH_CONFIG = {
-  supabaseUrl: "https://knmjxdnzttyacdtktbdl.supabase.co",
-  supabaseKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtubWp4ZG56dHR5YWNkdGt0YmRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzMjg5MTcsImV4cCI6MjEwNjkwNDkxN30.rEWcpL0OFyNhLAFLUuTWpx47uPquP40vcQz3GEqNvgE"
-};
+/* ======================= ACCOUNTS, PERSONAL PAGES & CHAT ======================= */
+// Log in / sign up, pick a username (= your page link), the account menu, the buttons under the name,
+// and private chat between people. Everything is saved in Supabase (see the database rules there).
 (function () {
-  const $id = (x) => document.getElementById(x);
-  const modal = $id("authModal"), form = $id("authForm"), msg = $id("authMsg");
-  const btn = $id("authBtn"), go = $id("authGo"), pass = $id("authPass");
-  let mode = "login", user = null, sb = null;
-  const ready = AUTH_CONFIG.supabaseUrl.startsWith("https://") && window.supabase;
-  if (ready) sb = window.supabase.createClient(AUTH_CONFIG.supabaseUrl, AUTH_CONFIG.supabaseKey);
+  const $id = x => document.getElementById(x);
+  const USER_RE = /^[a-z0-9_]{3,20}$/;
+  const RESERVED = new Set(["admin", "administrator", "flexippo", "support", "help", "root", "system", "moderator", "mod", "official", "staff", "null", "undefined", "api", "www", "login", "signup"]);
+  const SKIP = "flexSkipIntro";
+  let pendingChat = null, pendingEdit = false;
 
-  function say(t, ok) { msg.textContent = t || ""; msg.className = "auth-msg" + (ok ? " ok" : ""); }
-  function setMode(m) {
-    mode = m;
-    $id("tabLogin").classList.toggle("on", m === "login");
-    $id("tabSignup").classList.toggle("on", m === "signup");
-    go.textContent = m === "login" ? "Log in" : "Create account";
-    pass.autocomplete = m === "login" ? "current-password" : "new-password";
-    say("");
+  /* ---------- helpers ---------- */
+  function go(u, hash) {
+    try { sessionStorage.setItem(SKIP, "1"); } catch (e) {}
+    location.href = location.pathname + (u ? "?u=" + encodeURIComponent(u) : "") + (hash || "");
   }
-  function show() { modal.hidden = false; setTimeout(() => $id("authEmail").focus(), 50); }
-  function hide() { modal.hidden = true; say(""); }
-  function paint() { btn.textContent = user ? "Log out" : "Log in"; }
+  const person = p => ({ id: p.id || p.other_id, username: p.username || "", display_name: p.display_name || "", avatar_url: p.avatar_url || null });
+  const nameOf = p => (p && (p.display_name || p.username)) || "someone";
+  function avatarHtml(p, size, cls) {
+    const url = p && typeof p.avatar_url === "string" && p.avatar_url.startsWith(MEDIA_PREFIX) ? p.avatar_url : "";
+    const k = cls ? cls + " " : "";
+    if (url) return `<img class="${k}av" src="${esc(url)}" alt="" width="${size}" height="${size}" style="width:${size}px;height:${size}px" loading="lazy">`;
+    const nm = nameOf(p), [a1, a2] = AV_COLORS[seedOf((p && p.username) || nm) % AV_COLORS.length];
+    return `<span class="${k}av av0" style="--a1:${a1};--a2:${a2};width:${size}px;height:${size}px;font-size:${Math.round(size * 0.44)}px" aria-hidden="true">${esc(nm.trim().charAt(0).toUpperCase() || "?")}</span>`;
+  }
+  function copyText(t) {
+    const legacy = () => { try { const x = document.createElement("textarea"); x.value = t; x.setAttribute("readonly", ""); x.style.cssText = "position:fixed;opacity:0;top:0;left:0"; document.body.appendChild(x); x.select(); const ok = document.execCommand("copy"); x.remove(); return ok; } catch (e) { return false; } };
+    try { if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(t).then(() => true, legacy); } catch (e) {}
+    return Promise.resolve(legacy());
+  }
+  const copyLink = u => copyText(Cloud.shareLink(u)).then(ok => toast(ok ? "Link copied: " + Cloud.shareLink(u).replace(/^https?:\/\//, "") : "Couldn't copy. Your link is " + Cloud.shareLink(u)));
+  function whenEntered(fn) {
+    if (document.body.classList.contains("entered")) return fn();
+    const mo = new MutationObserver(() => { if (document.body.classList.contains("entered")) { mo.disconnect(); fn(); } });
+    mo.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+  }
+  function quickEnter() {     // moving around inside the site skips the press-and-hold intro
+    if (document.body.classList.contains("entered")) return;
+    const intro = $("#intro"); document.body.classList.add("entered");
+    intro.style.transition = "opacity .35s"; intro.style.opacity = "0";
+    setTimeout(() => { intro.classList.add("gone"); document.body.classList.remove("locked"); afterEnter(); }, 360);
+  }
+  try { if (sessionStorage.getItem(SKIP)) { sessionStorage.removeItem(SKIP); quickEnter(); } } catch (e) {}
 
-  btn.addEventListener("click", async () => {
-    if (user && sb) { await sb.auth.signOut(); user = null; paint(); if (window.toast) toast("Logged out"); }
-    else { setMode("login"); show(); }
-  });
-  $id("authClose").addEventListener("click", hide);
-  modal.addEventListener("click", (e) => { if (e.target === modal) hide(); });
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !modal.hidden) hide(); });
+  /* ---------- login / sign up / username pop-up ---------- */
+  const modal = $id("authModal");
+  let authMode = "login", lastFocus = null;
+  function say(id, t, ok) { const m = $id(id); if (m) { m.textContent = t || ""; m.className = "auth-msg" + (ok ? " ok" : ""); } }
+  function showView(v) {
+    $$("#authModal .auth-view").forEach(x => { x.hidden = x.dataset.view !== v; });
+    modal.hidden = false;
+    setTimeout(() => { const f = $(`#authModal [data-view="${v}"] input:not([readonly])`); if (f) try { f.focus({ preventScroll: true }); } catch (e) {} }, 60);
+  }
+  function openModal(v) { if (modal.hidden) lastFocus = document.activeElement; showView(v); }
+  function closeModal() {
+    modal.hidden = true; ["authMsg", "forgotMsg", "newPassMsg", "setupMsg"].forEach(id => say(id, ""));
+    if (lastFocus && lastFocus.focus) try { lastFocus.focus({ preventScroll: true }); } catch (e) {}
+  }
+  function setMode(m) {
+    authMode = m;
+    $id("tabLogin").classList.toggle("on", m === "login"); $id("tabSignup").classList.toggle("on", m === "signup");
+    $id("tabLogin").setAttribute("aria-selected", String(m === "login")); $id("tabSignup").setAttribute("aria-selected", String(m === "signup"));
+    $id("authGo").textContent = m === "login" ? "Log in" : "Create account";
+    $id("authPass").autocomplete = m === "login" ? "current-password" : "new-password";
+    $id("authForgot").hidden = m !== "login"; say("authMsg", "");
+  }
+  function openAuth(mode, why) {
+    if (!Cloud.sb) { toast("Accounts aren't available right now. Try again later."); return; }
+    setMode(mode || "login");
+    $id("authTitle").textContent = mode === "signup" ? "Make your own page" : "Welcome back";
+    $id("authSub").textContent = why || (mode === "signup" ? "It's free. Get your own link, change anything on it, and chat with friends." : "Log in to edit your page and chat with friends.");
+    openModal("auth");
+  }
+  function prefillSetup(name) {
+    const u = $id("setupUser");
+    if (!u.value) {
+      const fromEmail = Cloud.user && Cloud.user.email ? Cloud.user.email.split("@")[0].toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 20) : "";
+      u.value = name || (Custom.missing && !Custom.failed ? Custom.missing : "") || (fromEmail.length >= 3 ? fromEmail : "");
+    }
+    checkName();
+  }
+  function openSetup(name) { prefillSetup(name); openModal("setup"); }
+
+  $id("authClose").addEventListener("click", closeModal);
+  modal.addEventListener("click", e => { if (e.target === modal) closeModal(); });
+  addEventListener("keydown", e => { if (e.key === "Escape" && !modal.hidden) { e.stopPropagation(); closeModal(); } }, true);
   $id("tabLogin").addEventListener("click", () => setMode("login"));
   $id("tabSignup").addEventListener("click", () => setMode("signup"));
+  $id("authForgot").addEventListener("click", () => { $id("forgotEmail").value = $id("authEmail").value.trim(); showView("forgot"); });
+  $id("forgotBack").addEventListener("click", () => showView("auth"));
 
-  form.addEventListener("submit", async (e) => {
+  $id("authForm").addEventListener("submit", async e => {
     e.preventDefault();
-    const email = $id("authEmail").value.trim(), password = pass.value;
-    if (!sb) { say("Login is not switched on yet. The site owner still needs to connect Supabase."); return; }
-    if (!email || !email.includes("@")) { say("Please type a real email."); return; }
-    if (password.length < 6) { say("Password needs at least 6 characters."); return; }
-    go.disabled = true; say("One moment...", true);
+    const email = $id("authEmail").value.trim(), password = $id("authPass").value, btn = $id("authGo");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return say("authMsg", "Please type a real email.");
+    if (password.length < 6) return say("authMsg", "Password needs at least 6 characters.");
+    btn.disabled = true; say("authMsg", "One moment…", true);
     try {
-      if (mode === "signup") {
-        const { data, error } = await sb.auth.signUp({ email, password });
+      if (authMode === "signup") {
+        const { data, error } = await Cloud.sb.auth.signUp({ email, password, options: { emailRedirectTo: BASE.siteUrl } });
         if (error) throw error;
-        if (data.session) { user = data.user; paint(); hide(); if (window.toast) toast("Welcome! Account created."); }
-        else say("Account created! Check your email and tap the confirm link, then log in.", true);
+        if (!data || !data.session) { say("authMsg", "Account created! Check your email and tap the confirm link, then log in here.", true); return; }
       } else {
-        const { data, error } = await sb.auth.signInWithPassword({ email, password });
+        const { error } = await Cloud.sb.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        user = data.user; paint(); hide(); if (window.toast) toast("Welcome back!");
       }
-    } catch (err) { say(err.message || "Something went wrong. Try again."); }
-    go.disabled = false;
+      $id("authPass").value = "";
+      afterLogin(await Cloud.refresh());
+    } catch (err) { say("authMsg", friendlyError(err)); }
+    finally { btn.disabled = false; }
+  });
+  function afterLogin(me) {
+    if (!me) {
+      if (Cloud.notSetUp) { closeModal(); toast("Accounts are still being set up. Try again soon."); return; }
+      openSetup(); return;
+    }
+    closeModal(); toast("Hey @" + me.username + " 👋");
+    if (pendingChat) { const p = pendingChat; pendingChat = null; Chat.openWith(p); return; }
+    const onMine = Custom.target && Custom.target.id === me.id;
+    if (pendingEdit && onMine) { pendingEdit = false; Editor.open("profile"); return; }
+    if (!onMine) go(me.username, pendingEdit ? "#edit" : "");
+  }
+
+  $id("forgotForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const email = $id("forgotEmail").value.trim(), btn = $id("forgotGo");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return say("forgotMsg", "Please type a real email.");
+    btn.disabled = true; say("forgotMsg", "Sending…", true);
+    try {
+      const { error } = await Cloud.sb.auth.resetPasswordForEmail(email, { redirectTo: BASE.siteUrl });
+      if (error) throw error;
+      say("forgotMsg", "If that email has an account, a reset link is on its way. Check your inbox (and spam).", true);
+    } catch (err) { say("forgotMsg", friendlyError(err)); }
+    finally { btn.disabled = false; }
+  });
+  $id("newPassForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const pw = $id("newPass").value, btn = $id("newPassGo");
+    if (pw.length < 6) return say("newPassMsg", "Password needs at least 6 characters.");
+    btn.disabled = true; say("newPassMsg", "Saving…", true);
+    try {
+      const { error } = await Cloud.sb.auth.updateUser({ password: pw });
+      if (error) throw error;
+      $id("newPass").value = ""; closeModal(); toast("Password updated ✓");
+      if (!Cloud.me) openSetup();
+    } catch (err) { say("newPassMsg", friendlyError(err)); }
+    finally { btn.disabled = false; }
   });
 
-  if (sb) {
-    sb.auth.getSession().then(({ data }) => { user = data.session ? data.session.user : null; paint(); });
-    sb.auth.onAuthStateChange((_ev, session) => { user = session ? session.user : null; paint(); });
+  // username: letters, numbers, _ only; live "available?" check
+  let checkT = 0, checkSeq = 0;
+  function hint(t, cls) { const h = $id("setupHint"); h.textContent = t; h.className = "u-hint" + (cls ? " " + cls : ""); }
+  function checkName() {
+    const el = $id("setupUser"), v = el.value.toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 20);
+    if (v !== el.value) el.value = v;
+    clearTimeout(checkT); const seq = ++checkSeq;
+    if (!v) return hint("3 to 20 letters, numbers or _");
+    if (v.length < 3) return hint("At least 3 characters", "bad");
+    if (RESERVED.has(v)) return hint("That one is reserved. Try another.", "bad");
+    hint("Checking…");
+    checkT = setTimeout(async () => {
+      try { const free = await Cloud.usernameFree(v); if (seq === checkSeq) hint(free ? "✓ Available: flexippo.com/?u=" + v : "✕ Taken. Try another.", free ? "ok" : "bad"); }
+      catch (e) { if (seq === checkSeq) hint("Couldn't check right now"); }
+    }, 350);
   }
+  $id("setupUser").addEventListener("input", checkName);
+  $id("setupForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const u = $id("setupUser").value.trim().toLowerCase(), nm = $id("setupName").value.trim().slice(0, 24) || u, btn = $id("setupGo");
+    if (!USER_RE.test(u)) return say("setupMsg", "Your username needs 3 to 20 letters, numbers or _.");
+    if (RESERVED.has(u)) return say("setupMsg", "That username is reserved. Try another.");
+    if (!Cloud.user) { showView("auth"); return say("authMsg", "Please log in again."); }
+    btn.disabled = true; say("setupMsg", "Creating your page…", true);
+    try {
+      const me = await Cloud.createMe(u, nm);
+      closeModal(); toast("Your page is ready: flexippo.com/?u=" + me.username + " 🎉");
+      if (pendingChat) { const p = pendingChat; pendingChat = null; Chat.openWith(p); }
+      else go(me.username, "#edit");
+    } catch (err) {
+      const m = String(err && err.message || "");
+      say("setupMsg", err && err.code === "23505" ? (m.includes("username") ? "That username is taken. Try another." : "You already have a page. Refresh this page.")
+        : err && err.code === "23514" ? "That username isn't allowed. Try another." : friendlyError(err));
+    } finally { btn.disabled = false; }
+  });
+
+  /* ---------- account button (top right) + menu ---------- */
+  function paintBtn() {
+    const b = $id("authBtn"), u = Cloud.user, me = Cloud.me;
+    b.classList.toggle("out", !me);
+    if (!u) { b.textContent = "Log in"; b.setAttribute("aria-label", "Log in or sign up"); }
+    else if (!me) { b.innerHTML = "<span>Claim your page</span>"; b.setAttribute("aria-label", "Pick your username"); }
+    else { b.innerHTML = avatarHtml(me, 32, "acc-av") + `<span>@${esc(me.username)}</span>`; b.setAttribute("aria-label", "Your account: @" + me.username); }
+  }
+  function openMenu() {
+    const me = Cloud.me; if (!me) return;
+    $id("accHead").innerHTML = avatarHtml(me, 54, "acc-av") + `<div><b>${esc(nameOf(me))}</b><small>@${esc(me.username)}</small></div>`;
+    $id("accLink").value = Cloud.shareLink(me.username);
+    $id("accMine").hidden = !!(Custom.target && Custom.target.id === me.id && !Custom.isHome);
+    openModal("menu");
+  }
+  $id("authBtn").addEventListener("click", () => {
+    Snd.fx("tick");
+    if (!Cloud.user) openAuth("login"); else if (!Cloud.me) openSetup(); else openMenu();
+  });
+  $id("accCopy").addEventListener("click", () => { if (Cloud.me) copyLink(Cloud.me.username); });
+  $id("accMine").addEventListener("click", () => { if (Cloud.me) go(Cloud.me.username); });
+  $id("accEdit").addEventListener("click", () => {
+    if (!Cloud.me) return;
+    if (Custom.owner) { closeModal(); Editor.open("profile"); } else go(Cloud.me.username, "#edit");
+  });
+  $id("accChats").addEventListener("click", () => { closeModal(); Chat.open(); });
+  $id("accHome").addEventListener("click", () => go(""));
+  $id("accOut").addEventListener("click", async () => {
+    closeModal();
+    try { await Cloud.sb.auth.signOut(); } catch (e) {}
+    await Cloud.refresh(); toast("Logged out");
+  });
+
+  /* ---------- buttons under the big name ---------- */
+  function paintActs() {
+    const box = $id("pageActs"); if (!box) return;
+    const T = Custom.target, me = Cloud.me;
+    let h = "";
+    if (Custom.failed) h = `<p class="pa-miss">Couldn't load <b>@${esc(PAGE_U)}</b>'s page. Check your internet and refresh.</p>`;
+    else if (Custom.missing) h = `<p class="pa-miss">There's no page called <b>@${esc(Custom.missing)}</b> yet.</p>` + (me ? `<button class="pa-b ghost" type="button" data-act="mine">Go to my page</button>` : `<button class="pa-b" type="button" data-act="claim">✨ Claim @${esc(Custom.missing)}</button>`);
+    else if (T && Custom.owner) h = `<button class="pa-b" type="button" data-act="edit">✎ Edit my page</button><button class="pa-b ghost" type="button" data-act="share">🔗 Copy my link</button>`;
+    else if (T && !Custom.isHome) h = `<button class="pa-b" type="button" data-act="msg">💬 Message ${esc(nameOf(T))}</button>`;
+    box.innerHTML = h;
+  }
+  $id("pageActs").addEventListener("click", e => {
+    const b = e.target.closest("button[data-act]"); if (!b) return;
+    Snd.fx("tick");
+    const a = b.dataset.act, T = Custom.target;
+    if (a === "edit") Editor.open("profile");
+    else if (a === "share" && T) copyLink(T.username);
+    else if (a === "msg" && T) Chat.openWith(person(T));
+    else if (a === "mine" && Cloud.me) go(Cloud.me.username);
+    else if (a === "claim") { if (Cloud.user) openSetup(Custom.missing); else { $id("setupUser").value = Custom.missing; openAuth("signup", "Sign up to claim flexippo.com/?u=" + Custom.missing); } }
+  });
+
+  /* ---------- chat ---------- */
+  const Chat = (() => {
+    const panel = $id("chat"), fab = $id("chatFab"), badge = $id("chatBadge");
+    let isOpen = false, view = "list", peer = null, convos = null, msgs = [], hasMore = false, blockedByMe = false;
+    let channel = null, live = false, pollT = 0, convT = 0, searchT = 0, searchSeq = 0, threadSeq = 0, readT = 0, unread = 0, sending = false, connectedFor = null;
+    const meId = () => (Cloud.me ? Cloud.me.id : null);
+    const phone = () => matchMedia("(max-width: 600px)").matches;
+    const searching = () => $id("chatQ").value.trim().length >= 2;
+    const clock = d => d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+    function dayLabel(d) {
+      const t = new Date(), y = new Date(Date.now() - 864e5);
+      if (d.toDateString() === t.toDateString()) return "TODAY";
+      if (d.toDateString() === y.toDateString()) return "YESTERDAY";
+      return d.toLocaleDateString([], { day: "numeric", month: "short", year: d.getFullYear() === t.getFullYear() ? undefined : "numeric" }).toUpperCase();
+    }
+    function shortAgo(ts) {
+      const d = new Date(ts), s = (Date.now() - d) / 1000;
+      if (s < 60) return "now"; if (s < 3600) return Math.floor(s / 60) + "m"; if (s < 86400) return Math.floor(s / 3600) + "h";
+      if (s < 6 * 86400) return d.toLocaleDateString([], { weekday: "short" });
+      return d.toLocaleDateString([], { day: "numeric", month: "short" });
+    }
+    function showView(v) {
+      view = v; $$("#chat .chat-view").forEach(x => { x.hidden = x.dataset.view !== v; });
+      hideMenu();
+    }
+    function openPanel() {
+      if (isOpen) return;
+      isOpen = true; panel.hidden = false; fab.setAttribute("aria-expanded", "true");
+      if (phone()) document.documentElement.classList.add("chat-lock");
+    }
+    function open() {
+      openPanel();
+      if (!Cloud.user || !Cloud.me) { paintGate(); showView("gate"); return; }
+      if (view === "thread" && peer) { showView("thread"); return; }
+      showView("list"); renderList(); refreshConvos();
+      if (fine) setTimeout(() => $id("chatQ").focus(), 60);
+    }
+    function close() {
+      isOpen = false; panel.hidden = true; fab.setAttribute("aria-expanded", "false");
+      document.documentElement.classList.remove("chat-lock"); hideMenu();
+    }
+    function note(t) { const n = $id("chatNote"); n.textContent = t || ""; n.hidden = !t; }
+    function hideMenu() { $id("chatMenu").hidden = true; $id("chatMore").setAttribute("aria-expanded", "false"); }
+    function setUnread(n) {
+      unread = Math.max(0, n | 0); badge.hidden = !unread; badge.textContent = unread > 99 ? "99+" : String(unread);
+      fab.setAttribute("aria-label", unread ? `Open chats (${unread} unread)` : "Open chats");
+    }
+
+    function paintGate() {
+      const g = $id("chatGate");
+      if (!Cloud.sb) g.innerHTML = `<span class="chat-gate-ic">📡</span><b>Chat is offline</b><p>Check your internet and refresh the page.</p>`;
+      else if (!Cloud.user) g.innerHTML = `<span class="chat-gate-ic">💬</span><b>Chat with your friends</b><p>Make a free account to message anyone on flexippo. You also get your own page.</p><button class="pa-b" type="button" data-gate="signup">Sign up free</button><button class="auth-link" type="button" data-gate="login">I already have an account</button>`;
+      else g.innerHTML = `<span class="chat-gate-ic">✨</span><b>One more step</b><p>Pick a username so your friends can find you.</p><button class="pa-b" type="button" data-gate="setup">Pick my username</button>`;
+    }
+    $id("chatGate").addEventListener("click", e => {
+      const b = e.target.closest("[data-gate]"); if (!b) return;
+      close();
+      if (b.dataset.gate === "signup") openAuth("signup", "Sign up to start chatting. It's free.");
+      else if (b.dataset.gate === "login") openAuth("login");
+      else openSetup();
+    });
+
+    /* list + search */
+    function linkBox() {
+      if (!Cloud.me) return "";
+      const l = Cloud.shareLink(Cloud.me.username);
+      return `<div class="chat-linkbox"><input readonly value="${esc(l)}" aria-label="Your link"><button class="auth-mini" type="button" data-copy="1">Copy</button></div>`;
+    }
+    function rowHtml(p, sub, c) {
+      const n = c ? c.unread : 0;
+      return `<button class="chat-row${n ? " unread" : ""}" type="button" data-pid="${esc(p.id)}" data-user="${esc(p.username)}" data-name="${esc(p.display_name)}" data-av="${esc(p.avatar_url || "")}">` +
+        `${avatarHtml(p, 46)}<span class="cr-main"><span class="cr-top"><b>${esc(nameOf(p))}</b>${c ? `<time>${esc(shortAgo(c.last_at))}</time>` : ""}</span>` +
+        `<span class="cr-bot"><span class="cr-last">${sub}</span>${n ? `<i class="cr-n">${n > 99 ? "99+" : n}</i>` : ""}</span></span></button>`;
+    }
+    function renderList() {
+      if (searching()) return;
+      const box = $id("chatList");
+      if (!convos) { box.innerHTML = '<p class="chat-empty">Loading chats…</p>'; return; }
+      if (!convos.length) { box.innerHTML = `<div class="chat-empty"><b>No chats yet</b>Search a friend's username above, or send them your link so they can message you:</div>` + linkBox(); return; }
+      box.innerHTML = convos.map(c => rowHtml(person(c), (c.last_from_me ? "You: " : "") + esc(c.last_body || "") + (c.i_blocked ? " · blocked" : ""), c)).join("");
+    }
+    async function refreshConvos() {
+      if (!Cloud.me) return;
+      try { convos = (await Cloud.conversations()) || []; } catch (e) { if (!convos) convos = []; return; }
+      setUnread(convos.reduce((n, c) => n + (c.unread || 0), 0));
+      if (isOpen && view === "list") renderList();
+    }
+    const refreshSoon = () => { clearTimeout(convT); convT = setTimeout(refreshConvos, 450); };
+    $id("chatQ").addEventListener("input", () => {
+      clearTimeout(searchT);
+      const q = $id("chatQ").value.trim().replace(/^@/, "");
+      if (q.length < 2) { renderList(); return; }
+      const box = $id("chatList"), seq = ++searchSeq;
+      box.innerHTML = '<p class="chat-sec">PEOPLE</p><p class="chat-empty">Searching…</p>';
+      searchT = setTimeout(async () => {
+        let rows;
+        try { rows = (await Cloud.search(q)) || []; } catch (e) { if (seq === searchSeq) box.innerHTML = `<p class="chat-empty">${esc(friendlyError(e))}</p>`; return; }
+        if (seq !== searchSeq) return;
+        box.innerHTML = '<p class="chat-sec">PEOPLE</p>' + (rows.length ? rows.map(r => rowHtml(person(r), "@" + esc(r.username))).join("")
+          : `<div class="chat-empty"><b>No one called “${esc(q)}” yet</b>Send your link to a friend so they can join and message you:</div>` + linkBox());
+      }, 260);
+    });
+    $id("chatList").addEventListener("click", e => {
+      if (e.target.closest("[data-copy]")) { if (Cloud.me) copyLink(Cloud.me.username); return; }
+      const r = e.target.closest(".chat-row"); if (!r) return;
+      Snd.fx("tick");
+      openWith({ id: r.dataset.pid, username: r.dataset.user, display_name: r.dataset.name, avatar_url: r.dataset.av || null });
+    });
+
+    /* one conversation */
+    function paintPeer() {
+      $id("chatAvatar").innerHTML = avatarHtml(peer, 40);
+      $id("chatName").textContent = nameOf(peer); $id("chatUser").textContent = peer.username ? "@" + peer.username : "";
+      $id("chatWho").href = location.pathname + "?u=" + encodeURIComponent(peer.username || "");
+      $id("chatBlock").textContent = blockedByMe ? "Unblock" : "Block";
+    }
+    function paintComposer() {
+      const inp = $id("chatInput");
+      inp.disabled = blockedByMe; $id("chatGo").disabled = blockedByMe || sending;
+      inp.placeholder = blockedByMe ? "You blocked this person" : "Message " + nameOf(peer) + "…";
+      note(blockedByMe ? `You blocked ${nameOf(peer)}. Unblock them from the ⋯ menu to chat.` : "");
+    }
+    function renderMsgs(toEnd, placeholder) {
+      const box = $id("chatMsgs"), me = meId();
+      if (placeholder !== undefined) { box.innerHTML = `<p class="chat-empty">${esc(placeholder)}</p>`; return; }
+      if (!msgs.length) { box.innerHTML = `<div class="chat-empty"><b>Say hi to ${esc(nameOf(peer))} 👋</b>Messages here are private between you two.</div>`; return; }
+      const near = box.scrollHeight - box.scrollTop - box.clientHeight < 140;
+      const lastMine = [...msgs].reverse().find(m => m.sender_id === me && !m.pending);
+      let h = hasMore ? '<button class="chip chat-older" type="button" id="chatOlder">Load older messages</button>' : "", lastDay = "";
+      for (const m of msgs) {
+        const d = new Date(m.created_at), day = d.toDateString();
+        if (day !== lastDay) { lastDay = day; h += `<p class="chat-day">${esc(dayLabel(d))}</p>`; }
+        h += `<div class="bub ${m.sender_id === me ? "me" : "them"}${m.pending ? " pending" : ""}">${esc(m.body)}<time>${esc(m.pending ? "Sending…" : clock(d))}</time></div>`;
+        if (m === lastMine && m.read_at) h += '<p class="chat-seen">Seen</p>';
+      }
+      box.innerHTML = h;
+      if (toEnd || near) box.scrollTop = box.scrollHeight;
+      const older = $id("chatOlder"); if (older) older.addEventListener("click", loadOlder);
+    }
+    function upsert(row) {
+      if (!row || row.id == null) return;
+      const i = msgs.findIndex(m => m.id === row.id);
+      if (i >= 0) { msgs[i] = { ...msgs[i], ...row }; return; }
+      if (row.sender_id === meId()) { const j = msgs.findIndex(m => m.pending && m.body === row.body); if (j >= 0) { msgs[j] = row; return; } }
+      msgs.push(row);
+      msgs.sort((a, b) => (typeof a.id === "number" ? a.id : Infinity) - (typeof b.id === "number" ? b.id : Infinity));
+    }
+    async function openWith(p) {
+      p = person(p);
+      if (!Cloud.sb) { toast("Chat isn't available right now."); return; }
+      if (!Cloud.user) { pendingChat = p; openAuth("signup", `Sign up to message ${nameOf(p)}. It's free.`); return; }
+      if (!Cloud.me) { pendingChat = p; openSetup(); return; }
+      if (p.id === Cloud.me.id) { toast("That's you 🙂"); return; }
+      openPanel();
+      peer = p; msgs = []; hasMore = false; blockedByMe = false; note("");
+      showView("thread"); paintPeer(); paintComposer(); renderMsgs(true, "Loading…");
+      const seq = ++threadSeq;
+      try {
+        const [rows, blocked, fresh] = await Promise.all([Cloud.thread(p.id), Cloud.iBlocked(p.id).catch(() => false), Cloud.getPerson(p.id).catch(() => null)]);
+        if (seq !== threadSeq) return;
+        if (fresh) { peer = person(fresh); }
+        msgs = (rows || []).slice().reverse(); hasMore = (rows || []).length >= 50; blockedByMe = blocked;
+        paintPeer(); paintComposer(); renderMsgs(true);
+        if (msgs.some(m => m.sender_id === p.id && !m.read_at)) markRead();
+      } catch (e) { if (seq === threadSeq) renderMsgs(true, friendlyError(e)); }
+      if (fine && !blockedByMe) setTimeout(() => $id("chatInput").focus(), 60);
+    }
+    async function loadOlder() {
+      const first = msgs.find(m => typeof m.id === "number"); if (!peer || !first) return;
+      const seq = threadSeq, box = $id("chatMsgs"), h0 = box.scrollHeight;
+      try {
+        const rows = (await Cloud.thread(peer.id, first.id)) || [];
+        if (seq !== threadSeq) return;
+        msgs = rows.slice().reverse().concat(msgs); hasMore = rows.length >= 50;
+        renderMsgs(false); box.scrollTop = box.scrollHeight - h0;
+      } catch (e) { toast(friendlyError(e)); }
+    }
+    function markRead() {
+      clearTimeout(readT); const p = peer;
+      readT = setTimeout(async () => { if (!p) return; try { await Cloud.markRead(p.id); } catch (e) {} refreshConvos(); }, 300);
+    }
+    function sendError(e) {
+      const m = String((e && e.message) || "");
+      if (m.includes("cannot_message")) return `You can't message ${nameOf(peer)}.`;
+      if (m.includes("you_blocked_them")) { blockedByMe = true; paintPeer(); return `You blocked ${nameOf(peer)}. Unblock them from the ⋯ menu to chat.`; }
+      if (m.includes("slow_down")) return "You're sending messages too fast. Wait a few seconds.";
+      if (m.includes("too_long")) return "That message is too long (2000 characters max).";
+      if (m.includes("no_profile")) return "Pick a username first.";
+      if (m.includes("no_such_user")) return "This account doesn't exist anymore.";
+      return "Couldn't send. " + friendlyError(e);
+    }
+    async function send() {
+      const inp = $id("chatInput"), text = inp.value.trim();
+      if (!text || !peer || sending) return;
+      if (text.length > 2000) { note("That message is too long (2000 characters max)."); return; }
+      if (blockedByMe) { paintComposer(); return; }
+      const tmp = { id: "tmp-" + Date.now() + Math.random().toString(36).slice(2, 6), sender_id: meId(), recipient_id: peer.id, body: text, created_at: new Date().toISOString(), read_at: null, pending: true };
+      msgs.push(tmp); inp.value = ""; grow(); note(""); renderMsgs(true);
+      sending = true; $id("chatGo").disabled = true;
+      const seq = threadSeq;
+      try {
+        const row = await Cloud.send(peer.id, text);
+        if (seq === threadSeq) { msgs = msgs.filter(m => m !== tmp); upsert(row); renderMsgs(true); }
+        Snd.fx("tick"); refreshSoon();
+      } catch (e) {
+        msgs = msgs.filter(m => m !== tmp);
+        if (seq === threadSeq) { renderMsgs(true); if (!inp.value) { inp.value = text; grow(); } note(sendError(e)); paintComposerKeepNote(); }
+      } finally { sending = false; if (!blockedByMe) $id("chatGo").disabled = false; }
+    }
+    function paintComposerKeepNote() { const n = $id("chatNote").textContent; paintComposer(); if (n && !blockedByMe) note(n); }
+    function grow() { const t = $id("chatInput"); t.style.height = "auto"; t.style.height = Math.min(120, t.scrollHeight) + "px"; }
+
+    /* live updates */
+    function onNew(row) {
+      if (!row || !Cloud.me) return;
+      const me = Cloud.me.id, other = row.sender_id === me ? row.recipient_id : row.sender_id;
+      if (isOpen && view === "thread" && peer && peer.id === other) {
+        upsert(row); renderMsgs(false);
+        if (row.sender_id === other && document.visibilityState === "visible") markRead();
+      } else if (row.recipient_id === me) notify(row);
+      refreshSoon();
+    }
+    function onUpdate(row) {
+      if (!row) return;
+      const i = msgs.findIndex(m => m.id === row.id);
+      if (i >= 0) { msgs[i] = { ...msgs[i], ...row }; if (isOpen && view === "thread") renderMsgs(false); }
+    }
+    async function notify(row) {
+      setUnread(unread + 1);
+      let who = (convos || []).find(c => c.other_id === row.sender_id);
+      if (!who) { try { who = await Cloud.getPerson(row.sender_id); } catch (e) {} }
+      toast("💬 " + nameOf(who) + ": " + String(row.body || "").slice(0, 60)); Snd.fx("pop");
+    }
+    async function poll() {
+      if (!Cloud.me || document.visibilityState !== "visible") return;
+      refreshConvos();
+      if (!(isOpen && view === "thread" && peer)) return;
+      const seq = threadSeq, p = peer;
+      try {
+        const rows = (await Cloud.thread(p.id)) || [];
+        if (seq !== threadSeq) return;
+        let changed = false;
+        rows.forEach(r => { const old = msgs.find(m => m.id === r.id); if (!old || old.read_at !== r.read_at) { upsert(r); changed = true; } });
+        if (changed) { renderMsgs(false); if (rows.some(r => r.sender_id === p.id && !r.read_at)) markRead(); }
+      } catch (e) {}
+    }
+    function startPoll() { clearInterval(pollT); pollT = setInterval(poll, live ? 30000 : 10000); }
+    function connect() {
+      disconnect();
+      const uid = meId(); if (!Cloud.sb || !uid) return;
+      try {
+        channel = Cloud.sb.channel("inbox-" + uid)
+          .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages", filter: "recipient_id=eq." + uid }, p => onNew(p.new))
+          .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages", filter: "sender_id=eq." + uid }, p => onNew(p.new))
+          .on("postgres_changes", { event: "UPDATE", schema: "public", table: "messages", filter: "sender_id=eq." + uid }, p => onUpdate(p.new))
+          .subscribe(status => { const was = live; live = status === "SUBSCRIBED"; if (was !== live) startPoll(); });
+      } catch (e) { live = false; }
+      startPoll(); refreshConvos();
+    }
+    function disconnect() {
+      if (channel) { try { Cloud.sb.removeChannel(channel); } catch (e) {} channel = null; }
+      live = false; clearInterval(pollT);
+    }
+    function onAuth() {
+      const id = meId();
+      if (id === connectedFor) return;
+      connectedFor = id;
+      if (!id) { disconnect(); convos = null; peer = null; msgs = []; threadSeq++; setUnread(0); if (isOpen) { paintGate(); showView("gate"); } return; }
+      convos = null; connect(); if (isOpen) open();
+    }
+
+    /* buttons */
+    fab.addEventListener("click", () => { Snd.fx("tick"); isOpen ? close() : open(); });
+    $$("#chat [data-close]").forEach(b => b.addEventListener("click", close));
+    $id("chatBack").addEventListener("click", () => { peer = null; threadSeq++; note(""); showView("list"); renderList(); refreshConvos(); });
+    $id("chatMore").addEventListener("click", e => { e.stopPropagation(); const m = $id("chatMenu"); m.hidden = !m.hidden; $id("chatMore").setAttribute("aria-expanded", String(!m.hidden)); });
+    panel.addEventListener("click", e => { if (!e.target.closest("#chatMenu, #chatMore")) hideMenu(); });
+    $id("chatWho").addEventListener("click", e => { e.preventDefault(); if (peer && peer.username) go(peer.username); });
+    $id("chatView").addEventListener("click", () => { if (peer && peer.username) go(peer.username); });
+    $id("chatBlock").addEventListener("click", async () => {
+      hideMenu(); if (!peer) return;
+      const on = !blockedByMe;
+      try { await Cloud.setBlock(peer.id, on); blockedByMe = on; paintPeer(); paintComposer(); toast(on ? "Blocked " + nameOf(peer) : "Unblocked " + nameOf(peer)); refreshSoon(); }
+      catch (e) { toast(friendlyError(e)); }
+    });
+    $id("chatInput").addEventListener("input", grow);
+    $id("chatInput").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing && fine) { e.preventDefault(); send(); } });
+    $id("chatForm").addEventListener("submit", e => { e.preventDefault(); send(); });
+    addEventListener("keydown", e => { if (e.key === "Escape" && isOpen && modal.hidden && $("#editor").hidden) { if (!$id("chatMenu").hidden) hideMenu(); else close(); } });
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && Cloud.me) poll(); });
+    Cloud.on(onAuth);
+    return { open, close, openWith, onAuth };
+  })();
+
+  /* ---------- start ---------- */
+  const waitCustom = () => new Promise(r => { if (Custom.loaded) r(); else Custom.on(r); });
+  paintBtn(); paintActs();
+  Cloud.on(() => { paintBtn(); paintActs(); });
+  Custom.on(paintActs);
+  Cloud.init().then(waitCustom).then(() => {
+    paintBtn(); paintActs(); Chat.onAuth();
+    if (AUTH_HASH_ERROR) toast(/expired|invalid/i.test(AUTH_HASH_ERROR) ? "That email link has expired. Ask for a new one." : AUTH_HASH_ERROR);
+    if (AUTH_RECOVERY && Cloud.user) openModal("newpass");
+    Cloud.on(why => { if (why === "recovery") openModal("newpass"); });
+    if (Custom.missing && !Custom.failed) toast("There's no page called @" + Custom.missing + " yet");
+    if (location.hash === "#edit") {
+      try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
+      if (Custom.owner) whenEntered(() => setTimeout(() => Editor.open("profile"), 450));
+      else if (!Cloud.user) { pendingEdit = true; openAuth("login", "Log in to edit your page."); }
+      else if (!Cloud.me) openSetup();
+      else if (!(Custom.target && Custom.target.id === Cloud.me.id)) go(Cloud.me.username, "#edit");
+    }
+  });
 })();
 </script>
 
