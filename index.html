@@ -252,6 +252,9 @@ a.cnt:hover{transform:translateY(-2px);border-color:var(--pink)}
 .soc-id span{display:block;font-family:var(--f-hud);font-size:13px;color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .soc-id .hdl{display:flex;align-items:center;gap:5px}
 .hdl em{font-style:normal;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hdl .pfp{flex:none;display:block;width:24px;height:24px;padding:2px;border-radius:50%;background:linear-gradient(45deg,var(--gold),var(--pink) 45%,var(--violet) 80%,var(--cyan))}
+.hdl .pfp img{width:100%;height:100%;border-radius:50%;object-fit:cover;border:2px solid var(--bg2);background:var(--bg2)}
+.duo-half .hdl .pfp{width:22px;height:22px}
 .vf{width:15px;height:15px;flex:none}
 .xshot{display:block;flex:1;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#000}
 .xshot img{display:block;width:100%;height:100%;object-fit:cover;object-position:top;transition:transform .5s}
@@ -1584,6 +1587,7 @@ function safeUrl(u, fallback) { u = String(u || "").trim(); return /^https?:\/\/
 function readableOn(hex) { const m = /^#?([0-9a-f]{6})$/i.exec(hex || ""); if (!m) return "#06210f"; const n = parseInt(m[1], 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255; return (0.299 * r + 0.587 * g + 0.114 * b) > 150 ? "#0b0b0b" : "#ffffff"; }
 function parseTracks(list) { return (list || []).map(t => String(t).trim()).filter(Boolean).slice(0, 6).map(t => { const p = t.split(/\s+[—–-]\s+/); return { title: p[0], artist: p.slice(1).join(" - ") }; }); }
 const VERIFIED = `<svg class="vf" viewBox="0 0 24 24" role="img" aria-label="Verified"><path d="M12.00 1.00 L14.41 3.02 L17.50 2.47 L18.58 5.42 L21.53 6.50 L20.98 9.59 L23.00 12.00 L20.98 14.41 L21.53 17.50 L18.58 18.58 L17.50 21.53 L14.41 20.98 L12.00 23.00 L9.59 20.98 L6.50 21.53 L5.42 18.58 L2.47 17.50 L3.02 14.41 L1.00 12.00 L3.02 9.59 L2.47 6.50 L5.42 5.42 L6.50 2.47 L9.59 3.02Z" fill="#1d9bf0" stroke="#1d9bf0" stroke-width="1.6" stroke-linejoin="round"/><path d="M7.6 12.4l3 3 5.8-6.4" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+function pfpHtml() { const a = (typeof Custom !== "undefined" && Custom.media && Custom.media.avatar) || CONFIG.avatar; return `<i class="pfp" aria-hidden="true"><img src="${esc(a)}" alt="" width="24" height="24" loading="lazy" draggable="false"></i>`; }
 function brandIcon(s) { return `<span class="soc-ic" style="background:${s.brand}" aria-hidden="true"><i class="fa-brands ${s.icon}"></i><span class="fb">${esc(s.label.charAt(0))}</span></span>`; }
 const X_ICONS = ['<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"/>', '<path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/>', '<path d="M12 21s-7-4.4-9.3-9A5.3 5.3 0 0 1 12 6.3 5.3 5.3 0 0 1 21.3 12C19 16.6 12 21 12 21z"/>', '<path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/>'];
 // everything the owner can change, merged over CONFIG
@@ -1607,13 +1611,13 @@ function duoCard(V, ids) {
     if (base.id === "spotify") {
       const v = V.spotify;
       return `<section class="duo-half" data-half="spotify" style="--brand:${v.accent};--sp:${v.accent};--sp-ink:${readableOn(v.accent)}">
-        <div class="soc-h">${brandIcon({ ...base, brand: v.accent })}<div class="soc-id"><b class="vh">${esc(base.label)}</b><span class="hdl"><em>${esc(v.title)}</em>${VERIFIED}</span></div><button class="ed-chip owner-only" type="button" data-edit="spotify" aria-label="Customize Spotify">✎</button></div>
+        <div class="soc-h">${brandIcon({ ...base, brand: v.accent })}<div class="soc-id"><b class="vh">${esc(base.label)}</b><span class="hdl">${pfpHtml()}<em>${esc(v.title)}</em>${VERIFIED}</span></div><button class="ed-chip owner-only" type="button" data-edit="spotify" aria-label="Customize Spotify">✎</button></div>
         <div class="sp-mini"><img class="sp-cover" src="${esc(v.cover)}" alt="Playlist cover"><div style="min-width:0"><b class="sp-n">${esc(v.playlist)}</b><span class="sp-a">${esc(v.artist)}</span><div class="bars"><i></i><i></i><i></i><i></i><i></i></div></div></div>
         <div class="duo-cta"><button class="btn" type="button" data-np style="--brand:var(--sp);color:var(--sp-ink)">Play here</button><a class="btn ghost" href="${esc(v.url)}" target="_blank" rel="noopener">${esc(base.cta)}</a></div>
       </section>`;
     }
     return `<section class="duo-half" data-half="${base.id}" style="--brand:${base.brand}">
-        <div class="soc-h">${brandIcon(base)}<div class="soc-id"><b class="vh">${esc(base.label)}</b><span class="hdl"><em>${esc(base.handle || "")}</em>${VERIFIED}</span></div></div>
+        <div class="soc-h">${brandIcon(base)}<div class="soc-id"><b class="vh">${esc(base.label)}</b><span class="hdl">${pfpHtml()}<em>${esc(base.handle || "")}</em>${VERIFIED}</span></div></div>
         ${base.blurb ? `<p class="duo-blurb">${esc(base.blurb)}</p>` : ""}
         <div class="duo-cta"><a class="btn" href="${esc(base.url)}" target="_blank" rel="noopener">${esc(base.cta)}</a></div>
       </section>`;
@@ -1643,7 +1647,7 @@ function renderSocials() {
     }
     const editable = ["instagram", "spotify", "x", "snapchat"].includes(base.id);
     return `<article class="soc ${base.width || ""}" data-soc="${base.id}" style="--brand:${base.brand}${extraStyle}">
-      <div class="soc-h">${brandIcon(base)}<div class="soc-id"><b class="vh">${esc(base.label)}</b><span class="hdl"><em>${esc(s.handle)}</em>${VERIFIED}</span></div>${editable ? `<button class="ed-chip owner-only" type="button" data-edit="${base.id}" aria-label="Customize ${esc(base.label)}">✎</button>` : ""}<a class="btn" href="${esc(ctaUrl)}" target="_blank" rel="noopener" style="--brand:${base.id === "x" ? "#333" : base.id === "spotify" ? "var(--sp)" : (base.brand.startsWith("linear") ? "#d62976" : base.brand)}${base.id === "spotify" ? ";color:var(--sp-ink)" : base.id === "snapchat" ? ";color:#111" : ""}">${esc(base.cta)}</a></div>
+      <div class="soc-h">${brandIcon(base)}<div class="soc-id"><b class="vh">${esc(base.label)}</b><span class="hdl">${pfpHtml()}<em>${esc(s.handle)}</em>${VERIFIED}</span></div>${editable ? `<button class="ed-chip owner-only" type="button" data-edit="${base.id}" aria-label="Customize ${esc(base.label)}">✎</button>` : ""}<a class="btn" href="${esc(ctaUrl)}" target="_blank" rel="noopener" style="--brand:${base.id === "x" ? "#333" : base.id === "spotify" ? "var(--sp)" : (base.brand.startsWith("linear") ? "#d62976" : base.brand)}${base.id === "spotify" ? ";color:var(--sp-ink)" : base.id === "snapchat" ? ";color:#111" : ""}">${esc(base.cta)}</a></div>
       ${body}</article>`;
   }).join("") + duoCard(V, DUO);
   $$("#socGrid [data-np]").forEach(b => b.addEventListener("click", () => { Snd.fx("tick"); Snd.toggle(); }));
