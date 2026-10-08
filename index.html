@@ -670,6 +670,12 @@ footer p{margin:4px 0}
 /* ---------- player ---------- */
 .player{position:fixed;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:80;display:flex;align-items:center;gap:10px;padding:6px 8px 6px 6px;border-radius:999px;background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 10px 30px var(--shadow);transform:translateY(140%);transition:transform .5s cubic-bezier(.2,1.2,.3,1)}
 body.entered .player{transform:none}
+.pitch{margin-top:10px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;max-width:560px;padding:12px 14px;border-radius:16px;background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(8px)}
+.pitch p{margin:0;font-size:14px;line-height:1.45;color:var(--ink);flex:1 1 240px}
+.pitch-btn{display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:999px;background:linear-gradient(90deg,var(--pink),var(--violet));color:#fff;font-weight:800;font-size:14px;text-decoration:none;white-space:nowrap}
+.fab-get{position:fixed;left:50%;margin-left:-100px;width:200px;text-align:center;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:80;padding:11px 16px;border-radius:999px;background:linear-gradient(90deg,var(--pink),var(--violet));color:#fff;font-weight:800;font-size:13px;text-decoration:none;box-shadow:0 8px 24px var(--shadow);opacity:0;pointer-events:none;transform:translateY(20px);transition:opacity .3s,transform .3s}
+body.entered .fab-get{opacity:1;pointer-events:auto;transform:none}
+body.entered .fab-get.away{opacity:0;pointer-events:none;transform:translateY(20px)}
 .totop{--sp:0;position:fixed;right:14px;bottom:calc(80px + env(safe-area-inset-bottom,0px));z-index:79;width:48px;height:48px;padding:3px;border:0;border-radius:50%;background:conic-gradient(var(--pink) calc(var(--sp) * 360deg),color-mix(in srgb,var(--ink) 14%,transparent) 0);box-shadow:0 10px 26px var(--shadow);cursor:pointer;opacity:0;visibility:hidden;transform:translateY(16px) scale(.8);transition:opacity .25s,transform .3s cubic-bezier(.2,1.4,.4,1),visibility 0s .3s}
 .totop.show{opacity:1;visibility:visible;transform:none;transition:opacity .25s,transform .3s cubic-bezier(.2,1.4,.4,1)}
 .totop span{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;background:var(--bg);color:var(--ink);transition:background .2s,color .2s}
@@ -921,12 +927,12 @@ html.chat-lock{overflow:hidden}
   <div class="slash-line" id="slashLine"></div>
   <div class="wrap intro-top"><span class="brand"><span class="brand-mark" aria-hidden="true">F</span><span class="brand-word">flex<em>ippo</em><small>.com</small></span></span></div>
   <div class="intro-inner">
-    <button class="hold" id="enterBtn" type="button" aria-label="Press and hold to open the site" aria-describedby="introHint">
+    <button class="hold" id="enterBtn" type="button" aria-label="Tap to open the site" aria-describedby="introHint">
       <img id="introAv" src="assets/avatar.webp" alt="" draggable="false">
       <svg viewBox="0 0 164 164" aria-hidden="true"><defs><linearGradient id="holdGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22e4ff"/><stop offset=".5" stop-color="#8b5cff"/><stop offset="1" stop-color="#ff2e88"/></linearGradient></defs><circle class="tickr" cx="82" cy="82" r="79"/><circle class="trk" cx="82" cy="82" r="72"/><circle class="arc" id="holdArc" cx="82" cy="82" r="72" stroke-dasharray="452.4" stroke-dashoffset="452.4"/></svg>
     </button>
     <div class="boot" aria-hidden="true"><div class="boot-row"><span id="introKick">SATYAM</span><b id="bootPct">0%</b></div><div class="boot-bar"><i id="loadFill"></i></div></div>
-    <p class="intro-hint" id="introHint" aria-live="polite">Press &amp; hold the photo</p>
+    <p class="intro-hint" id="introHint" aria-live="polite">Tap the photo to enter</p>
   </div>
   <p class="intro-sound">🔊 Sound on for the full vibe</p>
 </div>
@@ -959,6 +965,7 @@ html.chat-lock{overflow:hidden}
         </div>
       </div>
       <div class="page-acts" id="pageActs"></div>
+      <div class="pitch" id="pitch"><p><b>flexippo</b> makes personal pages like this one: your socials, collection and music in one link.</p><a class="pitch-btn" href="#get-yours">Get your own page <span aria-hidden="true">→</span></a></div>
     </div>
   </header>
 
@@ -1047,7 +1054,7 @@ html.chat-lock{overflow:hidden}
             <div class="wa-h"><span class="wa-back" aria-hidden="true">‹</span><span class="wa-av" aria-hidden="true">B</span><div><b>bestie</b><small>online</small></div></div>
             <div class="wa-body">
               <div class="wa-in">
-                <div class="wa-card"><img src="assets/og-kai.jpg" alt="Link preview image"><div><b id="ogTitle">Satyam's Neon Vault</b><small id="ogDomain">your-domain.com</small></div></div>
+                <div class="wa-card"><img src="assets/og-kai.jpg" alt="Link preview image"><div><b id="ogTitle">Satyam's Neon Vault</b><small id="ogDomain">flexippo.com</small></div></div>
                 <div class="wa-msg">i'm on google 😉<small>9:41 PM <i class="wa-tick">✓✓</i></small></div>
               </div>
               <div class="wa-txt rcv">no wayy!!🥴😭<small>9:42 PM</small></div>
@@ -1057,7 +1064,7 @@ html.chat-lock{overflow:hidden}
           <div class="igdm">
             <div class="igdm-h"><span class="igdm-av"></span><div><b>bestie</b><small>Active now</small></div></div>
             <div class="igdm-out">
-              <div class="igdm-card"><img src="assets/og-kai.jpg" alt="Link preview image"><div><b class="og-t">Satyam's Neon Vault</b><small class="og-d">your-domain.com</small></div></div>
+              <div class="igdm-card"><img src="assets/og-kai.jpg" alt="Link preview image"><div><b class="og-t">Satyam's Neon Vault</b><small class="og-d">flexippo.com</small></div></div>
               <div class="igdm-b">you NEED to see my new site 🔥</div>
             </div>
             <div class="igdm-in">bro what 😭 how</div>
@@ -1105,6 +1112,7 @@ html.chat-lock{overflow:hidden}
 </main>
 
 <!-- music player -->
+<a class="fab-get" id="fabGet" href="#get-yours">✨ Get your own website</a>
 <button class="totop" id="toTop" type="button" aria-label="Go to top"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/></svg></span></button>
 <div class="player" id="player">
   <button class="disc" id="pDisc" type="button" aria-label="Play or pause music"><img src="assets/album.webp" alt=""></button>
@@ -1265,7 +1273,7 @@ const CONFIG = {
   titles: ["S-Rank Otaku", "Builds websites at 3AM", "Main character energy", "Collector of shiny things"],
   avatar: "assets/avatar.webp",       // profile picture (used in the Instagram/X post previews)
   cover: "assets/cover-main.jpg",         // big main photo at the top
-  birthday: "11-20",                 // MM-DD  (placeholder, change to yours)
+  birthday: "",                      // MM-DD, e.g. "11-20" (empty hides the countdown)
   defaultSkin: "sakura",              // night | sakura | fire
   defaultEntry: "random",             // slash | sakura | glitch | random
   // "Get your own website" box at the bottom of the page (your Flexippo business)
@@ -1277,9 +1285,9 @@ const CONFIG = {
   // Likes and comments on the collection. Every item gets its own numbers from these ranges,
   // and 3 comments picked from the list below. Change any of it.
   hype: {
-    likes: [1200000, 9800000],       // like count range (1.2M to 9.8M)
-    comments: [2400, 48000],         // comment count range (2.4K to 48K)
-    people: ["aura.farmer", "npc.no.more", "ramen.at.3am", "lowkey.otaku", "sigma.scrolls", "drip.check.99", "midnight.gamer", "certified.weeb"],
+    likes: [0, 0],                   // starting like count range (real likes are added on top)
+    comments: [0, 0],                // starting comment count range
+    people: [],
     lines: ["aura +1000 🔥", "bro is NOT an NPC 💀", "W collection fr", "where do you even get this 😭", "this is so clean bro",
             "main character behaviour", "my wallet is crying rn 😭", "ok this one goes hard", "lowkey jealous ngl", "10/10 no notes",
             "how is this even real", "saving this for my vision board ✨"]
@@ -1799,6 +1807,13 @@ function resetIntro() {
   document.body.classList.add("locked"); document.body.classList.remove("entered");
   window.scrollTo({ top: 0 });
 }
+(() => {
+  const fab = document.getElementById("fabGet"), pitch = document.getElementById("pitch"), box = document.getElementById("get-yours");
+  if (PAGE_U) { fab.hidden = true; pitch.hidden = true; return; }
+  if (!("IntersectionObserver" in window)) return;
+  const seen = new Set(), io = new IntersectionObserver(es => { es.forEach(e => e.isIntersecting ? seen.add(e.target) : seen.delete(e.target)); fab.classList.toggle("away", seen.size > 0); });
+  [pitch, box].forEach(el => el && io.observe(el));
+})();
 let entered = false;
 function afterEnter() {
   if (entered) return; entered = true;
@@ -1809,7 +1824,7 @@ function afterEnter() {
 /* ---- press & hold the profile picture to open the site ---- */
 const Hold = (() => {
   const HOLD_MS = 550, C = 452.4; let p = 0, holding = false, raf = 0, last = 0, lastFx = 0, done = false;
-  const btn = () => $("#enterBtn"), hint = t => { const h = $("#introHint"); h.textContent = t; h.classList.toggle("live", t !== "Press & hold the photo"); };
+  const btn = () => $("#enterBtn"), hint = t => { const h = $("#introHint"); h.textContent = t; h.classList.toggle("live", t !== "Tap the photo to enter"); };
   function draw() { btn().style.setProperty("--p", p.toFixed(3)); $("#holdArc").setAttribute("stroke-dashoffset", (C * (1 - p)).toFixed(1)); }
   function loop(t) {
     const dt = Math.min(50, t - last); last = t;
@@ -1821,15 +1836,15 @@ const Hold = (() => {
   }
   function start(e) {
     if (done || entering) return; if (e && e.cancelable) e.preventDefault();
-    Snd.unlock(); holding = true; btn().classList.add("charging"); hint("Keep holding…");
-    if (!raf) { last = performance.now(); raf = requestAnimationFrame(loop); }
+    Snd.unlock(); done = true; p = 1; draw(); hint("Unlocked ✓"); Snd.fx("sparkle");
+    const r = btn().getBoundingClientRect(); FX.sparkles(r.left + r.width / 2, r.top + r.height / 2, 30); setTimeout(enter, 120);
   }
   function stop() {
     Snd.unlock(); if (!entered && !Snd.playing && done) Snd.play();   // phones only allow sound after the finger lifts
     if (!holding) return; holding = false;
     if (p < 1) { hint(p < 0.25 ? "Hold it a little longer" : "Almost… hold till it fills"); const b = btn(); b.classList.remove("nudge"); void b.offsetWidth; b.classList.add("nudge"); }
   }
-  function reset() { p = 0; holding = false; done = false; if (raf) cancelAnimationFrame(raf); raf = 0; draw(); btn().classList.remove("charging"); hint("Press & hold the photo"); }
+  function reset() { p = 0; holding = false; done = false; if (raf) cancelAnimationFrame(raf); raf = 0; draw(); btn().classList.remove("charging"); hint("Tap the photo to enter"); }
   function init() {
     const b = btn();
     b.addEventListener("pointerdown", start);
@@ -1881,7 +1896,7 @@ const OnceFx = (() => {
 
 /* ======================= HERO ======================= */
 function renderName() {
-  const HN = CONFIG.heroName || CONFIG.name; const h = $("#name"); h.dataset.text = HN; h.style.setProperty("--len", Math.max(3, [...HN].length)); h.innerHTML = [...HN].map((c, i) => `<span style="--i:${i}">${esc(c)}</span>`).join("");
+  const HN = CONFIG.heroName || CONFIG.name; const h = $("#name"); h.dataset.text = HN; h.style.setProperty("--len", Math.max(3, [...HN].length)); h.innerHTML = [...HN].map((c, i) => `<span style="--i:${i}">${c === " " ? "&nbsp;" : esc(c)}</span>`).join("");
   $("#kana").textContent = CONFIG.kana; $("#footName").textContent = CONFIG.name;
   $("#introKick").textContent = CONFIG.name; $("#introAv").src = CONFIG.avatar;
   if (CONFIG.cover) document.documentElement.style.setProperty("--intro-img", `url("${CONFIG.cover}")`);
