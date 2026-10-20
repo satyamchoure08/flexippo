@@ -181,7 +181,7 @@ const prettyLink = u => BASE.siteUrl.replace(/\/+$/, "") + "/" + u;
 if (PAGE_U && !AUTH_IN_URL) { try { if (location.pathname !== "/" + PAGE_U) history.replaceState(history.state, "", "/" + PAGE_U + location.hash); } catch (e) {} }
 const pageKey = k => (PAGE_U ? k + "@" + PAGE_U : k);   // keeps each page's guestbook + likes apart on this device
 if (PAGE_U) {   // until their page loads, show their username instead of the main page's name
-  Object.assign(CONFIG, { name: PAGE_U, heroName: PAGE_U.toUpperCase().slice(0, 14), kana: "@" + PAGE_U, avatar: FLEX_AVATAR, birthday: "",
+  Object.assign(CONFIG, { name: PAGE_U, heroName: PAGE_U.toUpperCase().slice(0, 14), kana: "@" + PAGE_U, avatar: FLEX_AVATAR, birthday: "", cover: "", titles: [],
     ticker: [PAGE_U.toUpperCase(), "WELCOME TO MY PAGE", "限界突破", "FLEXIPPO.COM"], contact: BASE.contact.map(c => ({ ...c, value: "", url: "" })) });
 }
 function cleanSettings(s) {
@@ -192,6 +192,7 @@ function cleanSettings(s) {
     return it;
   });
   if (s.links !== undefined) s.links = cleanLinks(s.links);
+  if (s.socials !== undefined) s.socials = cleanSocials(s.socials);
   return s;
 }
 function cleanMedia(m) {   // only our own photo storage (or the site's own images) may show up on a page
@@ -202,6 +203,34 @@ function cleanMedia(m) {   // only our own photo storage (or the site's own imag
 function cleanLinks(v) {
   return (Array.isArray(v) ? v : []).filter(x => x && typeof x === "object").map(x => ({ t: String(x.t || "").trim().slice(0, 40), u: String(x.u || "").trim().slice(0, 300) }))
     .filter(x => /^https?:\/\/[^\s<>"']+\.[^\s<>"']+/i.test(x.u)).slice(0, CONFIG.linkLimit || 8);
+}
+/* ---------- socials on personal pages: the owner types a username, the link is made from it ---------- */
+const IG_BRAND = "linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5)";
+const SOCIAL = {
+  instagram: { label: "Instagram", icon: "instagram", brand: IG_BRAND, cta: "Follow", at: 1, re: /^[A-Za-z0-9_.]{1,30}$/, url: v => "https://www.instagram.com/" + v + "/" },
+  snapchat: { label: "Snapchat", icon: "snapchat", brand: "#fffc00", dark: 1, cta: "Add me", at: 1, re: /^[A-Za-z0-9_.-]{2,30}$/, url: v => "https://www.snapchat.com/add/" + v },
+  youtube: { label: "YouTube", icon: "youtube", brand: "#ff0033", cta: "Subscribe", re: /^([A-Za-z0-9_.-]{3,30}|channel\/UC[A-Za-z0-9_-]{20,24}|c\/[A-Za-z0-9_.-]{1,60})$/, url: v => "https://www.youtube.com/" + (v.includes("/") ? v : "@" + v), show: v => (v.includes("/") ? "YouTube channel" : "@" + v) },
+  whatsapp: { label: "WhatsApp", icon: "whatsapp", brand: "#25d366", cta: "Message", re: /^\d{8,15}$/, url: v => "https://wa.me/" + v, show: v => "+" + v },
+  x: { label: "X", icon: "x", brand: "#111111", cta: "Follow", at: 1, re: /^[A-Za-z0-9_]{1,15}$/, url: v => "https://x.com/" + v },
+  tiktok: { label: "TikTok", icon: "tiktok", brand: "#111111", cta: "Follow", at: 1, re: /^[A-Za-z0-9_.]{2,24}$/, url: v => "https://www.tiktok.com/@" + v },
+  discord: { label: "Discord", icon: "discord", brand: "#5865f2", cta: "Join", re: /^[A-Za-z0-9-]{2,32}$/, url: v => "https://discord.gg/" + v, show: v => "discord.gg/" + v },
+  spotify: { label: "Spotify", icon: "spotify", brand: "#1ed760", cta: "Listen", re: /^((artist|album|playlist|track|user|show|episode)\/[A-Za-z0-9._-]{1,64}|https:\/\/spotify\.link\/[A-Za-z0-9]{4,20})$/, url: v => (v.startsWith("https:") ? v : "https://open.spotify.com/" + v), show: v => (/^(artist|user)\//.test(v) ? "Spotify profile" : /^track\//.test(v) ? "A song" : /^album\//.test(v) ? "An album" : /^(show|episode)\//.test(v) ? "A podcast" : "My playlist") },
+  telegram: { label: "Telegram", icon: "telegram", brand: "#229ed9", cta: "Message", at: 1, re: /^[A-Za-z0-9_]{5,32}$/, url: v => "https://t.me/" + v },
+  twitch: { label: "Twitch", icon: "twitch", brand: "#9146ff", cta: "Watch", at: 1, re: /^[A-Za-z0-9_]{3,25}$/, url: v => "https://www.twitch.tv/" + v },
+  github: { label: "GitHub", icon: "github", brand: "#24292f", cta: "Follow", at: 1, re: /^[A-Za-z0-9-]{1,39}$/, url: v => "https://github.com/" + v },
+  linkedin: { label: "LinkedIn", icon: "linkedin", brand: "#0a66c2", cta: "Connect", re: /^[A-Za-z0-9-]{3,100}$/, url: v => "https://www.linkedin.com/in/" + v },
+  facebook: { label: "Facebook", icon: "facebook", brand: "#1877f2", cta: "Follow", re: /^[A-Za-z0-9.]{5,50}$/, url: v => "https://www.facebook.com/" + v },
+  threads: { label: "Threads", icon: "threads", brand: "#111111", cta: "Follow", at: 1, re: /^[A-Za-z0-9_.]{1,30}$/, url: v => "https://www.threads.net/@" + v },
+  pinterest: { label: "Pinterest", icon: "pinterest", brand: "#e60023", cta: "Follow", at: 1, re: /^[A-Za-z0-9_]{3,30}$/, url: v => "https://www.pinterest.com/" + v + "/" },
+  reddit: { label: "Reddit", icon: "reddit", brand: "#ff4500", cta: "Follow", re: /^[A-Za-z0-9_-]{3,20}$/, url: v => "https://www.reddit.com/user/" + v, show: v => "u/" + v },
+  steam: { label: "Steam", icon: "steam", brand: "#1b2838", cta: "Add me", re: /^(id\/[A-Za-z0-9_-]{2,32}|profiles\/\d{17})$/, url: v => "https://steamcommunity.com/" + v + "/", show: v => v.replace(/^(id|profiles)\//, "") },
+  email: { label: "Email", icon: "envelope", brand: "#ea4335", cta: "Email me", re: /^[^\s@<>"'/]{1,64}@[^\s@<>"'/]+\.[A-Za-z]{2,}$/, url: v => "mailto:" + v, show: v => v }
+};
+const socialShow = (k, v) => { const d = SOCIAL[k]; return d ? (d.show ? d.show(v) : (d.at ? "@" : "") + v) : v; };
+function cleanSocials(v) {
+  const seen = new Set();
+  return (Array.isArray(v) ? v : []).filter(x => x && typeof x === "object" && SOCIAL[x.k] && typeof x.v === "string" && SOCIAL[x.k].re.test(x.v) && !seen.has(x.k) && seen.add(x.k))
+    .slice(0, 20).map(x => ({ k: x.k, v: x.v }));
 }
 
 // plain reading from the database (public things, no login needed) without downloading the login library
@@ -290,6 +319,28 @@ const Cloud = (() => {
     emit("me");
     return data;
   }
+  // the new editor: photos upload the moment they're picked, the page itself saves a moment after each change
+  async function uploadPhoto(key, dataUrl) {
+    await ensure();
+    if (!sb || !user) throw new Error("not_logged_in");
+    return upload(key, dataUrl);
+  }
+  async function savePage(settings, media, displayName) {
+    await ensure();
+    if (!sb || !user) throw new Error("not_logged_in");
+    const patch = { settings, media, avatar_url: media.avatar && /^https:\/\//.test(media.avatar) ? media.avatar : null };
+    if (typeof displayName === "string" && displayName.trim()) patch.display_name = displayName.trim().slice(0, 40);
+    const { data, error } = await sb.from("profiles").update(patch).eq("id", user.id).select(COLS).single();
+    if (error) fail(error);
+    if (me) { me.display_name = data.display_name; me.avatar_url = data.avatar_url; cacheMe(); }
+    emit("me");
+    return data;
+  }
+  async function removeFiles(paths) {
+    const mine = (paths || []).filter(p => user && String(p).startsWith(user.id + "/"));
+    if (!mine.length || !sb) return;
+    try { await sb.storage.from("media").remove(mine); } catch (e) {}
+  }
   async function rpc(fn, args) { await ensure(); const { data, error } = await sb.rpc(fn, args || {}); if (error) fail(error); return data; }
   async function refresh() {
     await ensure();
@@ -321,7 +372,7 @@ const Cloud = (() => {
       if (error) fail(error);
       me = data; notSetUp = false; cacheMe(); emit("me"); return data;
     },
-    saveMyPage,
+    saveMyPage, uploadPhoto, savePage, removeFiles, pathOf,
     async iBlocked(other) {
       await ensure();
       const { data, error } = await sb.from("blocks").select("blocked_id").eq("blocked_id", other).maybeSingle();
@@ -633,7 +684,48 @@ function duoCard(V, ids) {
   const sp = V.spotify ? V.spotify.accent : "#1ed760", dc = (CONFIG.socials.find(s => s.id === "discord") || {}).brand || "#5865f2";
   return `<article class="soc soc-duo${halves.length < 2 ? " solo" : ""}" data-soc="duo" data-glow="${esc(sp)}" style="--brand:linear-gradient(90deg,${sp} 0 50%,${dc} 50% 100%)">${halves.join("")}</article>`;
 }
-function renderSocials() {
+/* ---- personal pages: one card per account the owner added (only theirs, nothing from the example page) ---- */
+function personalSocialCard(s, D, M) {
+  const d = SOCIAL[s.k], url = d.url(s.v);
+  let body = "";
+  if (s.k === "instagram") {
+    const posts = [0, 1, 2].map(j => ({ img: M["ig" + j], ...(((D.instagram || {}).posts || [])[j] || {}) })).filter(p => p.img);
+    if (posts.length) body = `<div class="posts">${posts.map(p => `<a class="post" href="${esc(safeUrl(p.link, url))}" target="_blank" rel="noopener"><figure style="margin:0"><img src="${esc(p.img)}" alt="${esc(p.cap || "Instagram post")}" loading="lazy" decoding="async">${p.cap ? `<figcaption>${esc(p.cap)}</figcaption>` : ""}</figure></a>`).join("")}</div>`;
+  }
+  if (s.k === "snapchat") {
+    const C = D.snapchat || {}, num = v => { const n = parseInt(String(v === undefined ? "" : v).replace(/[^\d]/g, ""), 10); return isFinite(n) && n > 0 ? n : 0; };
+    const score = num(C.score), streak = num(C.streak), st = snapStories().list;
+    if (score || streak) body += `<div class="snap-stats">${score ? `<span>👻 <b>${score.toLocaleString("en-IN")}</b> Snapscore</span>` : ""}${streak ? `<span>🔥 <b>${streak.toLocaleString("en-IN")}</b> day streak</span>` : ""}</div>`;
+    if (st.length) body += `<div class="snap-row">${st.map((x, i) => `<button class="story${Stories.seen(i) ? " seen" : ""}" type="button" data-story="${i}" aria-label="Watch story: ${esc(x.cap || "story " + (i + 1))}"><img src="${esc(x.img)}" alt="" loading="lazy" decoding="async">${x.when ? `<i>${esc(x.when)}</i>` : ""}${x.cap ? `<span>${esc(x.cap)}</span>` : ""}</button>`).join("")}</div>`;
+    if (body) body = `<div class="snap">${body}</div>`;
+  }
+  if (s.k === "x" && M.x0) body = `<a class="xshot" href="${esc(safeUrl((D.x || {}).link, url))}" target="_blank" rel="noopener"><img src="${esc(M.x0)}" alt="X profile" loading="lazy" decoding="async"></a>`;
+  if (s.k === "spotify") {
+    const P = D.spotify || {};
+    if (M.spCover || P.playlist) body = `<div class="sp-mini">${M.spCover ? `<img class="sp-cover" src="${esc(M.spCover)}" alt="" loading="lazy" decoding="async">` : `<span class="sp-cover sp-ph" aria-hidden="true">${icon("spotify")}</span>`}<div style="min-width:0"><b class="sp-n">${esc(P.playlist || socialShow("spotify", s.v))}</b>${P.artist ? `<span class="sp-a">${esc(P.artist)}</span>` : ""}<div class="bars"><i></i><i></i><i></i><i></i><i></i></div></div></div>`;
+  }
+  if (s.k === "discord" && (D.discord || {}).blurb) body = `<p class="duo-blurb">${esc(D.discord.blurb)}</p>`;
+  const btnStyle = `--brand:${s.k === "x" || s.k === "tiktok" || s.k === "threads" ? "#333" : d.brand.startsWith("linear") ? "#d62976" : d.brand}${d.dark ? ";color:#111" : ""}`;
+  return `<article class="soc${body ? "" : " soc-mini"}" data-soc="${s.k}" style="--brand:${d.brand}">
+    <div class="soc-h"><span class="soc-ic" style="background:${d.brand}${d.dark ? ";color:#111" : ""}" aria-hidden="true">${icon(d.icon)}</span><div class="soc-id"><b>${esc(d.label)}</b><span class="hdl">${pfpHtml()}<em>${esc(socialShow(s.k, s.v))}</em></span></div><button class="ed-chip owner-only" type="button" data-open="social:${s.k}" aria-label="Change ${esc(d.label)}">✎</button><a class="btn" href="${esc(url)}" target="_blank" rel="noopener" style="${btnStyle}">${esc(d.cta)}</a></div>${body}</article>`;
+}
+let socKey = "";
+function renderPersonalSocials(why) {
+  const D = pageData(), M = Custom.media || {}, list = D.socials;
+  // while the owner types elsewhere (name, bio...), don't redraw this part for nothing
+  const key = JSON.stringify([list, D.links, D.instagram, D.snapchat, D.x, D.spotify, D.discord, M.avatar, M.x0, M.spCover, [0, 1, 2].map(i => M["ig" + i]), [0, 1, 2, 3].map(i => M["sc" + i])]);
+  if (why === "local" && key === socKey) return;
+  socKey = key;
+  const has = list.length > 0 || D.links.length > 0;
+  $("#links").classList.toggle("empty", !has);
+  $("#socGrid").innerHTML = list.map(s => personalSocialCard(s, D, M)).join("") + (list.length ? "" :
+    `<div class="own-empty owner-only" data-open="socials"><span class="own-empty-ic" aria-hidden="true">${icon("instagram")}${icon("snapchat")}${icon("youtube")}</span><b>Add your socials</b><span>Type your usernames. People can follow you in one tap.</span><span class="own-empty-btn">＋ Add socials</span></div>`);
+  renderLinks();
+  Snd.syncUI();
+}
+function renderSocials(why) {
+  if (!Custom.demo) return renderPersonalSocials(why);
+  $("#links").classList.remove("empty");
   const V = socialView();
   const DUO = ["spotify", "discord"];   // these two share one card at the bottom, half each
   $("#socGrid").innerHTML = CONFIG.socials.filter(b => !DUO.includes(b.id)).map(base => {
@@ -664,7 +756,6 @@ function renderSocials() {
 function setupSocialClicks() {
   $("#socGrid").addEventListener("click", e => {
     const np = e.target.closest("[data-np]"); if (np) { Snd.fx("tick"); Snd.toggle(); return; }
-    const ed = e.target.closest("[data-edit]"); if (ed) { Snd.fx("tick"); Editor.open(ed.dataset.edit); return; }
     const st = e.target.closest("[data-story]"); if (st) { Snd.fx("tick"); Stories.open(+st.dataset.story); return; }
     if (e.target.closest("a")) Snd.fx("tick");
   });
@@ -683,7 +774,7 @@ function linkKind(u) {
   const k = LINK_KINDS.find(([re]) => re.test(host));
   return { icon: k ? k[1] : "link", brand: k ? k[2] : "linear-gradient(135deg,var(--pink),var(--violet))", host, dark: k && k[1] === "snapchat" };
 }
-function linksNow() { const S = Custom.settings || {}; return cleanLinks(Array.isArray(S.links) ? S.links : CONFIG.links); }
+function linksNow() { if (!Custom.demo) return pageData().links; const S = Custom.settings || {}; return cleanLinks(Array.isArray(S.links) ? S.links : CONFIG.links); }
 function renderLinks() {
   const list = linksNow(), box = $("#linkList");
   box.hidden = !list.length;
@@ -691,10 +782,17 @@ function renderLinks() {
     const k = linkKind(l.u);
     return `<a class="lnk" href="${esc(l.u)}" target="_blank" rel="noopener"><span class="soc-ic" style="background:${k.brand}${k.dark ? ";color:#111" : ""}" aria-hidden="true">${icon(k.icon)}</span><span class="lnk-t">${esc(l.t || k.host)}<small>${esc(k.host)}</small></span><i aria-hidden="true">↗</i></a>`;
   }).join("");
-  $("#editLinks").textContent = list.length ? "✎ Edit links" : "＋ Add more links";
+  $("#editLinks").textContent = list.length ? "✎ Edit links" : "＋ Add a link (YouTube video, shop...)";
 }
 
 /* ======================= SNAPCHAT STORIES ======================= */
+// the stories to play: the example page's, or (on a personal page) only the ones its owner added
+function snapStories() {
+  if (Custom.demo) { const v = socialView().snapchat; return v ? { list: v.stories.filter(st => st.img), url: v.url } : { list: [], url: "" }; }
+  const D = pageData(), M = Custom.media || {}, s = D.socials.find(x => x.k === "snapchat");
+  const list = [0, 1, 2, 3].map(j => ({ img: M["sc" + j], ...((((D.snapchat || {}).stories) || [])[j] || {}) })).filter(x => x.img);
+  return { list, url: s ? SOCIAL.snapchat.url(s.v) : "" };
+}
 // Tap right = next, tap left = back, hold = pause, Esc = close. Stories you've watched turn grey (this visit).
 const Stories = (() => {
   const DUR = 4500; let list = [], i = 0, timer = 0, startAt = 0, left = DUR, lastFocus = null, holdT = 0, held = false;
@@ -714,8 +812,8 @@ const Stories = (() => {
   function next() { Snd.fx("tick"); if (i < list.length - 1) { i++; show(); } else close(); }
   function prev() { Snd.fx("tick"); if (i > 0) i--; show(); }
   function open(k) {
-    const v = socialView().snapchat; if (!v) return;
-    list = v.stories.filter(st => st.img); i = Math.min(Math.max(0, k), list.length - 1); lastFocus = document.activeElement;
+    const v = snapStories(); if (!v.list.length) return;
+    list = v.list; i = Math.min(Math.max(0, k), list.length - 1); lastFocus = document.activeElement;
     $("#svAv").src = (Custom.media && Custom.media.avatar) || CONFIG.avatar; $("#svName").textContent = ownerName(); $("#svAdd").href = v.url;
     el().hidden = false; document.documentElement.style.overflow = "hidden"; show();
     setTimeout(() => $("#svClose").focus(), 50);
@@ -741,12 +839,13 @@ const Stories = (() => {
 
 /* ======================= OWNER CUSTOMIZATION ======================= */
 // On someone's page (flexippo.com/name) everything they change is saved to their account,
-// so it shows for everyone, on every device. Opened from the computer, edits save in this browser.
+// so it shows for everyone, on every device. While they edit, the page changes on screen straight away
+// and saves itself a moment later (no Save button to forget).
 const Custom = (() => {
   let owner = false, cloud = false, target = null, isHome = false, missing = "", failed = false, loaded = false, lastError = null;
-  let settings = LS.get("custom", {}) || {}, media = LS.get("customMedia", {}) || {};
+  let settings = {}, media = {}, saved = { settings: {}, media: {} };
   const subs = [];
-  const emit = () => subs.forEach(f => { try { f(); } catch (e) { console.error(e); } });
+  const emit = why => subs.forEach(f => { try { f(why); } catch (e) { console.error(e); } });   // why: load | local (being edited, not saved yet) | save
   const wanted = () => PAGE_U || String(CONFIG.homeProfile || "").trim().replace(/^@/, "").toLowerCase();
   const syncOwner = () => {
     const meId = Cloud.ready ? (Cloud.user && Cloud.user.id) : ((Cloud.cachedMe || {}).id);
@@ -760,50 +859,142 @@ const Custom = (() => {
       const slow = setTimeout(() => document.body.classList.remove("loading-page"), 6000);   // never hide the page for long
       try { target = await Cloud.getProfile(u); } catch (e) { target = null; lastError = e; failed = !!PAGE_U; }
       clearTimeout(slow);
-      if (target) { settings = cleanSettings(target.settings); media = cleanMedia(target.media); }
+      if (target) { settings = cleanSettings(target.settings); media = cleanMedia(target.media); saved = { settings, media }; }
       else if (PAGE_U && !failed) missing = u;
       syncOwner();
       Cloud.on(why => { if (why === "auth" || why === "me" || why === "init") { const was = owner; syncOwner(); if (was !== owner) apply(); } });
       return apply();
     }
-    owner = location.protocol === "file:";   // opened from the computer: you're the owner, edits stay in this browser
     apply();
   }
   function apply() {
     loaded = true;
     document.body.classList.toggle("is-owner", owner);
     document.body.classList.toggle("on-page", !!target && !isHome);
-    emit();
+    document.body.classList.toggle("personal", !!target);
+    emit("load");
     document.body.classList.remove("loading-page");
     document.documentElement.classList.remove("upage");
   }
-  async function save(next, pend) {
-    if (cloud) {
-      if (!owner || !target) { lastError = new Error("not_owner"); return "error"; }
-      try {
-        const nm = String(((next || {}).profile || {}).name || "").trim();
-        const row = await Cloud.saveMyPage(next, media, pend, nm || target.display_name || target.username);
-        target = { ...target, ...row }; settings = cleanSettings(row.settings); media = cleanMedia(row.media); lastError = null;
-        emit(); return "cloud";
-      } catch (e) { lastError = e; return "error"; }
-    }
-    settings = next; const m = { ...media }; for (const k in pend) { if (pend[k]) m[k] = pend[k]; else delete m[k]; } media = m;
-    let ok = true;
-    try { localStorage.setItem("nv_custom", JSON.stringify(settings)); localStorage.setItem("nv_customMedia", JSON.stringify(media)); } catch (e) { ok = false; }
-    emit();
-    return ok ? "local" : "full";
+  // show a change on the page right away (not saved yet)
+  function setLocal(s, m) { settings = s; if (m) media = m; emit("local"); }
+  // save what's on screen now. Photos that are still uploading are left out until they're done.
+  let chain = Promise.resolve("cloud"), queued = null;
+  async function doPersist() {
+    if (!cloud || !owner || !target) { lastError = new Error("not_owner"); return "error"; }
+    const s = settings, m = cleanMedia(media), nm = String(((s || {}).profile || {}).name || "").trim();
+    try {
+      const row = await Cloud.savePage(s, m, nm || target.display_name || target.username);
+      target = { ...target, ...row }; saved = { settings: cleanSettings(row.settings), media: cleanMedia(row.media) }; lastError = null;
+      return "cloud";
+    } catch (e) { lastError = e; return "error"; }
   }
+  function persist() {
+    if (queued) return queued;                 // one save is already waiting: it will take the newest changes with it
+    queued = chain.then(() => { queued = null; return doPersist(); });
+    chain = queued.catch(() => "error");
+    return queued;
+  }
+  async function save(next) { settings = next; emit("save"); return persist(); }
   return {
-    init, save, on(f) { subs.push(f); },
-    get settings() { return settings; }, get media() { return media; }, get owner() { return owner; },
+    init, save, setLocal, persist, on(f) { subs.push(f); },
+    get settings() { return settings; }, get media() { return media; }, get saved() { return saved; }, get owner() { return owner; },
     get cloud() { return cloud; }, get target() { return target; }, get isHome() { return isHome; }, get missing() { return missing; }, get failed() { return failed; }, get loaded() { return loaded; }, get lastError() { return lastError; },
     // the example page with made-up numbers = the main page without a real profile behind it
     get demo() { return !cloud || !target; }
   };
 })();
 
+/* ======================= WHAT'S ON A PERSONAL PAGE ======================= */
+// A personal page only shows what its owner added. Nothing from the example page (its photos, @flexippo,
+// a made-up Snapscore...) ever fills the gaps. Pages saved with the old editor did carry that example content
+// along, so it's filtered out here: the owner's own photos and text stay, the leftovers go.
+function parseSocial(k, raw) {
+  const d = SOCIAL[k]; if (!d) return "";
+  let s = String(raw || "").trim().replace(/^<|>$/g, "");
+  if (!s) return "";
+  if (k === "email") s = s.replace(/^mailto:/i, "");
+  // a link (has https:// or a /path) is read for the username; anything else IS the username (riya.art is a username, not a website)
+  let u = null;
+  if (k !== "email" && (/^https?:\/\//i.test(s) || /^([a-z0-9-]+\.)+[a-z]{2,}\//i.test(s))) { try { u = new URL(/^https?:\/\//i.test(s) ? s : "https://" + s); } catch (e) { u = null; } }
+  else if (k !== "email" && /^(www\.)?(instagram|snapchat|youtube|youtu|x|twitter|tiktok|whatsapp|wa|discord|discordapp|spotify|open\.spotify|t|telegram|twitch|github|linkedin|facebook|fb|threads|pinterest|reddit|steamcommunity)\.(com|be|me|gg|tv|net|link)$/i.test(s)) return "";   // just the website's name, no username
+  let v = s.replace(/^@/, "");
+  if (u) {
+    const host = u.hostname.toLowerCase().replace(/^(www|m|mobile|web|in|uk|br|de|fr|es|it|nl|jp)\./, "");
+    const p = u.pathname.split("/").filter(Boolean).map(x => { try { return decodeURIComponent(x); } catch (e) { return x; } });
+    const at = x => String(x || "").replace(/^@/, "");
+    const on = re => re.test(host);
+    v = "";
+    if (k === "instagram" && on(/^instagram\.com$/)) v = p[0] === "stories" ? at(p[1]) : ["p", "reel", "reels", "explore", "tv", "accounts"].includes(p[0]) ? "" : at(p[0]);
+    else if (k === "threads" && on(/^threads\.(net|com)$/)) v = at(p[0]);
+    else if (k === "snapchat" && on(/snapchat\.com$/)) v = p[0] === "add" ? p[1] : /^@/.test(p[0] || "") ? at(p[0]) : "";
+    else if (k === "youtube" && on(/^youtube\.com$/)) v = /^@/.test(p[0] || "") ? at(p[0]) : p[0] === "channel" && p[1] ? "channel/" + p[1] : p[0] === "c" && p[1] ? "c/" + p[1] : "";
+    else if (k === "x" && on(/^(x|twitter)\.com$/)) v = ["home", "i", "intent", "share", "search", "hashtag"].includes(p[0]) ? "" : at(p[0]);
+    else if (k === "tiktok" && on(/tiktok\.com$/)) v = /^@/.test(p[0] || "") ? at(p[0]) : "";
+    else if (k === "whatsapp" && on(/^(wa\.me|api\.whatsapp\.com|whatsapp\.com)$/)) v = String(u.searchParams.get("phone") || p[0] || "").replace(/\D/g, "");
+    else if (k === "discord" && on(/^(discord\.gg|discord\.com|discordapp\.com)$/)) v = host === "discord.gg" ? p[0] : p[0] === "invite" ? p[1] : "";
+    else if (k === "spotify" && on(/^(open\.spotify\.com|spotify\.link)$/)) {
+      if (host === "spotify.link") v = p[0] ? "https://spotify.link/" + p[0] : "";
+      else { const q = /^intl-/.test(p[0] || "") ? p.slice(1) : p; v = q[0] && q[1] ? q[0] + "/" + q[1] : ""; }
+    }
+    else if (k === "telegram" && on(/^(t\.me|telegram\.me)$/)) v = at(p[0]);
+    else if (k === "twitch" && on(/twitch\.tv$/)) v = p[0];
+    else if (k === "github" && on(/^github\.com$/)) v = p[0];
+    else if (k === "linkedin" && on(/linkedin\.com$/)) v = p[0] === "in" ? p[1] : "";
+    else if (k === "facebook" && on(/^(facebook\.com|fb\.com)$/)) v = p[0] === "profile.php" ? "" : p[0];
+    else if (k === "pinterest" && on(/pinterest\./)) v = p[0];
+    else if (k === "reddit" && on(/reddit\.com$/)) v = (p[0] === "user" || p[0] === "u") ? p[1] : "";
+    else if (k === "steam" && on(/steamcommunity\.com$/)) v = (p[0] === "id" || p[0] === "profiles") && p[1] ? p[0] + "/" + p[1] : "";
+  } else {
+    if (k === "whatsapp") v = s.replace(/[\s()+-]/g, "");
+    if (k === "steam" && v && !/^(id|profiles)\//.test(v)) v = /^\d{17}$/.test(v) ? "profiles/" + v : "id/" + v;
+    if (k === "spotify") v = "";                      // Spotify needs a link (there's no username to make one from)
+    if (k === "discord") v = v.replace(/^discord\.gg\//i, "");
+  }
+  v = String(v || "").trim();
+  return d.re.test(v) ? v : "";
+}
+const same = (a, b) => String(a === undefined || a === null ? "" : a).trim().toLowerCase() === String(b === undefined || b === null ? "" : b).trim().toLowerCase();
+let pdS = null, pdM = null, pdVal = null;
+function pageData() {
+  const S = Custom.settings || {}, M = Custom.media || {};
+  if (S === pdS && M === pdM && pdVal) return pdVal;
+  let out;
+  if (S.v === 2) {
+    out = { ...S, profile: S.profile && typeof S.profile === "object" ? S.profile : {}, socials: cleanSocials(S.socials), links: cleanLinks(S.links), collection: Array.isArray(S.collection) ? S.collection : [] };
+  } else {
+    // saved with the old editor (or never saved): keep what the owner really put in
+    const P = { ...(S.profile && typeof S.profile === "object" ? S.profile : {}) };
+    if (Array.isArray(P.titles) && JSON.stringify(P.titles) === JSON.stringify(BASE.titles)) delete P.titles;
+    if (Array.isArray(P.ticker) && JSON.stringify(P.ticker) === JSON.stringify(BASE.ticker)) delete P.ticker;
+    const socials = [], add = (k, raw) => { if (socials.some(x => x.k === k)) return; const v = parseSocial(k, raw); if (v) socials.push({ k, v }); };
+    const ig = S.instagram || {}, sc = S.snapchat || {}, xx = S.x || {}, sp = S.spotify || {}, dc = S.discord || {}, C = S.contact || {};
+    if (!same(ig.handle, "@flexippo")) add("instagram", ig.handle); if (!same(ig.url, "https://www.instagram.com/")) add("instagram", ig.url);
+    if (!same(sc.handle, "@flexippo")) add("snapchat", sc.handle); if (!same(sc.url, "https://www.snapchat.com/")) add("snapchat", sc.url);
+    if (!same(xx.handle, "@flexippo")) add("x", xx.handle); if (!same(xx.url, "https://x.com/")) add("x", xx.url);
+    if (!same(sp.url, "https://open.spotify.com/")) add("spotify", sp.url);
+    if (!same(dc.url, "https://discord.com/")) add("discord", dc.url);
+    add("instagram", C.instagram); add("snapchat", C.snapchat); add("x", C.x); add("whatsapp", C.whatsapp); add("discord", C.discord); add("email", C.gmail);
+    const bsc = (BASE.socials.find(s => s.id === "snapchat") || {}), bdc = (BASE.socials.find(s => s.id === "discord") || {});
+    out = {
+      v: 2, profile: P, socials, links: cleanLinks(S.links), pins: S.pins, cmHidden: S.cmHidden,
+      instagram: { posts: [0, 1, 2].map(i => (M["ig" + i] ? (ig.posts || [])[i] || {} : {})) },
+      snapchat: { score: same(sc.score, bsc.score) ? "" : sc.score, streak: same(sc.streak, bsc.streak) ? "" : sc.streak, stories: [0, 1, 2, 3].map(i => (M["sc" + i] ? (sc.stories || [])[i] || {} : {})) },
+      x: { link: xx.link || "" },
+      spotify: { title: same(sp.title, BASE.spotify.title) ? "" : sp.title, playlist: same(sp.playlist, BASE.spotify.playlist) ? "" : sp.playlist, artist: same(sp.artist, BASE.spotify.artist) ? "" : sp.artist, accent: same(sp.accent, BASE.spotify.accent) ? "" : sp.accent },
+      discord: { blurb: same(dc.blurb, bdc.blurb) ? "" : dc.blurb },
+      // the collection: only photos the owner uploaded and text cards they changed
+      collection: (Array.isArray(S.collection) ? S.collection : []).filter(it => it && typeof it === "object" && (it.type === "uc"
+        ? !(same(it.amount, "10,000") && same(it.unit, "UC") && same(it.game, "PUBG MOBILE")) || !!M["col_" + it.id + "_icon"] || !!M["col_" + it.id + "_logo"]
+        : !!M["col_" + it.id]))
+    };
+  }
+  pdS = S; pdM = M; pdVal = out;
+  return out;
+}
+
 /* ======================= PROFILE BASICS (name, photos, birthday, theme, contact) ======================= */
-// Each page starts from the defaults in CONFIG; the owner's saved choices go on top.
+// The example page uses the defaults in CONFIG. Personal pages use only what their owner added.
 const clip = (v, n) => (typeof v === "string" ? v.trim().slice(0, n) : "");
 function cleanList(v, max, len) {
   const a = (Array.isArray(v) ? v : typeof v === "string" ? v.split("\n") : []).map(x => clip(String(x || ""), len)).filter(Boolean).slice(0, max);
@@ -825,26 +1016,29 @@ function contactFor(base, val, userPage) {
 }
 let skinTouched = false;
 function applyBasics() {
-  const S = Custom.settings || {}, M = Custom.media || {}, T = Custom.target;
-  const P = S.profile && typeof S.profile === "object" ? S.profile : {};
-  const userPage = !!T && !Custom.isHome;
-  const name = clip(P.name, 24) || (userPage ? T.display_name || T.username : BASE.name);
-  CONFIG.name = name;
-  CONFIG.heroName = clip(P.heroName, 14) || (userPage ? name.toUpperCase().slice(0, 14) : PAGE_U ? CONFIG.heroName : BASE.heroName);
-  CONFIG.kana = typeof P.kana === "string" ? clip(P.kana, 30) : userPage ? "@" + T.username : PAGE_U ? CONFIG.kana : BASE.kana;
-  CONFIG.titles = cleanList(P.titles, 6, 40) || BASE.titles;
-  CONFIG.birthday = typeof P.birthday === "string" ? P.birthday.trim() : userPage ? "" : BASE.birthday;
-  CONFIG.avatar = M.avatar || (userPage || PAGE_U ? FLEX_AVATAR : BASE.avatar);
-  CONFIG.cover = M.cover || BASE.cover;
-  CONFIG.ticker = cleanList(P.ticker, 8, 30) || (userPage ? [CONFIG.heroName, "WELCOME TO MY PAGE", "限界突破", "FLEXIPPO.COM"] : PAGE_U ? CONFIG.ticker : BASE.ticker);
-  const C = S.contact && typeof S.contact === "object" ? S.contact : {};
-  CONFIG.contact = BASE.contact.map(c => contactFor(c, C[c.id], userPage || !!PAGE_U));
-  const D = S.discord && typeof S.discord === "object" ? S.discord : {};
-  const d = CONFIG.socials.find(s => s.id === "discord"), bd = BASE.socials.find(s => s.id === "discord");
-  if (d && bd) { d.handle = clip(D.handle, 40) || bd.handle; d.url = safeUrl(D.url, bd.url); d.blurb = typeof D.blurb === "string" ? clip(D.blurb, 140) : bd.blurb; }
+  const T = Custom.target, own = !!T;                        // own = a real person's page (not the example page)
+  const userPage = own && !Custom.isHome;
+  if (own) {
+    const D = pageData(), P = D.profile || {}, M = Custom.media || {};
+    const name = clip(P.name, 24) || T.display_name || T.username;
+    CONFIG.name = name;
+    CONFIG.heroName = clip(P.heroName, 14) || name.toUpperCase().slice(0, 14);
+    CONFIG.kana = typeof P.kana === "string" && P.kana.trim() ? clip(P.kana, 30) : "@" + T.username;
+    CONFIG.titles = cleanList(P.titles, 6, 40) || [];
+    CONFIG.birthday = typeof P.birthday === "string" ? P.birthday.trim() : "";
+    CONFIG.avatar = M.avatar || FLEX_AVATAR;
+    CONFIG.cover = M.cover || "";
+    CONFIG.ticker = cleanList(P.ticker, 8, 30) || [CONFIG.heroName, "WELCOME TO MY PAGE", "限界突破", "FLEXIPPO.COM"];
+    CONFIG.contact = BASE.contact.map(c => ({ ...c, value: "", url: "" }));
+    if (!skinTouched && ["night", "sakura", "fire"].includes(P.skin) && document.documentElement.dataset.skin !== P.skin) applySkin(P.skin, false, true);
+  } else if (PAGE_U) {
+    CONFIG.titles = []; CONFIG.cover = "";              // page not found / not loaded: nothing from the example page
+  }
   CONFIG.siteUrl = userPage ? Cloud.shareLink(T.username) : BASE.siteUrl;
-  if (!skinTouched && ["night", "sakura", "fire"].includes(P.skin) && document.documentElement.dataset.skin !== P.skin) applySkin(P.skin, false, true);
-  document.title = userPage ? name + " · flexippo" : BASE_TITLE;
+  document.title = userPage ? CONFIG.name + " · flexippo" : BASE_TITLE;
+  document.body.classList.toggle("no-bio", !CONFIG.titles.length);
+  document.body.classList.toggle("no-cover", !CONFIG.cover);
+  $("#coverBtnT").textContent = CONFIG.cover ? "Change photo" : "Add your photo";
   renderName(); renderTicker(); renderContact(); renderShare(); tickCountdown();
 }
 function renderTicker() {
@@ -854,6 +1048,8 @@ function renderTicker() {
   if (tr.innerHTML !== html) tr.innerHTML = html;
 }
 function renderContact() {
+  // personal pages show how to reach them in the socials list, so this box is only on the example page
+  const sec = $("#contact"); sec.hidden = !Custom.demo || !!PAGE_U; if (sec.hidden) return;
   const mail = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>';
   $("#ctGrid").innerHTML = CONFIG.contact.map(c => {
     const link = !!(c.value && c.url), plain = !!c.value && !c.url;
@@ -865,6 +1061,7 @@ function renderContact() {
   }).join("");
 }
 
+// photos are made smaller on the phone before they're uploaded (quicker on slow internet, lighter for visitors)
 function shrinkImage(file, max = 720, maxBytes = 220000) {
   return new Promise((res, rej) => {
     if (!file || !/^image\//.test(file.type)) return rej(new Error("type"));
@@ -883,228 +1080,20 @@ function shrinkImage(file, max = 720, maxBytes = 220000) {
   });
 }
 
-const Editor = (() => {
-  let pend = {}, tab = "profile", colWork = [], linkWork = [];
-  const newId = () => "c" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-  const mediaOf = k => (Object.prototype.hasOwnProperty.call(pend, k) ? pend[k] : (Custom.media || {})[k]) || "";
-  function colRow(it, i, n) {
-    const isText = it.type === "uc";
-    const hasIcon = !!(mediaOf("col_" + it.id + "_icon") || it.icon), hasLogo = !!(mediaOf("col_" + it.id + "_logo") || it.logo);
-    const thumb = isText ? `<div class="col-uc">${esc(it.amount || "")}<small>${esc(it.unit || "")}</small></div>` : `<img class="col-thumb" src="${esc(mediaOf("col_" + it.id) || bestSrc(it.img || ""))}" alt="">`;
-    const fields = isText
-      ? `<input data-k="amount" maxlength="16" value="${esc(it.amount || "")}" placeholder="Big text, e.g. 10,000" aria-label="Big text">
-         <input data-k="unit" maxlength="16" value="${esc(it.unit || "")}" placeholder="Second line, e.g. UC" aria-label="Second line">
-         <input data-k="game" maxlength="30" value="${esc(it.game || "")}" placeholder="Small label, e.g. PUBG MOBILE" aria-label="Small label">`
-      : `<input data-k="meme" maxlength="40" value="${esc(it.meme || "")}" placeholder="Top text (optional), e.g. THOSE WHO KNOW" aria-label="Top text">
-         <input data-k="alt" maxlength="80" value="${esc(it.alt || "")}" placeholder="What's in the photo (helps Google + screen readers)" aria-label="Description">`;
-    const acts = `<button class="chip" type="button" data-act="top" ${i === 0 ? "disabled" : ""}>⤒ Top</button><button class="chip" type="button" data-act="up" ${i === 0 ? "disabled" : ""} aria-label="Move up">↑</button><button class="chip" type="button" data-act="down" ${i === n - 1 ? "disabled" : ""} aria-label="Move down">↓</button>` +
-      (isText ? `<label class="chip">${hasIcon ? "Icon ✓" : "+ Icon"}<input type="file" accept="image/*" data-colfile="icon" hidden></label><label class="chip">${hasLogo ? "Logo ✓" : "+ Logo"}<input type="file" accept="image/*" data-colfile="logo" hidden></label>`
-              : `<label class="chip">Change photo<input type="file" accept="image/*" data-colfile="img" hidden></label>`) +
-      `<button class="chip col-del" type="button" data-act="del">Remove</button>`;
-    return `<div class="col-row" data-i="${i}">${thumb}<div class="col-f">${fields}</div><div class="col-a">${acts}</div></div>`;
+/* ======================= OWNER TOOLS (downloaded only for the page's owner) ======================= */
+// Visitors never download the editor. It loads when the owner opens their own page.
+const OwnerTools = (() => {
+  let p = null;
+  const load = () => p || (p = loadScript("assets/edit.js?v=3").then(() => { if (!window.FlexEdit) throw new Error("Failed to fetch"); return window.FlexEdit; }, e => { p = null; throw e; }));
+  function open(what, opts) {
+    return load().then(E => E.open(what, opts), () => toast("Couldn't open the editor. Check your internet and try again."));
   }
-  function renderCol() {
-    const pane = $('#edBody [data-pane="collection"]'); if (!pane) return;
-    const full = colWork.length >= colMax();
-    pane.innerHTML = `<div class="col-add"><label class="btn${full ? " is-off" : ""}">+ Add photos<input type="file" accept="image/*" multiple data-colfile="add" hidden${full ? " disabled" : ""}></label><button class="chip" type="button" data-act="addtext"${full ? " disabled" : ""}>+ Text card</button><span class="col-count">${colWork.length} / ${colMax()} SLOTS</span></div>
-      ${colWork.length >= colMax() ? `<p class="col-full">🔒 All ${colMax()} slots are used. Remove one to add another. <b>More slots are coming with Premium.</b></p>` : `<p class="hint">You have ${colMax()} slots. New photos go to the end; tap ⤒ Top to move one first.</p>`}
-      <div class="col-list">${colWork.map((it, i) => colRow(it, i, colWork.length)).join("")}</div>
-      <button class="chip" type="button" data-act="restore" style="align-self:flex-start">Restore default collection</button>`;
-  }
-  function bindCol() {
-    const pane = $('#edBody [data-pane="collection"]');
-    pane.addEventListener("input", e => { const k = e.target.dataset.k; if (!k) return; const row = e.target.closest(".col-row"); if (row) colWork[+row.dataset.i][k] = e.target.value; });
-    pane.addEventListener("click", e => {
-      const b = e.target.closest("button[data-act]"); if (!b) return;
-      const act = b.dataset.act, row = b.closest(".col-row"), i = row ? +row.dataset.i : -1;
-      if (act === "top" && i > 0) colWork.unshift(colWork.splice(i, 1)[0]);
-      else if (act === "up" && i > 0) [colWork[i - 1], colWork[i]] = [colWork[i], colWork[i - 1]];
-      else if (act === "down" && i >= 0 && i < colWork.length - 1) [colWork[i + 1], colWork[i]] = [colWork[i], colWork[i + 1]];
-      else if (act === "del") { const it = colWork[i]; ["", "_icon", "_logo"].forEach(sfx => { const k = "col_" + it.id + sfx; if ((Custom.media || {})[k] || pend[k]) pend[k] = null; }); colWork.splice(i, 1); }
-      else if (act === "addtext") { if (colWork.length >= colMax()) return; colWork.unshift({ id: newId(), type: "uc", amount: "999", unit: "WINS", game: "" }); }
-      else if (act === "restore") { Object.keys(Custom.media || {}).concat(Object.keys(pend)).filter(k => k.startsWith("col_")).forEach(k => pend[k] = null); colWork = JSON.parse(JSON.stringify(BASE.collection.slice(0, colMax()))); }
-      else return;
-      Snd.fx(act === "del" ? "unpop" : "tick"); renderCol();
-    });
-    pane.addEventListener("change", async e => {
-      const t = e.target, kind = t.dataset.colfile; if (!kind) return;
-      const files = [...(t.files || [])]; if (!files.length) return;
-      if (kind === "add") {
-        const room = colMax() - colWork.length;
-        if (room <= 0) { $("#edNote").textContent = `All ${colMax()} slots are used. Remove one first.`; return; }
-        $("#edNote").textContent = "Adding photos…";
-        let added = 0;
-        for (const f of files.slice(0, room)) { try { const d = await shrinkImage(f, 640, 160000); const id = newId(); pend["col_" + id] = d; colWork.push({ id, alt: "", meme: "" }); added++; } catch (err) {} }
-        $("#edNote").textContent = added ? `Added ${added} photo${added > 1 ? "s" : ""}${files.length > room ? ` (only ${room} slot${room > 1 ? "s" : ""} left)` : ""}. Press Save to keep them.` : "Those files aren't images we can use. Try JPG or PNG.";
-        Snd.fx("pop"); renderCol(); return;
-      }
-      const row = t.closest(".col-row"); const it = colWork[+row.dataset.i];
-      try { const d = await shrinkImage(files[0], kind === "img" ? 640 : 360, 160000); pend["col_" + it.id + (kind === "img" ? "" : "_" + kind)] = d; Snd.fx("pop"); renderCol(); }
-      catch (err) { $("#edNote").textContent = "That file isn't an image we can use. Try a JPG or PNG."; }
-    });
-  }
-  /* ---- links tab ---- */
-  function renderLinksPane() {
-    const pane = $('#edBody [data-pane="links"]'); if (!pane) return;
-    const max = CONFIG.linkLimit || 8, full = linkWork.length >= max;
-    pane.innerHTML = `<p class="hint">Extra buttons under your socials: YouTube, a game profile, your shop, anything. Up to ${max}.</p>
-      <div class="col-list">${linkWork.map((l, i) => { const k = linkKind(l.u);
-        return `<div class="col-row lk" data-i="${i}"><span class="soc-ic" style="background:${k.brand}${k.dark ? ";color:#111" : ""}" aria-hidden="true">${icon(k.icon)}</span><div class="col-f"><input data-k="t" maxlength="40" value="${esc(l.t)}" placeholder="Button text, e.g. My YouTube" aria-label="Button text"><input data-k="u" type="url" maxlength="300" value="${esc(l.u)}" placeholder="https://..." aria-label="Link"></div><div class="col-a"><button class="chip" type="button" data-act="up" ${i === 0 ? "disabled" : ""} aria-label="Move up">↑</button><button class="chip" type="button" data-act="down" ${i === linkWork.length - 1 ? "disabled" : ""} aria-label="Move down">↓</button><button class="chip col-del" type="button" data-act="del">Remove</button></div></div>`; }).join("")}</div>
-      <button class="btn" type="button" data-act="add"${full ? " disabled" : ""} style="align-self:flex-start">+ Add a link</button>`;
-  }
-  function bindLinks() {
-    const pane = $('#edBody [data-pane="links"]');
-    pane.addEventListener("input", e => {
-      const k = e.target.dataset.k, row = e.target.closest(".col-row"); if (!k || !row) return;
-      linkWork[+row.dataset.i][k] = e.target.value;
-      if (k === "u") { const kk = linkKind(e.target.value.trim()), ic = $(".soc-ic", row); ic.style.background = kk.brand; ic.style.color = kk.dark ? "#111" : ""; ic.innerHTML = icon(kk.icon); }
-    });
-    pane.addEventListener("click", e => {
-      const b = e.target.closest("button[data-act]"); if (!b) return;
-      const act = b.dataset.act, row = b.closest(".col-row"), i = row ? +row.dataset.i : -1;
-      if (act === "add") { if (linkWork.length >= (CONFIG.linkLimit || 8)) return; linkWork.push({ t: "", u: "https://" }); }
-      else if (act === "del" && i >= 0) linkWork.splice(i, 1);
-      else if (act === "up" && i > 0) [linkWork[i - 1], linkWork[i]] = [linkWork[i], linkWork[i - 1]];
-      else if (act === "down" && i >= 0 && i < linkWork.length - 1) [linkWork[i + 1], linkWork[i]] = [linkWork[i], linkWork[i + 1]];
-      else return;
-      Snd.fx(act === "del" ? "unpop" : "tick"); renderLinksPane();
-      if (act === "add") { const ins = $$('#edBody [data-pane="links"] input[data-k="t"]'); if (ins.length) ins[ins.length - 1].focus(); }
-    });
-  }
-  const el = () => $("#editor");
-  function imgField(key, label, current) {
-    return `<div class="fld"><span class="lab">${label}</span><div class="imgpick"><img data-prev="${key}" src="${esc(current)}" alt=""><div class="row"><label class="chip pick">Upload<input type="file" accept="image/*" data-file="${key}" hidden></label><button class="chip" type="button" data-reset="${key}">Reset</button></div></div></div>`;
-  }
-  const txt = (id, label, val, max = 80, type = "text", ph = "") => `<div class="fld"><label for="${id}">${label}</label><input id="${id}" type="${type}" maxlength="${max}" value="${esc(val || "")}" placeholder="${esc(ph)}"></div>`;
-  function build() {
-    const V = socialView(), sp = V.spotify, ig = V.instagram, x = V.x, sc = V.snapchat;
-    const rawTracks = (Object.assign({}, CONFIG.spotify, (Custom.settings || {}).spotify || {}).tracks || []).join("\n");
-    const S0 = Custom.settings || {}, P = S0.profile || {}, D = S0.discord || {}, Cs = S0.contact || {};
-    const dc = CONFIG.socials.find(s => s.id === "discord") || {};
-    const cv = id => { const c = CONFIG.contact.find(x => x.id === id) || {}; return Cs[id] !== undefined ? String(Cs[id]) : String(c.value || "").replace(/^\+/, ""); };
-    const skinNow = ["night", "sakura", "fire"].includes(P.skin) ? P.skin : (document.documentElement.dataset.skin || "night");
-    $("#edBody").innerHTML = `
-      <section data-pane="profile">
-        ${txt("e-p-name", "YOUR NAME", P.name !== undefined ? P.name : CONFIG.name, 24, "text", "e.g. Rahul")}
-        ${txt("e-p-hero", "BIG NAME AT THE TOP (UP TO 14 LETTERS)", P.heroName !== undefined ? P.heroName : CONFIG.heroName, 14, "text", "e.g. RAHUL")}
-        ${txt("e-p-kana", "SMALL LINE UNDER THE NAME", P.kana !== undefined ? P.kana : CONFIG.kana, 30, "text", "e.g. ラフル or @rahul")}
-        <div class="fld"><label for="e-p-titles">TYPING LINES (ONE PER LINE, UP TO 6)</label><textarea id="e-p-titles" maxlength="300">${esc(CONFIG.titles.join("\n"))}</textarea></div>
-        ${imgField("avatar", "PROFILE PICTURE", CONFIG.avatar)}
-        ${imgField("cover", "BIG TOP PHOTO", bestSrc(CONFIG.cover))}
-        ${txt("e-p-bday", "BIRTHDAY AS MONTH-DAY, LIKE 11-20 (EMPTY HIDES THE COUNTDOWN)", P.birthday !== undefined ? P.birthday : CONFIG.birthday, 5, "text", "11-20")}
-        <div class="fld"><label for="e-p-skin">THEME</label><select id="e-p-skin">${[["night", "Neon Tokyo Night"], ["sakura", "Sakura Day"], ["fire", "Shonen Fire"]].map(([k, l]) => `<option value="${k}"${k === skinNow ? " selected" : ""}>${l}</option>`).join("")}</select></div>
-        <div class="fld"><label for="e-p-ticker">MOVING STRIP WORDS (ONE PER LINE, UP TO 8)</label><textarea id="e-p-ticker" maxlength="300">${esc(CONFIG.ticker.join("\n"))}</textarea></div>
-      </section>
-      <section data-pane="links"></section>
-      <section data-pane="spotify">
-        ${txt("e-sp-title", "CARD TITLE", sp.title, 30, "text", "On repeat")}
-        ${txt("e-sp-sub", "ONE-LINE MOOD", sp.subtitle, 70, "text", "What I'm playing this week")}
-        ${txt("e-sp-pl", "PLAYLIST OR SONG NAME", sp.playlist, 50)}
-        ${txt("e-sp-ar", "ARTIST / BY", sp.artist, 50)}
-        ${txt("e-sp-url", "SPOTIFY LINK", sp.url, 300, "url", "https://open.spotify.com/...")}
-        ${imgField("spCover", "COVER IMAGE", sp.cover)}
-        <div class="fld"><label for="e-sp-acc">ACCENT COLOR</label><input id="e-sp-acc" type="color" value="${esc(sp.accent)}"></div>
-        <div class="fld"><label for="e-sp-tr">TRACKS (ONE PER LINE: SONG — ARTIST, MAX 6)</label><textarea id="e-sp-tr" maxlength="600">${esc(rawTracks)}</textarea></div>
-      </section>
-      <section data-pane="instagram">
-        ${txt("e-ig-h", "INSTAGRAM USERNAME", ig.handle, 40, "text", "@yourname")}
-        ${txt("e-ig-u", "PROFILE LINK", ig.url, 300, "url", "https://instagram.com/yourname")}
-        ${ig.posts.map((p, i) => `<div class="ed-post"><b>Post ${i + 1}</b>${imgField("ig" + i, "IMAGE", bestSrc(p.img))}${txt("e-ig-c" + i, "CAPTION", p.cap, 60)}${txt("e-ig-l" + i, "POST LINK (OPTIONAL)", p.link, 300, "url", "https://instagram.com/p/...")}</div>`).join("")}
-      </section>
-      <section data-pane="x">
-        ${txt("e-x-h", "X USERNAME", x.handle, 40, "text", "@yourname")}
-        ${txt("e-x-u", "PROFILE LINK", x.url, 300, "url", "https://x.com/yourname")}
-        <div class="fld"><label for="e-x-t">POST TEXT</label><textarea id="e-x-t" maxlength="280">${esc(x.text)}</textarea></div>
-        ${txt("e-x-w", "TIME LABEL", x.when, 12, "text", "2h")}
-        ${imgField("x0", "POST IMAGE", bestSrc(x.img))}
-        ${txt("e-x-l", "POST LINK (OPTIONAL)", x.link, 300, "url", "https://x.com/.../status/...")}
-      </section>
-      <section data-pane="snapchat">
-        ${txt("e-sc-h", "SNAPCHAT USERNAME", sc.handle, 40, "text", "@yourname")}
-        ${txt("e-sc-u", "ADD-ME LINK", sc.url, 300, "url", "https://www.snapchat.com/add/yourname")}
-        ${txt("e-sc-s", "SNAPSCORE", String(sc.score), 12, "text", "128402")}
-        ${txt("e-sc-k", "STREAK (DAYS)", String(sc.streak), 6, "text", "365")}
-        ${sc.stories.map((st, i) => `<div class="ed-post"><b>Story ${i + 1}</b>${imgField("sc" + i, "IMAGE (TALL PHOTOS LOOK BEST)", bestSrc(st.img))}${txt("e-sc-c" + i, "CAPTION", st.cap, 60)}${txt("e-sc-w" + i, "TIME LABEL", st.when, 12, "text", "2h")}</div>`).join("")}
-      </section>
-      <section data-pane="discord">
-        ${txt("e-d-h", "SERVER OR USERNAME", D.handle !== undefined ? D.handle : dc.handle, 40, "text", "Neon Dojo server")}
-        ${txt("e-d-u", "INVITE LINK", D.url !== undefined ? D.url : dc.url, 300, "url", "https://discord.gg/...")}
-        <div class="fld"><label for="e-d-b">SHORT DESCRIPTION</label><textarea id="e-d-b" maxlength="140">${esc(D.blurb !== undefined ? D.blurb : dc.blurb || "")}</textarea></div>
-      </section>
-      <section data-pane="contact">
-        <p class="hint">Fill in the ones you want people to use. Empty ones show as "Coming soon".</p>
-        ${txt("e-c-instagram", "INSTAGRAM USERNAME", cv("instagram"), 30, "text", "yourname")}
-        ${txt("e-c-x", "X USERNAME", cv("x"), 15, "text", "yourname")}
-        ${txt("e-c-gmail", "EMAIL", cv("gmail"), 80, "text", "you@gmail.com")}
-        ${txt("e-c-snapchat", "SNAPCHAT USERNAME", cv("snapchat"), 30, "text", "yourname")}
-        ${txt("e-c-whatsapp", "WHATSAPP NUMBER WITH COUNTRY CODE", cv("whatsapp"), 20, "text", "919876543210")}
-        ${txt("e-c-discord", "DISCORD INVITE LINK", cv("discord"), 120, "url", "https://discord.gg/...")}
-      </section>
-      <section data-pane="collection"></section>`;
-    colWork = JSON.parse(JSON.stringify(collectionList()));
-    linkWork = JSON.parse(JSON.stringify(linksNow()));
-    renderCol(); bindCol(); renderLinksPane(); bindLinks();
-    $$("#edBody [data-file]").forEach(inp => inp.addEventListener("change", async () => {
-      const f = inp.files && inp.files[0]; if (!f) return;
-      try { const k = inp.dataset.file; const d = await shrinkImage(f, k === "spCover" ? 480 : k === "avatar" ? 400 : k === "cover" ? 1600 : 720, k === "cover" ? 450000 : 220000); pend[inp.dataset.file] = d; $(`[data-prev="${inp.dataset.file}"]`).src = d; Snd.fx("pop"); }
-      catch (e) { $("#edNote").textContent = "That file isn't an image we can use. Try a JPG or PNG."; }
-    }));
-    $$("#edBody [data-reset]").forEach(b => b.addEventListener("click", () => {
-      const k = b.dataset.reset; pend[k] = null;
-      const def = k === "avatar" ? (Custom.target && !Custom.isHome ? FLEX_AVATAR : BASE.avatar) : k === "cover" ? BASE.cover : k === "spCover" ? CONFIG.spotify.cover : k === "x0" ? CONFIG.socials.find(s => s.id === "x").post.img : k.startsWith("sc") ? CONFIG.socials.find(s => s.id === "snapchat").stories[+k.slice(2)].img : CONFIG.socials.find(s => s.id === "instagram").posts[+k.slice(2)].img;
-      $(`[data-prev="${k}"]`).src = bestSrc(def); Snd.fx("tick");
-    }));
-    show(tab);
-  }
-  function show(t) { tab = t; $$("#edBody [data-pane]").forEach(p => p.hidden = p.dataset.pane !== t); $$("#edTabs [data-tab]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.tab === t))); }
-  function open(t) { pend = {}; tab = t || "profile"; build(); $("#edNote").textContent = Custom.cloud ? "Saved to your account. Log in on any phone or laptop and it's there." : "Changes save in this browser."; el().hidden = false; document.body.classList.add("locked-ed"); setTimeout(() => { const f = $(`#edBody [data-pane="${tab}"] input`); f && f.focus(); }, 30); }
-  function close() { el().hidden = true; document.body.classList.remove("locked-ed"); }
-  async function save() {
-    const v = id => ($("#" + id) || {}).value || "";
-    const lines = (id, max, len) => v(id).split("\n").map(t => t.trim().slice(0, len)).filter(Boolean).slice(0, max);
-    const prev = Custom.settings || {};
-    const badLink = linkWork.find(l => (l.u.trim() && l.u.trim() !== "https://" && !/^https?:\/\/[^\s<>"']+\.[^\s<>"']+/i.test(l.u.trim())) || (l.t.trim() && !/^https?:\/\/[^\s<>"']+\.[^\s<>"']+/i.test(l.u.trim())));
-    if (badLink) { show("links"); $("#edNote").textContent = "Each link needs a full address that starts with https:// (for example https://youtube.com/@you)."; return; }
-    const next = {
-      ...prev,
-      profile: { name: v("e-p-name").trim().slice(0, 24), heroName: v("e-p-hero").trim().slice(0, 14), kana: v("e-p-kana").trim().slice(0, 30), titles: lines("e-p-titles", 6, 40), birthday: v("e-p-bday").trim(), skin: v("e-p-skin") || "night", ticker: lines("e-p-ticker", 8, 30) },
-      links: cleanLinks(linkWork),
-      discord: { handle: v("e-d-h").trim().slice(0, 40), url: v("e-d-u").trim(), blurb: v("e-d-b").trim().slice(0, 140) },
-      contact: Object.fromEntries(["instagram", "x", "gmail", "snapchat", "whatsapp", "discord"].map(id => [id, v("e-c-" + id).trim().replace(/^@/, "")])),
-      spotify: { title: v("e-sp-title").trim(), subtitle: v("e-sp-sub").trim(), playlist: v("e-sp-pl").trim(), artist: v("e-sp-ar").trim(), url: v("e-sp-url").trim(), accent: v("e-sp-acc"), tracks: v("e-sp-tr").split("\n").map(t => t.trim()).filter(Boolean).slice(0, 6) },
-      instagram: { handle: v("e-ig-h").trim(), url: v("e-ig-u").trim(), posts: [0, 1, 2].map(i => ({ cap: v("e-ig-c" + i).trim(), link: v("e-ig-l" + i).trim() })) },
-      x: { handle: v("e-x-h").trim(), url: v("e-x-u").trim(), text: v("e-x-t").trim(), when: v("e-x-w").trim(), link: v("e-x-l").trim() },
-      snapchat: { handle: v("e-sc-h").trim(), url: v("e-sc-u").trim(), score: v("e-sc-s").trim(), streak: v("e-sc-k").trim(), stories: [0, 1, 2, 3].map(i => ({ cap: v("e-sc-c" + i).trim(), when: v("e-sc-w" + i).trim() })) },
-      collection: colWork.slice(0, colMax()).map(it => {
-        const o = { id: String(it.id).slice(0, 40) };
-        if (it.type === "uc") Object.assign(o, { type: "uc", amount: String(it.amount || "").slice(0, 16), unit: String(it.unit || "").slice(0, 16), game: String(it.game || "").slice(0, 30), icon: /^assets\//.test(it.icon || "") ? it.icon : "", logo: /^assets\//.test(it.logo || "") ? it.logo : "" });
-        else Object.assign(o, { img: /^assets\//.test(it.img || "") ? it.img : "", alt: String(it.alt || "").slice(0, 80), meme: String(it.meme || "").slice(0, 40) });
-        return o;
-      })
-    };
-    const bad = [["e-sp-url", "Spotify link"], ["e-ig-u", "Instagram link"], ["e-x-u", "X link"], ["e-x-l", "X post link"], ["e-ig-l0", "Post 1 link"], ["e-ig-l1", "Post 2 link"], ["e-ig-l2", "Post 3 link"], ["e-sc-u", "Snapchat link"]].find(([id]) => v(id).trim() && !/^https?:\/\//i.test(v(id).trim()));
-    if (bad) { $("#edNote").textContent = bad[1] + " needs to start with https://"; return; }
-    if (v("e-d-u").trim() && !/^https:\/\//i.test(v("e-d-u").trim())) { show("discord"); $("#edNote").textContent = "Discord link needs to start with https://"; return; }
-    if (next.profile.birthday && !BDAY_RE.test(next.profile.birthday)) { show("profile"); $("#edNote").textContent = "Birthday should look like 11-20 (month-day), or leave it empty."; return; }
-    const cBad = { instagram: "Instagram username can only use letters, numbers, dots and _", x: "X username can only use letters, numbers and _ (15 max)", gmail: "That email doesn't look right", snapchat: "Snapchat username doesn't look right", whatsapp: "WhatsApp number: country code + number, digits only (like 919876543210)", discord: "Discord invite should look like https://discord.gg/yourcode" };
-    const cWrong = Object.keys(cBad).find(id => next.contact[id] && !CONTACT_LINK[id](next.contact[id]));
-    if (cWrong) { show("contact"); $("#edNote").textContent = cBad[cWrong]; return; }
-    $("#edSave").disabled = true; $("#edNote").textContent = Object.values(pend).some(Boolean) && Custom.cloud ? "Saving… uploading your photos" : "Saving…";
-    const r = await Custom.save(next, pend);
-    $("#edSave").disabled = false;
-    if (r === "error") { $("#edNote").textContent = Custom.cloud ? (Cloud.user ? "Couldn't save. " + friendlyError(Custom.lastError) : "Log in again to save your changes.") : "Couldn't save. Only the page owner can make changes."; return; }
-    if (r === "full") { $("#edNote").textContent = "This browser is out of space for photos. Remove a few, or use the online version of your page."; return; }
-    Snd.fx("chime"); close(); toast(r === "cloud" ? "Saved ✓ Your page is updated for everyone" : "Saved in this browser");
-  }
-  function init() {
-    $("#edClose").addEventListener("click", () => { Snd.fx("tick"); close(); });
-    $("#edCancel").addEventListener("click", () => { Snd.fx("tick"); close(); });
-    $("#edSave").addEventListener("click", save);
-    $$("#edTabs [data-tab]").forEach(b => b.addEventListener("click", () => { Snd.fx("tick"); show(b.dataset.tab); }));
-    el().addEventListener("click", e => { if (e.target === el()) close(); });
-    addEventListener("keydown", e => { if (e.key === "Escape" && !el().hidden) close(); });
-  }
-  return { open, close, init };
+  // tap on anything marked data-open (owner buttons all over the page)
+  document.addEventListener("click", e => {
+    const b = e.target.closest && e.target.closest("[data-open]"); if (!b || !Custom.owner) return;
+    e.preventDefault(); Snd.fx("tick"); open(b.dataset.open);
+  });
+  return { load, open };
 })();
 
 /* ======================= REAL NUMBERS ON PERSONAL PAGES (Supabase) =======================
@@ -1193,6 +1182,7 @@ const Live = (() => {
   return {
     load, loadMine, loadPinned, on(f) { subs.push(f); },
     get state() { return state; }, get live() { return live(); }, get page() { return page; }, get views() { return sum ? +sum.views || 0 : 0; },
+    totals() { const s = sum || {}, add = o => Object.values(o || {}).reduce((a, b) => a + (+b || 0), 0); return { views: +s.views || 0, likes: add(s.likes), comments: add(s.comments), guestbook: +s.guestbook || 0 }; },
     likes, comments, liked: id => mine.has(id), pinned: id => pinned[id] || null,
     toggleLike, listComments, addComment, deleteComment, listGuestbook, sign, unsign
   };
@@ -1265,15 +1255,23 @@ function avatarOf(who, url) {
   return `<span class="cm-av" style="--a1:${a1};--a2:${a2}" aria-hidden="true">${esc(String(who).charAt(0).toUpperCase())}</span>`;
 }
 const colMax = () => Math.max(1, CONFIG.collectionLimit || 9);
-function collectionList() { const S = Custom.settings || {}; return (Array.isArray(S.collection) ? S.collection : CONFIG.collection).slice(0, colMax()); }
+function collectionList() { return (Custom.demo ? CONFIG.collection : pageData().collection).slice(0, colMax()); }
 function collectionView() {
   const M = Custom.media || {};
   return collectionList().map(it => ({ ...it, img: M["col_" + it.id] || it.img || "", icon: M["col_" + it.id + "_icon"] || it.icon || "", logo: M["col_" + it.id + "_logo"] || it.logo || "" }))
     .filter(it => it.type === "uc" || it.img);
 }
-function renderVault() {
-  const items = collectionView();
+let vaultKey = "";
+function renderVault(why) {
+  const items = collectionView(), personal = !Custom.demo;
+  const key = JSON.stringify([items, personal, Custom.owner, pinsNow()]);
+  if (why === "local" && key === vaultKey) return;   // the owner is typing somewhere else: nothing to redraw here
+  vaultKey = key;
   $("#vaultDemo").hidden = !Custom.demo;
+  $("#vault").classList.toggle("empty", personal && !items.length);
+  const ownerAdd = !personal ? "" : !items.length
+    ? `<div class="own-empty owner-only" data-open="collection-add"><span class="own-empty-ic" aria-hidden="true">📸</span><b>Show off your stuff</b><span>Your setup, shoes, cards, pets, anything. Friends can like and comment on each one.</span><span class="own-empty-btn">＋ Add photos</span></div>`
+    : items.length < colMax() ? `<button class="card add-card owner-only" type="button" data-open="collection-add" aria-label="Add photos"><span class="ci"><b aria-hidden="true">＋</b><small>Add photos</small></span></button>` : "";
   $("#grid").innerHTML = items.map(it => {
     const media = it.type === "uc"
       ? `<div class="uc">${it.icon ? `<img class="uc-ic" src="${esc(it.icon)}" alt="UC">` : ""}<div class="uc-amt">${esc(it.amount)}</div><div class="uc-unit">${esc(it.unit)}</div>${it.logo ? `<img class="uc-logo" src="${esc(it.logo)}" alt="${esc(it.game)}">` : `<div class="uc-game">${esc(it.game)}</div>`}</div>`
@@ -1281,9 +1279,10 @@ function renderVault() {
     const label = it.type === "uc" ? `${it.amount} ${it.unit}` : (it.alt || it.id);
     const pt = pinnedText(it);
     const pin = pt ? `<button class="pin-cm" type="button" aria-label="Pinned comment: ${esc(pt)}. Open comments"><p>${esc(pt)}</p></button>` : "";
-    return `<article class="card" data-id="${esc(it.id)}"><div class="ci${it.type === "uc" ? " is-uc" : ""}">${media}${pin}</div>
+    const ed = personal ? `<button class="card-ed owner-only" type="button" data-open="item:${esc(it.id)}" aria-label="Change this one">✎</button>` : "";
+    return `<article class="card" data-id="${esc(it.id)}"><div class="ci${it.type === "uc" ? " is-uc" : ""}">${media}${pin}${ed}</div>
       <div class="react" role="group" aria-label="Likes and comments for ${esc(label)}"><button class="rx rx-like" type="button" data-rx="like" aria-pressed="false" aria-label="Like">${HEART}<em>0</em></button><button class="rx rx-cm" type="button" aria-label="Open comments">${BUBBLE}<em>${compact(commentCount(it))}</em></button></div></article>`;
-  }).join("");
+  }).join("") + ownerAdd;
   if (fine && !reduce) $$(".card").forEach(card => {
     const ci = $(".ci", card);
     ci.addEventListener("pointerenter", () => { card.classList.add("tilting"); Snd.fx("hover"); });
@@ -1806,7 +1805,10 @@ function boot() {
   applySkin(LS.get("skin", CONFIG.defaultSkin), false, true);
   renderName(); tickCountdown(); Snd.syncUI();
   $("#pTitle").textContent = CONFIG.song.title; $("#pArtist").textContent = CONFIG.song.artist;
-  $$(".skin").forEach(b => b.addEventListener("click", () => { skinTouched = true; applySkin(b.dataset.skin, true); }));
+  $$(".skin").forEach(b => b.addEventListener("click", () => {
+    if (Custom.owner && !Custom.demo) { OwnerTools.load().then(E => E.setSkin(b.dataset.skin), () => toast("Couldn't save the theme. Check your internet.")); return; }   // the owner: changes their page for everyone
+    skinTouched = true; applySkin(b.dataset.skin, true);
+  }));
   $("#sfxSwitch").addEventListener("click", () => { Snd.setSfx(!Snd.sfxOn); Snd.fx("tick"); toast(Snd.sfxOn ? "Sound effects on" : "Sound effects off"); });
   $("#pSfx").addEventListener("click", () => { Snd.setSfx(!Snd.sfxOn); Snd.fx("tick"); toast(Snd.sfxOn ? "Sound effects on" : "Sound effects off"); });
   $("#pPlay").addEventListener("click", () => { Snd.fx("tick"); Snd.toggle(); });
@@ -1819,8 +1821,13 @@ function boot() {
 }
 function boot2() {
   setupSocialClicks(); setupVault(); setupGuestbook(); setupShare();
-  Editor.init(); Stories.init(); Comments.init(); GetSite.init();
-  Custom.on(applyBasics); Custom.on(renderSocials); Custom.on(renderVault); Custom.on(Guestbook.refresh); Custom.on(onPage); Custom.on(() => { if (realPage()) Live.loadPinned(); });
+  Stories.init(); Comments.init(); GetSite.init();
+  Custom.on(applyBasics); Custom.on(renderSocials); Custom.on(renderVault); Custom.on(onPage);
+  // while the owner is editing ("local"), only redraw: don't fetch the guestbook and pins again on every change
+  Custom.on(why => { if (why === "local") Guestbook.paintForm(); else Guestbook.refresh(); });
+  Custom.on(why => { if (why !== "local" && realPage()) Live.loadPinned(); });
+  // the owner of this page: get the editor ready in the background (visitors never download it)
+  Custom.on(why => { if (why !== "local" && Custom.owner) idle(() => OwnerTools.load().then(E => E.attach(), () => {})); });
   Live.on(why => {
     if (why === "state" || why === "pinned") renderVault(); else paintReactions();
     if (why === "state") Guestbook.refresh();
@@ -1829,9 +1836,6 @@ function boot2() {
   Cloud.on(() => { if (Live.live) Live.loadMine(); Guestbook.paintForm(); if (realPage() && lastGb.length) renderGuestbook(lastGb); });
   OnceFx.prep();
   Custom.init();
-  ["#editSocials", "#editSocials2"].forEach(id => $(id).addEventListener("click", () => { Snd.fx("tick"); Editor.open("spotify"); }));
-  $("#editCollection").addEventListener("click", () => { Snd.fx("tick"); Editor.open("collection"); });
-  $("#editLinks").addEventListener("click", () => { Snd.fx("tick"); Editor.open("links"); });
   // go-to-top button: shows after you scroll down, ring fills with how far you've scrolled
   { const btn = $("#toTop"); let t = 0;
     const upd = () => { t = 0; const max = Math.max(1, document.documentElement.scrollHeight - innerHeight); btn.style.setProperty("--sp", Math.min(1, scrollY / max).toFixed(3)); btn.classList.toggle("show", scrollY > innerHeight * 0.8); };
@@ -1964,7 +1968,7 @@ const Accounts = (() => {
     if (pendingChat) { const p = pendingChat; pendingChat = null; Chat.openWith(p); return; }
     if (pendingThen) { const f = pendingThen; pendingThen = null; try { f(); } catch (e) {} return; }   // stay here and finish what they started
     const onMine = Custom.target && Custom.target.id === me.id;
-    if (pendingEdit && onMine) { pendingEdit = false; Editor.open("profile"); return; }
+    if (pendingEdit && onMine) { pendingEdit = false; OwnerTools.open("menu"); return; }
     if (!onMine) go(me.username, pendingEdit ? "#edit" : "");
   }
 
@@ -2026,7 +2030,7 @@ const Accounts = (() => {
       closeModal(); toast("Your page is ready: flexippo.com/" + me.username + " 🎉");
       if (pendingChat) { const p = pendingChat; pendingChat = null; Chat.openWith(p); }
       else if (pendingThen) { const f = pendingThen; pendingThen = null; try { f(); } catch (err) {} }
-      else go(me.username, "#edit");
+      else go(me.username, "#start");   // their new page, with the quick start open
     } catch (err) {
       const m = String(err && err.message || "");
       say("setupMsg", err && err.code === "23505" ? (m.includes("username") ? "That username is taken. Try another." : "You already have a page. Refresh this page.")
@@ -2062,7 +2066,7 @@ const Accounts = (() => {
   $id("accMine").addEventListener("click", () => { if (Cloud.me) go(Cloud.me.username); });
   $id("accEdit").addEventListener("click", () => {
     if (!Cloud.me) return;
-    if (Custom.owner) { closeModal(); Editor.open("profile"); } else go(Cloud.me.username, "#edit");
+    if (Custom.owner) { closeModal(); OwnerTools.open("menu"); } else go(Cloud.me.username, "#edit");
   });
   $id("accChats").addEventListener("click", () => { closeModal(); Chat.open(); });
   $id("accHome").addEventListener("click", () => go(""));
@@ -2079,7 +2083,7 @@ const Accounts = (() => {
     let h = "";
     if (Custom.failed) h = `<p class="pa-miss">Couldn't load <b>@${esc(PAGE_U)}</b>'s page. Check your internet and refresh.</p>`;
     else if (Custom.missing) h = `<p class="pa-miss">There's no page called <b>@${esc(Custom.missing)}</b> yet.</p>` + (me ? `<button class="pa-b ghost" type="button" data-act="mine">Go to my page</button>` : `<button class="pa-b" type="button" data-act="claim">✨ Claim @${esc(Custom.missing)}</button>`);
-    else if (T && Custom.owner) h = `<button class="pa-b" type="button" data-act="edit">✎ Edit my page</button><button class="pa-b ghost" type="button" data-act="share">🔗 Share my link</button>`;
+    else if (T && Custom.owner) h = `<button class="pa-b" type="button" data-open="menu">✎ Edit my page</button><button class="pa-b ghost" type="button" data-open="share">🔗 Share my page</button>`;
     else if (T && !Custom.isHome) h = `<button class="pa-b" type="button" data-act="msg">💬 Message ${esc(nameOf(T))}</button><button class="pa-b ghost" type="button" data-act="sharep">🔗 Share</button>`;
     box.innerHTML = h;
   }
@@ -2087,9 +2091,7 @@ const Accounts = (() => {
     const b = e.target.closest("button[data-act]"); if (!b) return;
     Snd.fx("tick");
     const a = b.dataset.act, T = Custom.target;
-    if (a === "edit") Editor.open("profile");
-    else if (a === "share" && T) shareLink(Cloud.shareLink(T.username), "Check out my page 👀");
-    else if (a === "sharep" && T) shareLink(Cloud.shareLink(T.username), "Check out " + nameOf(T) + "'s page 👀");
+    if (a === "sharep" && T) shareLink(Cloud.shareLink(T.username), "Check out " + nameOf(T) + "'s page 👀");
     else if (a === "msg" && T) Chat.openWith(person(T));
     else if (a === "mine") { const me = Cloud.me || Cloud.cachedMe; if (me) go(me.username); }
     else if (a === "claim") { if (Cloud.user) openSetup(Custom.missing); else { $id("setupUser").value = Custom.missing; openAuth("signup", "Sign up to claim flexippo.com/" + Custom.missing); } }
@@ -2391,6 +2393,15 @@ const Accounts = (() => {
     return { open, close, openWith, onAuth };
   })();
 
+  // "Make it myself, free" (the get-your-own box): sign up, or go to your page if you have one
+  $id("goFree").addEventListener("click", async () => {
+    Snd.fx("tick");
+    const me = Cloud.ready ? Cloud.me : Cloud.cachedMe;
+    if (me) { if (Custom.target && Custom.target.id === me.id) OwnerTools.open("menu"); else go(me.username, "#edit"); return; }
+    if (Cloud.ready && Cloud.user && !Cloud.me) { openSetup(); return; }
+    openAuth("signup", "Free, and ready in a minute. You get your own link, see who likes your stuff, and can chat with friends.");
+  });
+
   /* ---------- start ---------- */
   const waitCustom = () => new Promise(r => { if (Custom.loaded) r(); else Custom.on(r); });
   async function afterCloud() {
@@ -2401,9 +2412,13 @@ const Accounts = (() => {
     else if (AUTH_IN_URL && Cloud.user && !Cloud.me && !Cloud.notSetUp) openSetup();   // just confirmed their email: pick a username next
     Cloud.on(why => { if (why === "recovery") openModal("newpass"); });
     if (Custom.missing && !Custom.failed) toast("There's no page called @" + Custom.missing + " yet");
+    if (location.hash === "#start" && Custom.owner) {   // just made their page: the quick start
+      try { history.replaceState(history.state, "", location.pathname + location.search); } catch (e) {}
+      setTimeout(() => OwnerTools.open("start"), 350);
+    }
     if (location.hash === "#edit") {
       try { history.replaceState(history.state, "", location.pathname + location.search); } catch (e) {}
-      if (Custom.owner) setTimeout(() => Editor.open("profile"), 450);
+      if (Custom.owner) setTimeout(() => OwnerTools.open("menu"), 350);
       else if (!Cloud.user) { pendingEdit = true; openAuth("login", "Log in to edit your page."); }
       else if (!Cloud.me) openSetup();
       else if (!(Custom.target && Custom.target.id === Cloud.me.id)) go(Cloud.me.username, "#edit");
