@@ -88,19 +88,19 @@ const CONFIG = {
     accent: "#1ed760",
     tracks: ["Anime Cyberpunk — HitsLab"]
   },
-  // Collection: up to 6 photos (keeps pages clean).
-  // "uc" is the PUBG UC card: add icon/logo image paths when you have them.
+  // Collection: up to 6 photos (keeps pages clean). The example page shows the kind of wins people flex here.
+  // A "uc" item ({ type: "uc", amount, unit, game, icon, logo }) is a text card for in-game currency.
   collectionLimit: 6,
   collection: [
-    { id: "uc", type: "uc", amount: "10,000", unit: "UC", game: "PUBG MOBILE", icon: "", logo: "" },
-    { id: "nvidia", img: "assets/col/nvidia.jpg", alt: "NVIDIA 😏", meme: "Those who know" },
-    { id: "axolotls", img: "assets/col/axolotls.jpg", alt: "Axolotls in an aquarium" },
-    { id: "tuxedo-cat", img: "assets/col/tuxedo-cat.jpg", alt: "Black and white cat" },
-    { id: "tin-robots", img: "assets/col/tin-robots.jpg", alt: "Tin toy robots" },
-    { id: "guitar", img: "assets/col/guitar.jpg", alt: "Acoustic guitar" }
+    { id: "rank", img: "assets/col/ranked-grandmaster.jpg", alt: "Grandmaster rank, top 0.4% of the server" },
+    { id: "ticket", img: "assets/col/concert-ticket.jpg", alt: "Front-row concert ticket" },
+    { id: "pr", img: "assets/col/deadlift-pr.jpg", alt: "New deadlift personal best: 180 kg" },
+    { id: "hackathon", img: "assets/col/hackathon-win.jpg", alt: "1st place at a city hackathon" },
+    { id: "anime", img: "assets/col/anime-list.jpg", alt: "214 anime completed" },
+    { id: "streak", img: "assets/col/streak-365.jpg", alt: "365-day streak learning Japanese" }
   ],
   // example comment pinned on a photo on the demo page (photo id: commenter)
-  pins: { "guitar": "midnight.gamer", "tuxedo-cat": "aura.farmer" }
+  pins: { "rank": "midnight.gamer", "ticket": "aura.farmer" }
 };
 const BASE = JSON.parse(JSON.stringify(CONFIG));   // the defaults above. Every person's page starts from these.
 
@@ -136,7 +136,7 @@ function loadScript(src) {
 /* ---------- smaller photos for phones ----------
    The site's own photos also exist as small WebP copies in assets/opt (made from the originals, which stay as they are).
    [original width, original height, [copy widths]] */
-const OPT = {"assets/cover-main.jpg":[1440,1800,[800,1100,1440]],"assets/story-palms.jpg":[898,1350,[240,898]],"assets/post-beach-crew.jpg":[612,408,[320,612]],"assets/post-hike-crew.jpg":[720,540,[320,720]],"assets/post-lake.jpg":[1200,830,[320,720]],"assets/x-profile.jpg":[1000,746,[700,1000]],"assets/og-kai.jpg":[1200,630,[640]],"assets/flexippo-avatar.png":[320,320,[320]],"assets/col/axolotls.jpg":[640,640,[320,640]],"assets/col/doll-shelf.jpg":[640,640,[320,640]],"assets/col/figurine.jpg":[640,640,[320,640]],"assets/col/ginger-cat.jpg":[640,640,[320,640]],"assets/col/guitar.jpg":[640,640,[320,640]],"assets/col/mecha-robot.jpg":[640,640,[320,640]],"assets/col/mixtape-cd.jpg":[640,640,[320,640]],"assets/col/nvidia.jpg":[640,640,[320,640]],"assets/col/tin-robots.jpg":[640,640,[320,640]],"assets/col/tuxedo-cat.jpg":[640,640,[320,640]]};
+const OPT = {"assets/cover-main.jpg":[1440,1800,[800,1100,1440]],"assets/story-palms.jpg":[898,1350,[240,898]],"assets/post-beach-crew.jpg":[612,408,[320,612]],"assets/post-hike-crew.jpg":[720,540,[320,720]],"assets/post-lake.jpg":[1200,830,[320,720]],"assets/x-profile.jpg":[1000,746,[700,1000]],"assets/og-kai.jpg":[1200,630,[640]],"assets/flexippo-avatar.png":[320,320,[320]],"assets/col/ginger-cat.jpg":[640,640,[320,640]],"assets/col/guitar.jpg":[640,640,[320,640]],"assets/col/mecha-robot.jpg":[640,640,[320,640]],"assets/col/ranked-grandmaster.jpg":[640,640,[320,640]],"assets/col/concert-ticket.jpg":[640,640,[320,640]],"assets/col/deadlift-pr.jpg":[640,640,[320,640]],"assets/col/hackathon-win.jpg":[640,640,[320,640]],"assets/col/anime-list.jpg":[640,640,[320,640]],"assets/col/streak-365.jpg":[640,640,[320,640]]};
 function optList(src) {
   const o = OPT[src]; if (!o) return null;
   const base = src.replace(/^assets\//, "assets/opt/").replace(/\.\w+$/, "");
@@ -1584,7 +1584,7 @@ const Guestbook = (() => {
     $("#gbMsg").placeholder = "Reply to " + name + "…"; $("#gbSend").textContent = "Send reply ↩";
     focusForm();
   }
-  function cancel() { target = null; $("#gbReplying").hidden = true; $("#gbReplyThumb").hidden = true; $("#gbReplyThumb").style.display = ""; $("#gbMsg").placeholder = "Your setup is insane bro 🔥"; paintForm(); }
+  function cancel() { target = null; $("#gbReplying").hidden = true; $("#gbReplyThumb").hidden = true; $("#gbReplyThumb").style.display = ""; $("#gbMsg").placeholder = "Say hi, hype them up, leave your mark ✍️"; paintForm(); }
   // delete a message (tap once, then tap "Sure?" to confirm). Deleting a message also removes its replies.
   function remove(m, btn, isReply) {
     if (btn.dataset.armed !== "1") {
