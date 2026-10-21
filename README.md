@@ -9,13 +9,15 @@ Personal "flex" pages: socials, a collection, music and a guestbook in one link.
 
 | File | What it is |
 | --- | --- |
-| `index.html` | The page and all its styles. |
+| `index.html` | The page. |
+| `assets/style.css` | All the page styles. |
 | `assets/app.js` | Everything the page does. The `CONFIG` block at the top holds the example page's content (name, socials, collection, song, example comments). |
 | `assets/edit.js` | The page editor. Only the owner of a page downloads it (visitors never do). |
 | `404.html` | Turns short links (`flexippo.com/name`) into that person's page. |
 | `name.html` files (one per user) | Made automatically by `tools/previews.mjs`: the link preview of each person's page (see below). Don't edit them by hand. |
 | `tools/previews.mjs` | Makes those preview files from the public profile data. `tools/previews.json` lists the files it made (it never touches any other file). |
 | `.github/workflows/previews.yml` | Runs `tools/previews.mjs` on GitHub every 10 minutes and publishes the result. |
+| `assets/og-flexippo.jpg` | The chat preview picture of flexippo.com itself. |
 | `assets/og-default.jpg` | The preview picture for pages that haven't made their own yet. |
 | `manifest.webmanifest` | Lets people add the site to their home screen. |
 | `assets/opt/` | Smaller WebP copies of the built-in photos, for phones. The originals next to them are untouched and still used as the source. |

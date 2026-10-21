@@ -674,6 +674,15 @@ body.powered .hero{animation:aura 2.4s ease-out}
 [hidden]{display:none!important}
 .auth-btn{display:inline-flex;align-items:center;gap:9px;max-width:min(58vw,260px);min-height:44px;padding:5px 15px 5px 5px;border-radius:14px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-family:var(--f-body);font-weight:700;font-size:14px;cursor:pointer;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 8px 24px var(--shadow);transition:transform .15s}
 .auth-btn.out{padding:10px 18px}
+/* settings: gear next to the account button, and the panel inside the account box */
+.set-btn{display:inline-grid;place-items:center;flex:none;width:44px;height:44px;margin-left:auto;padding:0;border-radius:14px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 8px 24px var(--shadow);transition:transform .15s}
+.set-btn svg{width:20px;height:20px;transition:transform .4s}
+.set-btn:hover svg{transform:rotate(60deg)}
+.set-btn:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.set-sec{display:grid;gap:8px;margin-top:18px}
+.set-sec .acc-lbl{margin-bottom:0}
+.set-note{display:block;margin-top:2px;font-size:12px;line-height:1.4;color:var(--mute)}
+.set-view > .set-note{margin-top:18px;text-align:center}
 .auth-btn:hover{transform:translateY(-2px)}
 .auth-btn span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .av{flex:none;border-radius:50%;object-fit:cover;background:var(--panel2)}
@@ -860,8 +869,8 @@ button.own-empty{width:100%;font:inherit;color:var(--ink)}
 .og-u{color:#53bdeb;text-decoration:underline;text-underline-offset:2px}
 
 /* ---------- slow phones: no glass blur and no endless decoration ---------- */
-.lite .brand,.lite .auth-btn,.lite .count,.lite .pitch,.lite .pa-b.ghost,.lite .pa-miss,.lite .player,.lite .ed,.lite .cm,.lite .gs,.lite .auth-modal{-webkit-backdrop-filter:none;backdrop-filter:none}
-.lite .brand,.lite .auth-btn,.lite .count,.lite .pitch,.lite .pa-b.ghost,.lite .pa-miss,.lite .player,.lite .views{background:var(--solid)}
+.lite .brand,.lite .auth-btn,.lite .set-btn,.lite .count,.lite .pitch,.lite .pa-b.ghost,.lite .pa-miss,.lite .player,.lite .ed,.lite .cm,.lite .gs,.lite .auth-modal{-webkit-backdrop-filter:none;backdrop-filter:none}
+.lite .brand,.lite .auth-btn,.lite .set-btn,.lite .count,.lite .pitch,.lite .pa-b.ghost,.lite .pa-miss,.lite .player,.lite .views{background:var(--solid)}
 .lite .ed,.lite .cm,.lite .gs,.lite .auth-modal{background:rgba(0,0,0,.72)}
 .lite .name::before,.lite .name::after{display:none}
 .lite .cover-img::after{mix-blend-mode:normal;opacity:.35}

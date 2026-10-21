@@ -423,9 +423,8 @@ const Snd = (() => {
       pb.setAttribute("aria-label", playing ? "Pause music" : "Play music");
       $("#pDisc").setAttribute("aria-label", playing ? "Pause music" : "Play music");
     }
-    const s1 = $("#pSfx"), s2 = $("#sfxSwitch");
-    if (s1) s1.setAttribute("aria-pressed", String(sfxOn));
-    if (s2) s2.setAttribute("aria-pressed", String(sfxOn));
+    $$("#pSfx,#sfxSwitch,#setSfx").forEach(b => b.setAttribute("aria-pressed", String(sfxOn)));
+    const sm = $("#setMusic"); if (sm) sm.setAttribute("aria-pressed", String(playing));
     $$("[data-np]").forEach(b => b.textContent = playing ? "Pause" : "Play here");
     if ("mediaSession" in navigator) try { navigator.mediaSession.playbackState = playing ? "playing" : "paused"; } catch (e) {}
   }
@@ -1897,6 +1896,7 @@ const Accounts = (() => {
   function say(id, t, ok) { const m = $id(id); if (m) { m.textContent = t || ""; m.className = "auth-msg" + (ok ? " ok" : ""); } }
   function showView(v) {
     $$("#authModal .auth-view").forEach(x => { x.hidden = x.dataset.view !== v; });
+    const h = $(`#authModal [data-view="${v}"] .auth-h[id]`); modal.setAttribute("aria-labelledby", h ? h.id : "authTitle");
     modal.hidden = false;
     setTimeout(() => { const f = $$(`#authModal [data-view="${v}"] input:not([readonly])`).find(x => x.offsetParent !== null); if (f) try { f.focus({ preventScroll: true }); } catch (e) {} }, 60);
   }
@@ -2134,6 +2134,38 @@ const Accounts = (() => {
   $id("accChats").addEventListener("click", () => { closeModal(); Chat.open(); });
   $id("accHome").addEventListener("click", () => go(""));
   $id("accOut").addEventListener("click", async () => {
+    closeModal();
+    try { await Cloud.sb.auth.signOut(); } catch (e) {}
+    await Cloud.refresh(); toast("Logged out");
+  });
+
+  /* ---------- settings (⚙ next to the account button) ---------- */
+  function openSettings() {
+    const me = Cloud.ready ? Cloud.me : Cloud.cachedMe, inn = Cloud.ready ? !!Cloud.user : savedLogin();
+    $id("setIn").hidden = !inn; $id("setGuest").hidden = inn; $id("setEdit").hidden = !me;
+    $id("setSkinNote").textContent = Custom.owner && !Custom.demo ? "Changes the theme of your page for everyone who visits." : "Only changes how pages look for you.";
+    $id("setLite").setAttribute("aria-pressed", String(document.documentElement.classList.contains("lite")));
+    Snd.syncUI(); openModal("settings");
+  }
+  $id("setBtn").addEventListener("click", () => { Snd.fx("tick"); openSettings(); });
+  $id("accSet").addEventListener("click", () => { Snd.fx("tick"); openSettings(); });
+  $id("setMusic").addEventListener("click", () => { Snd.toggle(); });
+  $id("setSfx").addEventListener("click", () => { Snd.setSfx(!Snd.sfxOn); Snd.fx("tick"); });
+  $id("setLite").addEventListener("click", () => {
+    const on = !document.documentElement.classList.contains("lite");
+    document.documentElement.classList.toggle("lite", on); LS.set("lite", on);
+    $id("setLite").setAttribute("aria-pressed", String(on)); Snd.fx("tick");
+    toast(on ? "Lite mode on" : "Lite mode off");
+  });
+  $id("setLogin").addEventListener("click", () => openAuth("login"));
+  $id("setSignup").addEventListener("click", () => openAuth("signup"));
+  $id("setEdit").addEventListener("click", async () => {
+    if (!(await ensureOrSay()) || !Cloud.me) return;
+    if (Custom.owner) { closeModal(); OwnerTools.open("edit"); } else go(Cloud.me.username, "#edit");
+  });
+  $id("setPass").addEventListener("click", async () => { if (await ensureOrSay()) showView("newpass"); });
+  $id("setOut").addEventListener("click", async () => {
+    if (!(await ensureOrSay())) return;
     closeModal();
     try { await Cloud.sb.auth.signOut(); } catch (e) {}
     await Cloud.refresh(); toast("Logged out");
