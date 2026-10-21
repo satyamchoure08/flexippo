@@ -1,0 +1,38 @@
+name: Link previews
+# Every 10 minutes: makes or updates the small preview page of each flexippo user (flexippo.com/name),
+# so a link sent in a chat shows that person's own picture, name and bio. See tools/previews.mjs.
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: link-previews
+  cancel-in-progress: false
+
+jobs:
+  previews:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Make the preview pages
+        run: node tools/previews.mjs
+
+      - name: Save them and publish the site
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git add -A -- '*.html' tools/previews.json
+          if git diff --cached --quiet; then echo "Nothing changed."; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -q -m "Update link previews"
+          git push origin "HEAD:${GITHUB_REF_NAME}" || { git pull -q --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}"; }
+          # changes pushed by a workflow don't start a GitHub Pages build by themselves, so ask for one
+          gh api -X POST "repos/${GITHUB_REPOSITORY}/pages/builds" --silent || echo "Couldn't ask for a Pages build; the next change will publish it."

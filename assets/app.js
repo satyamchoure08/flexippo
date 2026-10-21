@@ -88,22 +88,19 @@ const CONFIG = {
     accent: "#1ed760",
     tracks: ["Anime Cyberpunk — HitsLab"]
   },
-  // Collection: up to 9 slots on the free plan (a Premium plan can raise this later).
+  // Collection: up to 6 photos (keeps pages clean).
   // "uc" is the PUBG UC card: add icon/logo image paths when you have them.
-  collectionLimit: 9,
+  collectionLimit: 6,
   collection: [
     { id: "uc", type: "uc", amount: "10,000", unit: "UC", game: "PUBG MOBILE", icon: "", logo: "" },
     { id: "nvidia", img: "assets/col/nvidia.jpg", alt: "NVIDIA 😏", meme: "Those who know" },
     { id: "axolotls", img: "assets/col/axolotls.jpg", alt: "Axolotls in an aquarium" },
     { id: "tuxedo-cat", img: "assets/col/tuxedo-cat.jpg", alt: "Black and white cat" },
     { id: "tin-robots", img: "assets/col/tin-robots.jpg", alt: "Tin toy robots" },
-    { id: "guitar", img: "assets/col/guitar.jpg", alt: "Acoustic guitar" },
-    { id: "doll-shelf", img: "assets/col/doll-shelf.jpg", alt: "Shelf of vintage dolls" },
-    { id: "figurine", img: "assets/col/figurine.jpg", alt: "Ceramic figurine" },
-    { id: "mixtape-cd", img: "assets/col/mixtape-cd.jpg", alt: "CD" }
+    { id: "guitar", img: "assets/col/guitar.jpg", alt: "Acoustic guitar" }
   ],
   // example comment pinned on a photo on the demo page (photo id: commenter)
-  pins: { "figurine": "midnight.gamer", "tuxedo-cat": "aura.farmer" }
+  pins: { "guitar": "midnight.gamer", "tuxedo-cat": "aura.farmer" }
 };
 const BASE = JSON.parse(JSON.stringify(CONFIG));   // the defaults above. Every person's page starts from these.
 
@@ -529,13 +526,7 @@ function applySkin(s, announce, keep) {
 function flash() { const f = $("#flash"); f.classList.remove("go"); void f.offsetWidth; f.classList.add("go"); }
 function speed() { const s = $("#speed"); s.classList.remove("go"); void s.offsetWidth; s.classList.add("go"); }
 function shake(el = $("#app")) { el.classList.remove("shake"); void el.offsetWidth; el.classList.add("shake"); }
-(() => {
-  const fab = document.getElementById("fabGet"), pitch = document.getElementById("pitch"), box = document.getElementById("get-yours");
-  if (PAGE_U) { fab.hidden = true; pitch.hidden = true; return; }
-  if (!("IntersectionObserver" in window)) return;
-  const seen = new Set(), io = new IntersectionObserver(es => { es.forEach(e => e.isIntersecting ? seen.add(e.target) : seen.delete(e.target)); fab.classList.toggle("away", seen.size > 0); });
-  [pitch, box].forEach(el => el && io.observe(el));
-})();
+if (PAGE_U) document.getElementById("pitch").hidden = true;   // personal pages: no flexippo pitch under the name
 
 /* ---- effects that play once per visit (every refresh / new open) ---- */
 const OnceFx = (() => {
@@ -571,8 +562,9 @@ const OnceFx = (() => {
 })();
 
 /* ======================= HERO ======================= */
-function renderName() {
+function renderName(quiet) {
   const HN = CONFIG.heroName || CONFIG.name; const h = $("#name");
+  if (quiet) h.classList.add("calm");   // the owner is typing their name: no letters flying in on every key
   if (h.dataset.text !== HN || !h.children.length) {
     h.dataset.text = HN; h.style.setProperty("--len", Math.max(3, [...HN].length));
     h.innerHTML = [...HN].map((c, i) => `<span style="--i:${i}">${c === " " ? "&nbsp;" : esc(c)}</span>`).join("");
@@ -669,7 +661,7 @@ function duoCard(V, ids) {
     if (base.id === "spotify") {
       const v = V.spotify;
       return `<section class="duo-half" data-half="spotify" style="--brand:${v.accent};--sp:${v.accent};--sp-ink:${readableOn(v.accent)}">
-        <div class="soc-h">${brandIcon({ ...base, brand: v.accent })}<div class="soc-id"><b class="vh">${esc(base.label)}</b><span class="hdl">${pfpHtml()}<em>${esc(v.title)}</em>${VERIFIED}</span></div><button class="ed-chip owner-only" type="button" data-edit="spotify" aria-label="Customize Spotify">✎</button></div>
+        <div class="soc-h">${brandIcon({ ...base, brand: v.accent })}<div class="soc-id"><b class="vh">${esc(base.label)}</b><span class="hdl">${pfpHtml()}<em>${esc(v.title)}</em>${VERIFIED}</span></div></div>
         <div class="sp-mini"><img class="sp-cover" src="${esc(v.cover)}" alt="Playlist cover" loading="lazy" decoding="async"><div style="min-width:0"><b class="sp-n">${esc(v.playlist)}</b><span class="sp-a">${esc(v.artist)}</span><div class="bars"><i></i><i></i><i></i><i></i><i></i></div></div></div>
         <div class="duo-cta"><button class="btn" type="button" data-np style="--brand:var(--sp);color:var(--sp-ink)">Play here</button><a class="btn ghost" href="${esc(v.url)}" target="_blank" rel="noopener">${esc(base.cta)}</a></div>
       </section>`;
@@ -707,7 +699,7 @@ function personalSocialCard(s, D, M) {
   if (s.k === "discord" && (D.discord || {}).blurb) body = `<p class="duo-blurb">${esc(D.discord.blurb)}</p>`;
   const btnStyle = `--brand:${s.k === "x" || s.k === "tiktok" || s.k === "threads" ? "#333" : d.brand.startsWith("linear") ? "#d62976" : d.brand}${d.dark ? ";color:#111" : ""}`;
   return `<article class="soc${body ? "" : " soc-mini"}" data-soc="${s.k}" style="--brand:${d.brand}">
-    <div class="soc-h"><span class="soc-ic" style="background:${d.brand}${d.dark ? ";color:#111" : ""}" aria-hidden="true">${icon(d.icon)}</span><div class="soc-id"><b>${esc(d.label)}</b><span class="hdl">${pfpHtml()}<em>${esc(socialShow(s.k, s.v))}</em></span></div><button class="ed-chip owner-only" type="button" data-open="social:${s.k}" aria-label="Change ${esc(d.label)}">✎</button><a class="btn" href="${esc(url)}" target="_blank" rel="noopener" style="${btnStyle}">${esc(d.cta)}</a></div>${body}</article>`;
+    <div class="soc-h"><span class="soc-ic" style="background:${d.brand}${d.dark ? ";color:#111" : ""}" aria-hidden="true">${icon(d.icon)}</span><div class="soc-id"><b>${esc(d.label)}</b><span class="hdl">${pfpHtml()}<em>${esc(socialShow(s.k, s.v))}</em></span></div><button class="ed-chip edit-only" type="button" data-open="social:${s.k}" aria-label="Change ${esc(d.label)}">✎</button><a class="btn" href="${esc(url)}" target="_blank" rel="noopener" style="${btnStyle}">${esc(d.cta)}</a></div>${body}</article>`;
 }
 let socKey = "";
 function renderPersonalSocials(why) {
@@ -717,15 +709,17 @@ function renderPersonalSocials(why) {
   if (why === "local" && key === socKey) return;
   socKey = key;
   const has = list.length > 0 || D.links.length > 0;
-  $("#links").classList.toggle("empty", !has);
-  $("#socGrid").innerHTML = list.map(s => personalSocialCard(s, D, M)).join("") + (list.length ? "" :
-    `<div class="own-empty owner-only" data-open="socials"><span class="own-empty-ic" aria-hidden="true">${icon("instagram")}${icon("snapchat")}${icon("youtube")}</span><b>Add your socials</b><span>Type your usernames. People can follow you in one tap.</span><span class="own-empty-btn">＋ Add socials</span></div>`);
+  $("#links").classList.toggle("is-empty", !has);
+  // edit mode only: a "+" to add more, or a big empty box when there are none yet
+  $("#socGrid").innerHTML = list.map(s => personalSocialCard(s, D, M)).join("") + (list.length
+    ? `<button class="soc soc-add edit-only" type="button" data-open="socials"><b aria-hidden="true">＋</b>Add a social</button>`
+    : `<button class="own-empty edit-only" type="button" data-open="socials"><span class="own-empty-ic" aria-hidden="true">${icon("instagram")}${icon("snapchat")}${icon("youtube")}</span><b>Add your socials</b><span class="own-empty-btn">＋ Add</span></button>`);
   renderLinks();
   Snd.syncUI();
 }
 function renderSocials(why) {
   if (!Custom.demo) return renderPersonalSocials(why);
-  $("#links").classList.remove("empty");
+  $("#links").classList.remove("is-empty");
   const V = socialView();
   const DUO = ["spotify", "discord"];   // these two share one card at the bottom, half each
   $("#socGrid").innerHTML = CONFIG.socials.filter(b => !DUO.includes(b.id)).map(base => {
@@ -744,9 +738,8 @@ function renderSocials(why) {
       body = `<div class="snap"><div class="snap-stats"><span>👻 <b>${v.score.toLocaleString("en-IN")}</b> Snapscore</span><span>🔥 <b>${v.streak.toLocaleString("en-IN")}</b> day streak</span></div>` +
         `<div class="snap-row">${v.stories.map((st, i) => `<button class="story${Stories.seen(i) ? " seen" : ""}" type="button" data-story="${i}" aria-label="Watch story: ${esc(st.cap || "story " + (i + 1))}"><img ${imgSrc(st.img, "(min-width: 820px) 140px, 22vw")} alt="" loading="lazy" decoding="async"><i>${esc(st.when)}</i>${st.cap ? `<span>${esc(st.cap)}</span>` : ""}</button>`).join("")}</div></div>`;
     }
-    const editable = ["instagram", "spotify", "x", "snapchat"].includes(base.id);
     return `<article class="soc ${base.width || ""}" data-soc="${base.id}" style="--brand:${base.brand}">
-      <div class="soc-h">${brandIcon(base)}<div class="soc-id"><b class="vh">${esc(base.label)}</b><span class="hdl">${pfpHtml()}<em>${esc(s.handle)}</em>${VERIFIED}</span></div>${editable ? `<button class="ed-chip owner-only" type="button" data-edit="${base.id}" aria-label="Customize ${esc(base.label)}">✎</button>` : ""}<a class="btn" href="${esc(ctaUrl)}" target="_blank" rel="noopener" style="--brand:${base.id === "x" ? "#333" : (base.brand.startsWith("linear") ? "#d62976" : base.brand)}${base.id === "snapchat" ? ";color:#111" : ""}">${esc(base.cta)}</a></div>
+      <div class="soc-h">${brandIcon(base)}<div class="soc-id"><b class="vh">${esc(base.label)}</b><span class="hdl">${pfpHtml()}<em>${esc(s.handle)}</em>${VERIFIED}</span></div><a class="btn" href="${esc(ctaUrl)}" target="_blank" rel="noopener" style="--brand:${base.id === "x" ? "#333" : (base.brand.startsWith("linear") ? "#d62976" : base.brand)}${base.id === "snapchat" ? ";color:#111" : ""}">${esc(base.cta)}</a></div>
       ${body}</article>`;
   }).join("") + duoCard(V, DUO);
   renderLinks();
@@ -782,7 +775,6 @@ function renderLinks() {
     const k = linkKind(l.u);
     return `<a class="lnk" href="${esc(l.u)}" target="_blank" rel="noopener"><span class="soc-ic" style="background:${k.brand}${k.dark ? ";color:#111" : ""}" aria-hidden="true">${icon(k.icon)}</span><span class="lnk-t">${esc(l.t || k.host)}<small>${esc(k.host)}</small></span><i aria-hidden="true">↗</i></a>`;
   }).join("");
-  $("#editLinks").textContent = list.length ? "✎ Edit links" : "＋ Add a link (YouTube video, shop...)";
 }
 
 /* ======================= SNAPCHAT STORIES ======================= */
@@ -1015,7 +1007,7 @@ function contactFor(base, val, userPage) {
   return { ...base, value: base.id === "whatsapp" && url ? "+" + v.replace(/\D/g, "") : v, url };
 }
 let skinTouched = false;
-function applyBasics() {
+function applyBasics(why) {
   const T = Custom.target, own = !!T;                        // own = a real person's page (not the example page)
   const userPage = own && !Custom.isHome;
   if (own) {
@@ -1039,7 +1031,7 @@ function applyBasics() {
   document.body.classList.toggle("no-bio", !CONFIG.titles.length);
   document.body.classList.toggle("no-cover", !CONFIG.cover);
   $("#coverBtnT").textContent = CONFIG.cover ? "Change photo" : "Add your photo";
-  renderName(); renderTicker(); renderContact(); renderShare(); tickCountdown();
+  renderName(why === "local"); renderTicker(); renderContact(); renderShare(); tickCountdown();
 }
 function renderTicker() {
   const isJp = t => /[぀-ヿ㐀-鿿＀-￯]/.test(t);   // Japanese letters
@@ -1084,9 +1076,11 @@ function shrinkImage(file, max = 720, maxBytes = 220000) {
 // Visitors never download the editor. It loads when the owner opens their own page.
 const OwnerTools = (() => {
   let p = null;
-  const load = () => p || (p = loadScript("assets/edit.js?v=3").then(() => { if (!window.FlexEdit) throw new Error("Failed to fetch"); return window.FlexEdit; }, e => { p = null; throw e; }));
-  function open(what, opts) {
-    return load().then(E => E.open(what, opts), () => toast("Couldn't open the editor. Check your internet and try again."));
+  const load = () => p || (p = loadScript("assets/edit.js?v=4").then(() => { if (!window.FlexEdit) throw new Error("Failed to fetch"); return window.FlexEdit; }, e => { p = null; throw e; }));
+  function open(what) {
+    // already downloaded: open right away, still inside the tap (phones only open the photo gallery straight from a tap)
+    if (window.FlexEdit) { window.FlexEdit.open(what, true); return Promise.resolve(); }
+    return load().then(E => E.open(what, false), () => toast("Couldn't open the editor. Check your internet and try again."));
   }
   // tap on anything marked data-open (owner buttons all over the page)
   document.addEventListener("click", e => {
@@ -1254,8 +1248,9 @@ function avatarOf(who, url) {
   const [a1, a2] = AV_COLORS[seedOf(who) % AV_COLORS.length];
   return `<span class="cm-av" style="--a1:${a1};--a2:${a2}" aria-hidden="true">${esc(String(who).charAt(0).toUpperCase())}</span>`;
 }
-const colMax = () => Math.max(1, CONFIG.collectionLimit || 9);
-function collectionList() { return (Custom.demo ? CONFIG.collection : pageData().collection).slice(0, colMax()); }
+const colMax = () => Math.max(1, CONFIG.collectionLimit || 6);   // how many photos can be added
+// pages that already had more photos (older limit) keep showing them
+function collectionList() { return Custom.demo ? CONFIG.collection.slice(0, colMax()) : pageData().collection.slice(0, Math.max(colMax(), 12)); }
 function collectionView() {
   const M = Custom.media || {};
   return collectionList().map(it => ({ ...it, img: M["col_" + it.id] || it.img || "", icon: M["col_" + it.id + "_icon"] || it.icon || "", logo: M["col_" + it.id + "_logo"] || it.logo || "" }))
@@ -1268,10 +1263,11 @@ function renderVault(why) {
   if (why === "local" && key === vaultKey) return;   // the owner is typing somewhere else: nothing to redraw here
   vaultKey = key;
   $("#vaultDemo").hidden = !Custom.demo;
-  $("#vault").classList.toggle("empty", personal && !items.length);
+  $("#vault").classList.toggle("is-empty", personal && !items.length);
+  // edit mode only: a big empty box, or a "+" tile while there's room
   const ownerAdd = !personal ? "" : !items.length
-    ? `<div class="own-empty owner-only" data-open="collection-add"><span class="own-empty-ic" aria-hidden="true">📸</span><b>Show off your stuff</b><span>Your setup, shoes, cards, pets, anything. Friends can like and comment on each one.</span><span class="own-empty-btn">＋ Add photos</span></div>`
-    : items.length < colMax() ? `<button class="card add-card owner-only" type="button" data-open="collection-add" aria-label="Add photos"><span class="ci"><b aria-hidden="true">＋</b><small>Add photos</small></span></button>` : "";
+    ? `<button class="own-empty edit-only" type="button" data-open="collection-add"><span class="own-empty-ic" aria-hidden="true">📸</span><b>Show off your stuff</b><span class="own-empty-btn">＋ Add photos</span></button>`
+    : items.length < colMax() ? `<button class="card add-card edit-only" type="button" data-open="collection-add" aria-label="Add photos"><span class="ci"><b aria-hidden="true">＋</b><small>Add photos</small></span></button>` : "";
   $("#grid").innerHTML = items.map(it => {
     const media = it.type === "uc"
       ? `<div class="uc">${it.icon ? `<img class="uc-ic" src="${esc(it.icon)}" alt="UC">` : ""}<div class="uc-amt">${esc(it.amount)}</div><div class="uc-unit">${esc(it.unit)}</div>${it.logo ? `<img class="uc-logo" src="${esc(it.logo)}" alt="${esc(it.game)}">` : `<div class="uc-game">${esc(it.game)}</div>`}</div>`
@@ -1279,7 +1275,7 @@ function renderVault(why) {
     const label = it.type === "uc" ? `${it.amount} ${it.unit}` : (it.alt || it.id);
     const pt = pinnedText(it);
     const pin = pt ? `<button class="pin-cm" type="button" aria-label="Pinned comment: ${esc(pt)}. Open comments"><p>${esc(pt)}</p></button>` : "";
-    const ed = personal ? `<button class="card-ed owner-only" type="button" data-open="item:${esc(it.id)}" aria-label="Change this one">✎</button>` : "";
+    const ed = personal ? `<button class="card-ed edit-only" type="button" data-open="item:${esc(it.id)}" aria-label="Change this photo">✎</button>` : "";
     return `<article class="card" data-id="${esc(it.id)}"><div class="ci${it.type === "uc" ? " is-uc" : ""}">${media}${pin}${ed}</div>
       <div class="react" role="group" aria-label="Likes and comments for ${esc(label)}"><button class="rx rx-like" type="button" data-rx="like" aria-pressed="false" aria-label="Like">${HEART}<em>0</em></button><button class="rx rx-cm" type="button" aria-label="Open comments">${BUBBLE}<em>${compact(commentCount(it))}</em></button></div></article>`;
   }).join("") + ownerAdd;
@@ -1342,8 +1338,7 @@ const Comments = (() => {
   }
   function paintDemo() {
     const it = curItem(); if (!it) return; head(it);
-    const pinned = pinsNow()[it.id], list = demoComments(it), gone = removedFor(it).length;
-    $("#cmTip").innerHTML = `<span>Tip: hold a comment or tap ⋯ to pin or remove it.</span>${gone ? `<button type="button" id="cmRestore">Restore ${gone} removed</button>` : ""}`;
+    const pinned = pinsNow()[it.id], list = demoComments(it);
     const sorted = list.slice().sort((x, y) => (y.who === pinned) - (x.who === pinned));   // pinned comment goes first
     $("#cmList").innerHTML = sorted.length ? sorted.map(c => { const isP = c.who === pinned, on = liked.has(it.id + "|" + c.who);
       return `<li class="${isP ? "is-pinned" : ""}" data-key="${esc(c.who)}">${avatarOf(c.who)}<div class="cm-t"><b>${esc(c.who)}</b>${esc(c.text)}<small>${c.ago} · ${compact(c.likes + (on ? 1 : 0))} likes${isP ? `<span class="cm-pinned">📌 Pinned</span>` : ""}</small></div><button class="cm-h" type="button" aria-pressed="${on}" aria-label="Like comment">${HEART}</button><button class="cm-more" type="button" aria-label="Options for comment by ${esc(c.who)}">⋯</button></li>`; }).join("")
@@ -1353,7 +1348,6 @@ const Comments = (() => {
   function paintReal(loading) {
     const it = curItem(); if (!it) return; head(it);
     const pinned = String(pinsNow()[it.id] || "");
-    $("#cmTip").innerHTML = `<span>Tip: hold a comment or tap ⋯ to pin it on the photo or delete it.</span>`;
     const sorted = real.slice().sort((x, y) => (String(y.id) === pinned) - (String(x.id) === pinned));
     $("#cmList").innerHTML = loading ? `<li class="cm-empty">Loading comments…</li>` : sorted.length ? sorted.map(c => {
       const isP = String(c.id) === pinned, u = c.author && c.author.username, nm = nameOf(c);
@@ -1374,7 +1368,7 @@ const Comments = (() => {
     if (!collectionView().find(x => x.id === id)) return;
     current = id; lastFocus = document.activeElement; closeMenu(); $("#cmNote").textContent = "";
     el().hidden = false; document.documentElement.style.overflow = "hidden";
-    if (realMode()) loadReal(); else if (!Custom.demo) { head(curItem()); $("#cmTip").innerHTML = ""; $("#cmList").innerHTML = `<li class="cm-empty">Comments are coming soon on this page.</li>`; $("#cmCompose").hidden = true; $("#cmFoot").hidden = false; }
+    if (realMode()) loadReal(); else if (!Custom.demo) { head(curItem()); $("#cmList").innerHTML = `<li class="cm-empty">Comments are coming soon on this page.</li>`; $("#cmCompose").hidden = true; $("#cmFoot").hidden = false; }
     else paintDemo();
     setTimeout(() => $("#cmClose").focus(), 50);
   }
@@ -1396,7 +1390,7 @@ const Comments = (() => {
   function removeDemo(who) {
     const all = { ...(cmSettings().cmHidden || {}) }, list = (all[current] || []).filter(w => w !== who).concat(who); all[current] = list;
     const pins = { ...pinsNow() }; if (pins[current] === who) delete pins[current];
-    Snd.fx("unpop"); saveCm({ cmHidden: all, pins }, "Comment removed. You can restore it at the top.");
+    Snd.fx("unpop"); saveCm({ cmHidden: all, pins }, "Comment removed");
   }
   async function deleteReal(c) {
     try {
@@ -1405,7 +1399,6 @@ const Comments = (() => {
       toast("Comment deleted");
     } catch (e) { toast(friendlyError(e)); }
   }
-  function restoreAll() { const all = { ...(cmSettings().cmHidden || {}) }; delete all[current]; Snd.fx("pop"); saveCm({ cmHidden: all }, "Removed comments are back"); }
   function toggleLike(who) { const k = current + "|" + who, on = !liked.has(k); on ? liked.add(k) : liked.delete(k); Snd.fx(on ? "pop" : "unpop"); paint(); }
   function copyText(text) {
     const done = ok => toast(ok ? "Comment copied" : "Couldn't copy on this device");
@@ -1456,7 +1449,6 @@ const Comments = (() => {
     el().addEventListener("click", e => { if (e.target === el()) close(); });
     addEventListener("keydown", e => { if (e.key !== "Escape" || el().hidden) return; if (!$("#cmMenu").hidden) closeMenu(); else close(); });
     $("#cmMenu").addEventListener("click", e => { if (e.target.id === "cmMenu") return closeMenu(); const b = e.target.closest("[data-do]"); if (!b) return; b.dataset.do === "cancel" ? closeMenu() : doAction(b.dataset.do); });
-    $("#cmTip").addEventListener("click", e => { if (e.target.id === "cmRestore") restoreAll(); });
     $("#cmCompose").addEventListener("submit", post);
     $("#cmSend").addEventListener("click", e => { if (!Cloud.me) { e.preventDefault(); needAccount("Log in to comment. It's free.", () => { if (current) paintReal(false); }); } });
     const list = $("#cmList"); let timer = 0, sx = 0, sy = 0, held = null, fired = false;
@@ -1563,10 +1555,9 @@ const Guestbook = (() => {
   function paintForm() {
     const real = realMode(), me = Cloud.me, as = $("#gbAs");
     $("#gbName").hidden = $("#gbNameLbl").hidden = real;
-    as.hidden = !real;
-    if (real) as.innerHTML = me ? `${avatarOf(me.username, me.avatar_url)}<span>Signing as <b>${esc(me.display_name || me.username)}</b> (@${esc(me.username)})</span>` : `<span>You need a free account to sign, so nobody can pretend to be you.</span>`;
+    as.hidden = !(real && me);
+    if (real && me) as.innerHTML = `${avatarOf(me.username, me.avatar_url)}<span>Signing as <b>${esc(me.display_name || me.username)}</b> (@${esc(me.username)})</span>`;
     if (!target) $("#gbSend").textContent = real && !me ? "Log in to sign ✍️" : "Sign guestbook ✍️";
-    $("#gbSub").textContent = real ? `Say something to ${ownerName()}. Everyone can see it.` : "Say something. Keep it clean, the filter is watching.";
   }
   function thumbHtml(it) { return !it ? `<span class="q-gone" aria-hidden="true">📷</span>` : it.type === "uc" ? `<span class="q-uc" aria-hidden="true">UC</span>` : `<img src="${esc(optList(it.img) ? optList(it.img)[0][0] : it.img)}" alt="">`; }
   function focusForm() {
@@ -1687,11 +1678,24 @@ const QR = (() => {
   }
   return { watch, refresh() { if (wanted) draw(); }, png, get ready() { return !!drawnFor; } };
 })();
+// "How it looks in chats": the preview people really get when the link is sent.
+// The main page reads its own preview tags. On a personal page the owner's editor fills it in (visitors don't see this box).
+const metaOf = p => { const m = document.querySelector(`meta[property="${p}"],meta[name="${p}"]`); return m ? m.getAttribute("content") || "" : ""; };
+const hostOf = u => { try { return new URL(u).hostname; } catch (e) { return "flexippo.com"; } };
+function chatPreview(v, root) {
+  const box = root || $("#previewBox"); if (!box) return;
+  $$(".og-i", box).forEach(i => { i.hidden = !v.img; if (v.img && i.getAttribute("src") !== v.img) i.src = v.img; });
+  $$(".og-t", box).forEach(e => { e.textContent = v.t || ""; });
+  $$(".og-s", box).forEach(e => { e.textContent = v.d || ""; e.hidden = !v.d; });
+  $$(".og-d", box).forEach(e => { e.textContent = v.host || "flexippo.com"; });
+  $$(".og-u", box).forEach(e => { e.textContent = v.url || ""; });
+}
 function renderShare() {
   const url = siteLink(); $("#linkInput").value = url;
-  try { const h = new URL(url).hostname; $("#ogDomain").textContent = h; $$(".og-d").forEach(e => e.textContent = h); } catch (e) {}
-  const ON = CONFIG.heroName || CONFIG.name, title = ON.charAt(0) + ON.slice(1).toLowerCase() + "'s Neon Vault";
-  $("#ogTitle").textContent = title; $$(".og-t").forEach(e => e.textContent = title);
+  if (Custom.demo) {
+    const site = BASE.siteUrl.replace(/\/+$/, "") + "/";
+    chatPreview({ img: metaOf("og:image").replace(site, ""), t: metaOf("og:title"), d: metaOf("og:description"), host: hostOf(url), url: url.replace(/^https?:\/\//, "").replace(/\/$/, "") });
+  }
   QR.refresh();
 }
 function copyText(t) {
@@ -1868,8 +1872,10 @@ function boot2() {
 // and private chat between people. Everything is saved in Supabase (see the database rules there).
 const Accounts = (() => {
   const $id = x => document.getElementById(x);
-  const RESERVED = new Set(["admin", "administrator", "flexippo", "support", "help", "root", "system", "moderator", "mod", "official", "staff", "null", "undefined", "api", "www", "login", "signup", "assets", "index", "supabase"]);
-  let pendingChat = null, pendingEdit = false, pendingThen = null;
+  // links that can't be anyone's page: the site's own files, and names people could mistake for official ones
+  const RESERVED = new Set(["admin", "administrator", "flexippo", "support", "help", "root", "system", "moderator", "mod", "official", "staff", "null", "undefined", "api", "www", "login", "signup", "assets", "index", "supabase",
+    "404", "tools", "previews", "readme", "cname", "manifest", "favicon", "robots", "sitemap", "edit", "settings", "home", "about", "privacy", "terms"]);
+  let pendingChat = null, pendingEdit = false, pendingThen = null, checkFor = "";
 
   /* ---------- helpers ---------- */
   function go(u, hash) { location.href = "/" + (u ? "?u=" + encodeURIComponent(u) : "") + (hash || ""); }
@@ -1885,42 +1891,79 @@ const Accounts = (() => {
   const copyLink = u => copyText(Cloud.shareLink(u)).then(ok => toast(ok ? "Link copied: " + Cloud.shareLink(u).replace(/^https?:\/\//, "") : "Couldn't copy. Your link is " + Cloud.shareLink(u)));
   const ensureOrSay = async msgId => { try { await Cloud.ensure(); return true; } catch (e) { if (msgId) say(msgId, friendlyError(e)); else toast(friendlyError(e)); return false; } };
 
-  /* ---------- login / sign up / username pop-up ---------- */
+  /* ---------- log in / sign up (one screen: your link, email, password) ---------- */
   const modal = $id("authModal");
   let authMode = "login", lastFocus = null;
   function say(id, t, ok) { const m = $id(id); if (m) { m.textContent = t || ""; m.className = "auth-msg" + (ok ? " ok" : ""); } }
   function showView(v) {
     $$("#authModal .auth-view").forEach(x => { x.hidden = x.dataset.view !== v; });
     modal.hidden = false;
-    setTimeout(() => { const f = $(`#authModal [data-view="${v}"] input:not([readonly])`); if (f) try { f.focus({ preventScroll: true }); } catch (e) {} }, 60);
+    setTimeout(() => { const f = $$(`#authModal [data-view="${v}"] input:not([readonly])`).find(x => x.offsetParent !== null); if (f) try { f.focus({ preventScroll: true }); } catch (e) {} }, 60);
   }
   function openModal(v) { if (modal.hidden) lastFocus = document.activeElement; showView(v); }
   function closeModal() {
-    modal.hidden = true; ["authMsg", "forgotMsg", "newPassMsg", "setupMsg"].forEach(id => say(id, ""));
+    modal.hidden = true; ["authMsg", "forgotMsg", "newPassMsg", "setupMsg", "checkMsg"].forEach(id => say(id, ""));
+    showPass(false);
     if (lastFocus && lastFocus.focus) try { lastFocus.focus({ preventScroll: true }); } catch (e) {}
   }
   function setMode(m) {
     authMode = m;
     $id("tabLogin").classList.toggle("on", m === "login"); $id("tabSignup").classList.toggle("on", m === "signup");
     $id("tabLogin").setAttribute("aria-selected", String(m === "login")); $id("tabSignup").setAttribute("aria-selected", String(m === "signup"));
-    $id("authGo").textContent = m === "login" ? "Log in" : "Create account";
+    $id("authTitle").textContent = m === "signup" ? "Get your free page" : "Welcome back";
+    $id("authUserRow").hidden = m !== "signup";
+    $id("authGo").textContent = m === "login" ? "Log in" : "Create my page";
     $id("authPass").autocomplete = m === "login" ? "current-password" : "new-password";
     $id("authForgot").hidden = m !== "login"; say("authMsg", "");
+    if (m === "signup") signName.check();
   }
+  // why: one short line, only when they came from something (liking, commenting, chatting...)
   function openAuth(mode, why) {
     Cloud.ensure().catch(() => {});      // start downloading the login part now, so it's ready when they press the button
     setMode(mode || "login");
-    $id("authTitle").textContent = mode === "signup" ? "Make your own page" : "Welcome back";
-    $id("authSub").textContent = why || (mode === "signup" ? "It's free. Get your own link, change anything on it, and chat with friends." : "Log in to edit your page and chat with friends.");
+    const sub = $id("authSub"); sub.textContent = why || ""; sub.hidden = !why;
     openModal("auth");
+  }
+  function showPass(on) {
+    const p = $id("authPass"), b = $id("authEye");
+    p.type = on ? "text" : "password"; b.setAttribute("aria-pressed", String(on)); b.setAttribute("aria-label", on ? "Hide password" : "Show password");
+  }
+  $id("authEye").addEventListener("click", () => { showPass($id("authPass").type === "password"); $id("authPass").focus(); });
+
+  // your link (username): letters, numbers and _ only, with a live "is it free?" check
+  function nameCheck(inputId, hintId) {
+    let T = 0, seq = 0;
+    const hint = (t, cls) => { const h = $id(hintId); h.textContent = t; h.className = "u-hint" + (cls ? " " + cls : ""); };
+    function check() {
+      const el = $id(inputId), v = el.value.toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 20);
+      if (v !== el.value) el.value = v;
+      clearTimeout(T); const s = ++seq;
+      if (!v) return hint("Letters, numbers or _");
+      if (v.length < 3) return hint("At least 3 characters", "bad");
+      if (RESERVED.has(v)) return hint("✕ Taken. Try another.", "bad");
+      hint("Checking…");
+      T = setTimeout(async () => {
+        try { const free = await Cloud.usernameFree(v); if (s === seq) hint(free ? "✓ Available: flexippo.com/" + v : "✕ Taken. Try another.", free ? "ok" : "bad"); }
+        catch (e) { if (s === seq) hint(""); }
+      }, 350);
+    }
+    $id(inputId).addEventListener("input", check);
+    return { check };
+  }
+  const signName = nameCheck("authUser", "authUserHint"), setupName = nameCheck("setupUser", "setupHint");
+  const niceName = u => u.replace(/_+/g, " ").trim().replace(/\b[a-z]/g, c => c.toUpperCase()) || u;
+  // the link they picked when signing up (kept with the account, so it works even if they confirm on another phone)
+  function wantedUser() {
+    const m = Cloud.user && Cloud.user.user_metadata, u = String((m && m.username) || LS.get("pendingUser", "") || "").toLowerCase();
+    return USER_RE.test(u) && !RESERVED.has(u) ? u : "";
   }
   function prefillSetup(name) {
     const u = $id("setupUser");
-    if (!u.value) {
+    if (name || !u.value) {
       const fromEmail = Cloud.user && Cloud.user.email ? Cloud.user.email.split("@")[0].toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 20) : "";
-      u.value = name || (Custom.missing && !Custom.failed ? Custom.missing : "") || (fromEmail.length >= 3 ? fromEmail : "");
+      u.value = name || wantedUser() || (Custom.missing && !Custom.failed ? Custom.missing : "") || (fromEmail.length >= 3 ? fromEmail : "");
     }
-    checkName();
+    setupName.check();
   }
   function openSetup(name) { prefillSetup(name); openModal("setup"); }
   // something needs an account (like, comment, guestbook): ask, then carry on where they were
@@ -1928,6 +1971,29 @@ const Accounts = (() => {
     pendingThen = then || null;
     if (Cloud.user && !Cloud.me) { openSetup(); return; }
     openAuth("signup", why);
+  }
+  // the account exists: make their page (= their link) and take them to it
+  async function makePage(u) {
+    try {
+      const me = await Cloud.createMe(u, niceName(u));
+      LS.del("pendingUser"); closeModal(); toast("Your page is ready: flexippo.com/" + me.username + " 🎉");
+      if (pendingChat) { const p = pendingChat; pendingChat = null; Chat.openWith(p); }
+      else if (pendingThen) { const f = pendingThen; pendingThen = null; try { f(); } catch (err) {} }
+      else go(me.username, "#start");
+      return true;
+    } catch (err) {
+      const m = String(err && err.message || "");
+      if (err && err.code === "23505" && !m.includes("username")) { await Cloud.refresh(); if (Cloud.me) { closeModal(); go(Cloud.me.username); return true; } }
+      openSetup(u);
+      say("setupMsg", err && err.code === "23505" ? "That link was just taken. Pick another." : err && err.code === "23514" ? "That link isn't allowed. Pick another." : friendlyError(err));
+      return false;
+    }
+  }
+  function showCheck(email, u) {
+    checkFor = email;
+    $id("checkEmail").textContent = email; $id("checkUser").textContent = u || ""; $id("checkKeep").hidden = !u;
+    $id("checkBack").dataset.mode = u ? "signup" : "login";
+    say("checkMsg", ""); openModal("check");
   }
 
   $id("authClose").addEventListener("click", () => { pendingThen = null; closeModal(); });
@@ -1937,23 +2003,45 @@ const Accounts = (() => {
   $id("tabSignup").addEventListener("click", () => setMode("signup"));
   $id("authForgot").addEventListener("click", () => { $id("forgotEmail").value = $id("authEmail").value.trim(); showView("forgot"); });
   $id("forgotBack").addEventListener("click", () => showView("auth"));
+  $id("checkBack").addEventListener("click", () => { setMode($id("checkBack").dataset.mode || "signup"); showView("auth"); });
+  $id("checkResend").addEventListener("click", async () => {
+    const b = $id("checkResend"); if (!checkFor) return;
+    b.disabled = true; say("checkMsg", "Sending…", true);
+    try {
+      if (!(await ensureOrSay("checkMsg"))) return;
+      const { error } = await Cloud.sb.auth.resend({ type: "signup", email: checkFor, options: { emailRedirectTo: BASE.siteUrl } });
+      if (error) throw error;
+      say("checkMsg", "Sent ✓ Look in spam too.", true);
+    } catch (err) { say("checkMsg", friendlyError(err)); }
+    finally { b.disabled = false; }
+  });
 
   $id("authForm").addEventListener("submit", async e => {
     e.preventDefault();
+    const signup = authMode === "signup", u = $id("authUser").value.trim().toLowerCase();
     const email = $id("authEmail").value.trim(), password = $id("authPass").value, btn = $id("authGo");
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return say("authMsg", "Please type a real email.");
-    if (password.length < 6) return say("authMsg", "Password needs at least 6 characters.");
-    btn.disabled = true; say("authMsg", "One moment…", true);
+    if (signup && !USER_RE.test(u)) { $id("authUser").focus(); return say("authMsg", "Pick your link: 3 to 20 letters, numbers or _."); }
+    if (signup && RESERVED.has(u)) { $id("authUser").focus(); return say("authMsg", "That link is taken. Try another."); }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { $id("authEmail").focus(); return say("authMsg", "Please type a real email."); }
+    if (password.length < 6) { $id("authPass").focus(); return say("authMsg", "Password needs at least 6 characters."); }
+    btn.disabled = true; say("authMsg", signup ? "Making your page…" : "One moment…", true);
     try {
       if (!(await ensureOrSay("authMsg"))) return;
-      if (authMode === "signup") {
-        const { data, error } = await Cloud.sb.auth.signUp({ email, password, options: { emailRedirectTo: BASE.siteUrl } });
+      if (signup) {
+        let free = true; try { free = await Cloud.usernameFree(u); } catch (err) {}
+        if (!free) { signName.check(); return say("authMsg", "That link was just taken. Try another."); }
+        const { data, error } = await Cloud.sb.auth.signUp({ email, password, options: { emailRedirectTo: BASE.siteUrl, data: { username: u } } });
         if (error) throw error;
-        if (!data || !data.session) { say("authMsg", "Account created! Check your email and tap the confirm link, then log in here.", true); return; }
-      } else {
-        const { error } = await Cloud.sb.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        // this is how Supabase answers when the email already has an account (it doesn't say it directly, for privacy)
+        if (data && data.user && Array.isArray(data.user.identities) && !data.user.identities.length) { setMode("login"); return say("authMsg", "That email already has an account. Log in here."); }
+        LS.set("pendingUser", u); $id("authPass").value = "";
+        if (!data || !data.session) { showCheck(email, u); return; }     // they need to tap the link in their email first
+        await Cloud.refresh();
+        await makePage(u);
+        return;
       }
+      const { error } = await Cloud.sb.auth.signInWithPassword({ email, password });
+      if (error) { if (/email not confirmed/i.test(error.message || "")) { showCheck(email, ""); return; } throw error; }
       $id("authPass").value = "";
       afterLogin(await Cloud.refresh());
     } catch (err) { say("authMsg", friendlyError(err)); }
@@ -1962,13 +2050,14 @@ const Accounts = (() => {
   function afterLogin(me) {
     if (!me) {
       if (Cloud.notSetUp) { closeModal(); toast("Accounts are still being set up. Try again soon."); return; }
+      const u = wantedUser(); if (u) { makePage(u); return; }
       openSetup(); return;
     }
     closeModal(); toast("Hey @" + me.username + " 👋");
     if (pendingChat) { const p = pendingChat; pendingChat = null; Chat.openWith(p); return; }
     if (pendingThen) { const f = pendingThen; pendingThen = null; try { f(); } catch (e) {} return; }   // stay here and finish what they started
     const onMine = Custom.target && Custom.target.id === me.id;
-    if (pendingEdit && onMine) { pendingEdit = false; OwnerTools.open("menu"); return; }
+    if (pendingEdit && onMine) { pendingEdit = false; OwnerTools.open("edit"); return; }
     if (!onMine) go(me.username, pendingEdit ? "#edit" : "");
   }
 
@@ -1995,47 +2084,21 @@ const Accounts = (() => {
       const { error } = await Cloud.sb.auth.updateUser({ password: pw });
       if (error) throw error;
       $id("newPass").value = ""; closeModal(); toast("Password updated ✓");
-      if (!Cloud.me) openSetup();
+      if (!Cloud.me) { const u = wantedUser(); if (u) makePage(u); else openSetup(); }
     } catch (err) { say("newPassMsg", friendlyError(err)); }
     finally { btn.disabled = false; }
   });
 
-  // username: letters, numbers, _ only; live "available?" check
-  let checkT = 0, checkSeq = 0;
-  function hint(t, cls) { const h = $id("setupHint"); h.textContent = t; h.className = "u-hint" + (cls ? " " + cls : ""); }
-  function checkName() {
-    const el = $id("setupUser"), v = el.value.toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 20);
-    if (v !== el.value) el.value = v;
-    clearTimeout(checkT); const seq = ++checkSeq;
-    if (!v) return hint("3 to 20 letters, numbers or _");
-    if (v.length < 3) return hint("At least 3 characters", "bad");
-    if (RESERVED.has(v)) return hint("That one is reserved. Try another.", "bad");
-    hint("Checking…");
-    checkT = setTimeout(async () => {
-      try { const free = await Cloud.usernameFree(v); if (seq === checkSeq) hint(free ? "✓ Available: flexippo.com/" + v : "✕ Taken. Try another.", free ? "ok" : "bad"); }
-      catch (e) { if (seq === checkSeq) hint("Couldn't check right now"); }
-    }, 350);
-  }
-  $id("setupUser").addEventListener("input", checkName);
+  // picking a link after logging in (accounts made before the one-screen sign-up, or if the link they wanted got taken)
   $id("setupForm").addEventListener("submit", async e => {
     e.preventDefault();
-    const u = $id("setupUser").value.trim().toLowerCase(), nm = $id("setupName").value.trim().slice(0, 24) || u, btn = $id("setupGo");
-    if (!USER_RE.test(u)) return say("setupMsg", "Your username needs 3 to 20 letters, numbers or _.");
-    if (RESERVED.has(u)) return say("setupMsg", "That username is reserved. Try another.");
+    const u = $id("setupUser").value.trim().toLowerCase(), btn = $id("setupGo");
+    if (!USER_RE.test(u)) return say("setupMsg", "Your link needs 3 to 20 letters, numbers or _.");
+    if (RESERVED.has(u)) return say("setupMsg", "That link is taken. Try another.");
     if (!(await ensureOrSay("setupMsg"))) return;
-    if (!Cloud.user) { showView("auth"); return say("authMsg", "Please log in again."); }
-    btn.disabled = true; say("setupMsg", "Creating your page…", true);
-    try {
-      const me = await Cloud.createMe(u, nm);
-      closeModal(); toast("Your page is ready: flexippo.com/" + me.username + " 🎉");
-      if (pendingChat) { const p = pendingChat; pendingChat = null; Chat.openWith(p); }
-      else if (pendingThen) { const f = pendingThen; pendingThen = null; try { f(); } catch (err) {} }
-      else go(me.username, "#start");   // their new page, with the quick start open
-    } catch (err) {
-      const m = String(err && err.message || "");
-      say("setupMsg", err && err.code === "23505" ? (m.includes("username") ? "That username is taken. Try another." : "You already have a page. Refresh this page.")
-        : err && err.code === "23514" ? "That username isn't allowed. Try another." : friendlyError(err));
-    } finally { btn.disabled = false; }
+    if (!Cloud.user) { setMode("login"); showView("auth"); return say("authMsg", "Please log in again."); }
+    btn.disabled = true; say("setupMsg", "Making your page…", true);
+    try { await makePage(u); } finally { btn.disabled = false; }
   });
 
   /* ---------- account button (top right) + menu ---------- */
@@ -2066,7 +2129,7 @@ const Accounts = (() => {
   $id("accMine").addEventListener("click", () => { if (Cloud.me) go(Cloud.me.username); });
   $id("accEdit").addEventListener("click", () => {
     if (!Cloud.me) return;
-    if (Custom.owner) { closeModal(); OwnerTools.open("menu"); } else go(Cloud.me.username, "#edit");
+    if (Custom.owner) { closeModal(); OwnerTools.open("edit"); } else go(Cloud.me.username, "#edit");
   });
   $id("accChats").addEventListener("click", () => { closeModal(); Chat.open(); });
   $id("accHome").addEventListener("click", () => go(""));
@@ -2083,7 +2146,7 @@ const Accounts = (() => {
     let h = "";
     if (Custom.failed) h = `<p class="pa-miss">Couldn't load <b>@${esc(PAGE_U)}</b>'s page. Check your internet and refresh.</p>`;
     else if (Custom.missing) h = `<p class="pa-miss">There's no page called <b>@${esc(Custom.missing)}</b> yet.</p>` + (me ? `<button class="pa-b ghost" type="button" data-act="mine">Go to my page</button>` : `<button class="pa-b" type="button" data-act="claim">✨ Claim @${esc(Custom.missing)}</button>`);
-    else if (T && Custom.owner) h = `<button class="pa-b" type="button" data-open="menu">✎ Edit my page</button><button class="pa-b ghost" type="button" data-open="share">🔗 Share my page</button>`;
+    else if (T && Custom.owner) h = `<button class="pa-b" type="button" data-open="edit">✎ Edit my page</button><button class="pa-b ghost" type="button" data-open="share">🔗 Share</button>`;
     else if (T && !Custom.isHome) h = `<button class="pa-b" type="button" data-act="msg">💬 Message ${esc(nameOf(T))}</button><button class="pa-b ghost" type="button" data-act="sharep">🔗 Share</button>`;
     box.innerHTML = h;
   }
@@ -2094,7 +2157,7 @@ const Accounts = (() => {
     if (a === "sharep" && T) shareLink(Cloud.shareLink(T.username), "Check out " + nameOf(T) + "'s page 👀");
     else if (a === "msg" && T) Chat.openWith(person(T));
     else if (a === "mine") { const me = Cloud.me || Cloud.cachedMe; if (me) go(me.username); }
-    else if (a === "claim") { if (Cloud.user) openSetup(Custom.missing); else { $id("setupUser").value = Custom.missing; openAuth("signup", "Sign up to claim flexippo.com/" + Custom.missing); } }
+    else if (a === "claim") { if (Cloud.user) openSetup(Custom.missing); else { $id("authUser").value = Custom.missing; openAuth("signup"); } }
   });
 
   /* ---------- chat ---------- */
@@ -2387,19 +2450,19 @@ const Accounts = (() => {
     $id("chatInput").addEventListener("input", grow);
     $id("chatInput").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing && fine) { e.preventDefault(); send(); } });
     $id("chatForm").addEventListener("submit", e => { e.preventDefault(); send(); });
-    addEventListener("keydown", e => { if (e.key === "Escape" && isOpen && modal.hidden && $("#editor").hidden) { if (!$id("chatMenu").hidden) hideMenu(); else close(); } });
+    addEventListener("keydown", e => { if (e.key === "Escape" && isOpen && modal.hidden && !document.documentElement.classList.contains("fe-lock")) { if (!$id("chatMenu").hidden) hideMenu(); else close(); } });
     document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && Cloud.me) poll(); });
     Cloud.on(onAuth);
     return { open, close, openWith, onAuth };
   })();
 
-  // "Make it myself, free" (the get-your-own box): sign up, or go to your page if you have one
+  // "Make mine, free" (the get-your-own box): sign up, or go to your page if you have one
   $id("goFree").addEventListener("click", async () => {
     Snd.fx("tick");
     const me = Cloud.ready ? Cloud.me : Cloud.cachedMe;
-    if (me) { if (Custom.target && Custom.target.id === me.id) OwnerTools.open("menu"); else go(me.username, "#edit"); return; }
+    if (me) { if (Custom.target && Custom.target.id === me.id) OwnerTools.open("edit"); else go(me.username, "#edit"); return; }
     if (Cloud.ready && Cloud.user && !Cloud.me) { openSetup(); return; }
-    openAuth("signup", "Free, and ready in a minute. You get your own link, see who likes your stuff, and can chat with friends.");
+    openAuth("signup");
   });
 
   /* ---------- start ---------- */
@@ -2409,16 +2472,16 @@ const Accounts = (() => {
     paintBtn(); paintActs(); Chat.onAuth();
     if (AUTH_HASH_ERROR) toast(/expired|invalid/i.test(AUTH_HASH_ERROR) ? "That email link has expired. Ask for a new one." : AUTH_HASH_ERROR);
     if (AUTH_RECOVERY && Cloud.user) openModal("newpass");
-    else if (AUTH_IN_URL && Cloud.user && !Cloud.me && !Cloud.notSetUp) openSetup();   // just confirmed their email: pick a username next
+    else if (AUTH_IN_URL && Cloud.user && !Cloud.me && !Cloud.notSetUp) { const u = wantedUser(); if (u) makePage(u); else openSetup(); }   // just confirmed their email: make their page
     Cloud.on(why => { if (why === "recovery") openModal("newpass"); });
     if (Custom.missing && !Custom.failed) toast("There's no page called @" + Custom.missing + " yet");
-    if (location.hash === "#start" && Custom.owner) {   // just made their page: the quick start
+    if (location.hash === "#start" && Custom.owner) {   // just made their page: straight into editing it
       try { history.replaceState(history.state, "", location.pathname + location.search); } catch (e) {}
-      setTimeout(() => OwnerTools.open("start"), 350);
+      setTimeout(() => OwnerTools.open("start"), 300);
     }
     if (location.hash === "#edit") {
       try { history.replaceState(history.state, "", location.pathname + location.search); } catch (e) {}
-      if (Custom.owner) setTimeout(() => OwnerTools.open("menu"), 350);
+      if (Custom.owner) setTimeout(() => OwnerTools.open("edit"), 300);
       else if (!Cloud.user) { pendingEdit = true; openAuth("login", "Log in to edit your page."); }
       else if (!Cloud.me) openSetup();
       else if (!(Custom.target && Custom.target.id === Cloud.me.id)) go(Cloud.me.username, "#edit");
