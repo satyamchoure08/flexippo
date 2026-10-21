@@ -88,19 +88,19 @@ const CONFIG = {
     accent: "#1ed760",
     tracks: ["Anime Cyberpunk — HitsLab"]
   },
-  // Collection: up to 6 photos (keeps pages clean). The example page shows the kind of wins people flex here.
+  // Collection: up to 6 photos (keeps pages clean). The example page shows the kind of stuff people flex here.
   // A "uc" item ({ type: "uc", amount, unit, game, icon, logo }) is a text card for in-game currency.
   collectionLimit: 6,
   collection: [
-    { id: "rank", img: "assets/col/ranked-grandmaster.jpg", alt: "Grandmaster rank, top 0.4% of the server" },
-    { id: "ticket", img: "assets/col/concert-ticket.jpg", alt: "Front-row concert ticket" },
-    { id: "pr", img: "assets/col/deadlift-pr.jpg", alt: "New deadlift personal best: 180 kg" },
-    { id: "hackathon", img: "assets/col/hackathon-win.jpg", alt: "1st place at a city hackathon" },
-    { id: "anime", img: "assets/col/anime-list.jpg", alt: "214 anime completed" },
-    { id: "streak", img: "assets/col/streak-365.jpg", alt: "365-day streak learning Japanese" }
+    { id: "pc", img: "assets/col/gaming-pc.jpg", alt: "My RGB gaming PC build" },
+    { id: "jordans", img: "assets/col/jordan-1.jpg", alt: "Air Jordan 1 'Chicago'" },
+    { id: "ps5", img: "assets/col/ps5.jpg", alt: "PS5 + DualSense" },
+    { id: "travis", img: "assets/col/travis-jordans.jpg", alt: "Travis Scott Jordan 1 Lows" },
+    { id: "switch", img: "assets/col/switch.jpg", alt: "Nintendo Switch" },
+    { id: "airpods", img: "assets/col/airpods-pro.jpg", alt: "AirPods Pro" }
   ],
   // example comment pinned on a photo on the demo page (photo id: commenter)
-  pins: { "rank": "midnight.gamer", "ticket": "aura.farmer" }
+  pins: { "pc": "gpu.goblin", "jordans": "drip.check.99" }
 };
 const BASE = JSON.parse(JSON.stringify(CONFIG));   // the defaults above. Every person's page starts from these.
 
@@ -136,7 +136,7 @@ function loadScript(src) {
 /* ---------- smaller photos for phones ----------
    The site's own photos also exist as small WebP copies in assets/opt (made from the originals, which stay as they are).
    [original width, original height, [copy widths]] */
-const OPT = {"assets/cover-main.jpg":[1440,1800,[800,1100,1440]],"assets/story-palms.jpg":[898,1350,[240,898]],"assets/post-beach-crew.jpg":[612,408,[320,612]],"assets/post-hike-crew.jpg":[720,540,[320,720]],"assets/post-lake.jpg":[1200,830,[320,720]],"assets/x-profile.jpg":[1000,746,[700,1000]],"assets/og-kai.jpg":[1200,630,[640]],"assets/flexippo-avatar.png":[320,320,[320]],"assets/col/ginger-cat.jpg":[640,640,[320,640]],"assets/col/guitar.jpg":[640,640,[320,640]],"assets/col/mecha-robot.jpg":[640,640,[320,640]],"assets/col/ranked-grandmaster.jpg":[640,640,[320,640]],"assets/col/concert-ticket.jpg":[640,640,[320,640]],"assets/col/deadlift-pr.jpg":[640,640,[320,640]],"assets/col/hackathon-win.jpg":[640,640,[320,640]],"assets/col/anime-list.jpg":[640,640,[320,640]],"assets/col/streak-365.jpg":[640,640,[320,640]]};
+const OPT = {"assets/cover-main.jpg":[1440,1800,[800,1100,1440]],"assets/story-palms.jpg":[898,1350,[240,898]],"assets/post-beach-crew.jpg":[612,408,[320,612]],"assets/post-hike-crew.jpg":[720,540,[320,720]],"assets/post-lake.jpg":[1200,830,[320,720]],"assets/x-profile.jpg":[1000,746,[700,1000]],"assets/og-kai.jpg":[1200,630,[640]],"assets/flexippo-avatar.png":[320,320,[320]],"assets/col/ginger-cat.jpg":[640,640,[320,640]],"assets/col/guitar.jpg":[640,640,[320,640]],"assets/col/mecha-robot.jpg":[640,640,[320,640]]};
 function optList(src) {
   const o = OPT[src]; if (!o) return null;
   const base = src.replace(/^assets\//, "assets/opt/").replace(/\.\w+$/, "");
@@ -832,6 +832,23 @@ const Stories = (() => {
 // On someone's page (flexippo.com/name) everything they change is saved to their account,
 // so it shows for everyone, on every device. While they edit, the page changes on screen straight away
 // and saves itself a moment later (no Save button to forget).
+// A page that was never saved starts as a copy of the example page (its accounts, posts, stories and collection).
+// The owner changes or removes any of it from ✎ Customize; once they save, only what they kept stays.
+function starterPage() {
+  const soc = id => BASE.socials.find(s => s.id === id) || {};
+  const ig = soc("instagram"), sc = soc("snapchat"), xs = soc("x"), media = {};
+  (ig.posts || []).slice(0, 3).forEach((p, i) => { media["ig" + i] = p.img; });
+  (sc.stories || []).slice(0, 4).forEach((st, i) => { media["sc" + i] = st.img; });
+  if (xs.post && xs.post.img) media.x0 = xs.post.img;
+  const collection = BASE.collection.slice(0, colMax()).map(it => { media["col_" + it.id] = it.img; return { id: it.id, alt: it.alt || "", meme: it.meme || "" }; });
+  const settings = {
+    v: 2, profile: {}, links: [], collection,
+    socials: [["instagram", ig], ["snapchat", sc], ["x", xs]].map(([k, s]) => ({ k, v: String(s.handle || "").replace(/^@/, "") })).filter(s => SOCIAL[s.k].re.test(s.v)),
+    instagram: { posts: (ig.posts || []).slice(0, 3).map(p => ({ cap: p.cap || "" })) },
+    snapchat: { score: sc.score || "", streak: sc.streak || "", stories: (sc.stories || []).slice(0, 4).map(st => ({ cap: st.cap || "", when: st.when || "" })) }
+  };
+  return { settings, media };
+}
 const Custom = (() => {
   let owner = false, cloud = false, target = null, isHome = false, missing = "", failed = false, loaded = false, lastError = null;
   let settings = {}, media = {}, saved = { settings: {}, media: {} };
@@ -850,7 +867,11 @@ const Custom = (() => {
       const slow = setTimeout(() => document.body.classList.remove("loading-page"), 6000);   // never hide the page for long
       try { target = await Cloud.getProfile(u); } catch (e) { target = null; lastError = e; failed = !!PAGE_U; }
       clearTimeout(slow);
-      if (target) { settings = cleanSettings(target.settings); media = cleanMedia(target.media); saved = { settings, media }; }
+      if (target) {
+        settings = cleanSettings(target.settings); media = cleanMedia(target.media);
+        if (!Object.keys(settings).length) { const st = starterPage(); settings = st.settings; media = { ...st.media, ...media }; }
+        saved = { settings, media };
+      }
       else if (PAGE_U && !failed) missing = u;
       syncOwner();
       Cloud.on(why => { if (why === "auth" || why === "me" || why === "init") { const was = owner; syncOwner(); if (was !== owner) apply(); } });
@@ -1568,7 +1589,7 @@ const Guestbook = (() => {
     target = { item: id, title: itemTitle(it) }; Snd.fx("tick");
     const th = $("#gbReplyThumb"); th.innerHTML = thumbHtml(it); th.hidden = false; th.style.display = "contents";
     $("#gbReplyName").textContent = ownerName() + "'s photo"; $("#gbReplying").hidden = false;
-    $("#gbMsg").placeholder = "Say something about this photo…"; $("#gbSend").textContent = "Send reply ↩";
+    $("#gbSend").textContent = "Send reply ↩";
     if (mention) { const m = $("#gbMsg"); m.value = "@" + mention + " "; $("#gbCount").textContent = m.value.length + "/140"; }
     focusForm();
   }
@@ -1580,10 +1601,10 @@ const Guestbook = (() => {
   function replyTo(id, name) {
     target = { id, name }; Snd.fx("tick"); $("#gbReplyThumb").hidden = true; $("#gbReplyThumb").style.display = "";
     $("#gbReplyName").textContent = name; $("#gbReplying").hidden = false;
-    $("#gbMsg").placeholder = "Reply to " + name + "…"; $("#gbSend").textContent = "Send reply ↩";
+    $("#gbSend").textContent = "Send reply ↩";
     focusForm();
   }
-  function cancel() { target = null; $("#gbReplying").hidden = true; $("#gbReplyThumb").hidden = true; $("#gbReplyThumb").style.display = ""; $("#gbMsg").placeholder = "Say hi, hype them up, leave your mark ✍️"; paintForm(); }
+  function cancel() { target = null; $("#gbReplying").hidden = true; $("#gbReplyThumb").hidden = true; $("#gbReplyThumb").style.display = ""; paintForm(); }
   // delete a message (tap once, then tap "Sure?" to confirm). Deleting a message also removes its replies.
   function remove(m, btn, isReply) {
     if (btn.dataset.armed !== "1") {

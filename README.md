@@ -3,7 +3,7 @@
 Personal "flex" pages: socials, a collection, music and a guestbook in one link.
 
 - `flexippo.com` is the **example page**. Its likes and comments are made up and the page says so (the "DEMO" notes).
-- `flexippo.com/name` is a person's **own page**. It only shows what that person added, and its likes, comments, guestbook and page views are real (saved in Supabase).
+- `flexippo.com/name` is a person's **own page**. A new page starts as a copy of the example page (its @flexippo accounts, posts, stories and collection photos); the owner changes or removes any of it with ✎ Customize. Its likes, comments, guestbook and page views are always real (saved in Supabase).
 
 ## Files
 
@@ -21,6 +21,7 @@ Personal "flex" pages: socials, a collection, music and a guestbook in one link.
 | `assets/og-default.jpg` | The preview picture for pages that haven't made their own yet. |
 | `manifest.webmanifest` | Lets people add the site to their home screen. |
 | `assets/opt/` | Smaller WebP copies of the built-in photos, for phones. The originals next to them are untouched and still used as the source. |
+| `assets/col/` | Collection and story photos. The collection photos are free stock photos from Wikimedia Commons (CC0 / public domain, cropped): gaming-pc (Pea santsbh), ps5 (Howardcorn33), jordan-1 (Osyffar), travis-jordans (Silverspoon21), switch (Evan-Amos), airpods-pro (Jackienyyy). |
 | `assets/fonts/` | The five fonts, trimmed to the letters the site uses (licenses in `LICENSES.txt`). |
 | `assets/vendor/supabase.js` | Supabase's official JavaScript library v2.118.0, built from its source code. Only downloaded when someone logs in, likes, comments or opens a personal page. |
 | `assets/vendor/qrcodegen.js` | Makes the QR code (only downloaded when the share box comes into view, or for the story picture). |
@@ -45,13 +46,13 @@ When someone sends `flexippo.com/name` in WhatsApp, Instagram, iMessage, Telegra
 
 If previews stop updating: open the repository's **Actions** tab on GitHub → **Link previews**. GitHub pauses scheduled jobs after 60 days without any change in the repository; the button there turns it back on, and **Run workflow** runs it right away.
 
-A page's content is saved in `profiles.settings` (format `v: 2`: `profile`, `socials`, `links`, `collection` and optional extras for the big Instagram, Snapchat, X, Spotify and Discord cards) and its photos in `profiles.media`. Pages saved with the older editor still work: the parts they carried over from the example page (other people's photos, @flexippo, a made-up Snapscore) are left out when they're shown.
+A page's content is saved in `profiles.settings` (format `v: 2`: `profile`, `socials`, `links`, `collection` and optional extras for the big Instagram, Snapchat, X, Spotify and Discord cards) and its photos in `profiles.media`. A page that was never saved (`settings` empty) is shown with the example content (`starterPage()` in `app.js`); the first save stores it like anything the owner added. Pages saved with the older editor still work: the parts they carried over from the example page (other people's photos, @flexippo, a made-up Snapscore) are left out when they're shown.
 
 ## Rules this site follows
 
 1. **Nothing is loaded from other websites** (no CDNs, no Google Fonts, no hot-linked images). Everything the page needs lives in this repo. The only outside connection is the Supabase database.
 2. **Built for cheap phones**: no full-screen effects, no endless animations that repaint big areas, glass blur only on small things (and off on slow phones: `html.lite`), photos sized for the screen, music, login code and the editor only downloaded when needed.
-3. **The example page is honest**: made-up numbers only appear on `flexippo.com` and are labelled "DEMO". Personal pages only ever show real numbers and the owner's own content.
+3. **The example page is honest**: made-up likes and comments only appear on `flexippo.com` and are labelled "DEMO". Personal pages always show real likes, comments, guestbook and views.
 
 ## Database (Supabase project `knmjxdnzttyacdtktbdl`)
 
