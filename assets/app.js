@@ -1063,7 +1063,7 @@ function renderContact() {
   // personal pages show how to reach them in the socials list, so this box is only on the example page
   const sec = $("#contact"); sec.hidden = !Custom.demo || !!PAGE_U; if (sec.hidden) return;
   const mail = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>';
-  $("#ctGrid").innerHTML = CONFIG.contact.map(c => {
+  $("#ctGrid").innerHTML = CONFIG.contact.filter(c => c.value).map(c => {   // only the ones filled in (no "Coming soon" rows)
     const link = !!(c.value && c.url), plain = !!c.value && !c.url;
     const ic = `<span class="soc-ic" style="background:${c.brand};${c.id === "snapchat" ? "color:#111" : ""}" aria-hidden="true">${c.icon ? icon(c.icon) : mail}</span>`;
     const t = `<span class="cnt-t">${c.value ? esc(c.value) : "Coming soon"}</span>`;
