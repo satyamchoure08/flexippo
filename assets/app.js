@@ -88,19 +88,25 @@ const CONFIG = {
     accent: "#1ed760",
     tracks: ["Anime Cyberpunk — HitsLab"]
   },
-  // Collection: up to 6 photos (keeps pages clean). The example page shows the kind of stuff people flex here.
+  // Collection: up to 6 photos (keeps pages clean). The example page shows the kind of stuff people really flex: cheap figures, trends and bad habits.
+  // Photos under CC BY need their credit (credit, creditUrl, license, licenseUrl): it shows under the collection.
   // A "uc" item ({ type: "uc", amount, unit, game, icon, logo }) is a text card for in-game currency.
   collectionLimit: 6,
   collection: [
-    { id: "pc", img: "assets/col/gaming-pc.jpg", alt: "My RGB gaming PC build" },
-    { id: "jordans", img: "assets/col/jordan-1.jpg", alt: "Air Jordan 1 'Chicago'" },
-    { id: "ps5", img: "assets/col/ps5.jpg", alt: "PS5 + DualSense" },
-    { id: "travis", img: "assets/col/travis-jordans.jpg", alt: "Travis Scott Jordan 1 Lows" },
-    { id: "switch", img: "assets/col/switch.jpg", alt: "Nintendo Switch" },
-    { id: "airpods", img: "assets/col/airpods-pro.jpg", alt: "AirPods Pro" }
+    { id: "figure", img: "assets/col/miku-figure.jpg", alt: "Hatsune Miku figure", meme: "she's my wife, don't ask",
+      credit: "animaster", creditUrl: "https://www.flickr.com/photos/19043905@N06/8360367373", license: "CC BY 2.0", licenseUrl: "https://creativecommons.org/licenses/by/2.0/" },
+    { id: "dubai", img: "assets/col/dubai-chocolate.jpg", alt: "Dubai chocolate", meme: "spent my whole pocket money on this" },
+    { id: "crocs", img: "assets/col/crocs.jpg", alt: "Crocs full of jibbitz", meme: "jibbitz collection > my marks",
+      credit: "epredator", creditUrl: "https://www.flickr.com/photos/53726379@N00/2549381762", license: "CC BY 2.0", licenseUrl: "https://creativecommons.org/licenses/by/2.0/" },
+    { id: "monster", img: "assets/col/monster.jpg", alt: "Monster Energy cans", meme: "4th one today. heart is fine",
+      credit: "JeepersMedia", creditUrl: "https://www.flickr.com/photos/39160147@N03/14506941546", license: "CC BY 2.0", licenseUrl: "https://creativecommons.org/licenses/by/2.0/" },
+    { id: "noodles", img: "assets/col/cup-noodles.jpg", alt: "Cup noodles", meme: "dinner at 3am. again.",
+      credit: "elsie.hui", creditUrl: "https://www.flickr.com/photos/91188380@N05/9131988144", license: "CC BY 2.0", licenseUrl: "https://creativecommons.org/licenses/by/2.0/" },
+    { id: "screen", img: "assets/col/phone.jpg", alt: "Phone, never put down", meme: "screen time: 11h 42m",
+      credit: "r.nial.bradshaw", creditUrl: "https://www.flickr.com/photos/33227787@N05/37856638405", license: "CC BY 2.0", licenseUrl: "https://creativecommons.org/licenses/by/2.0/" }
   ],
   // example comment pinned on a photo on the demo page (photo id: commenter)
-  pins: { "pc": "gpu.goblin", "jordans": "drip.check.99" }
+  pins: { "screen": "sleep.is.404", "noodles": "ramen.at.3am" }
 };
 const BASE = JSON.parse(JSON.stringify(CONFIG));   // the defaults above. Every person's page starts from these.
 
@@ -1299,6 +1305,11 @@ function renderVault(why) {
     return `<article class="card" data-id="${esc(it.id)}"><div class="ci${it.type === "uc" ? " is-uc" : ""}">${media}${pin}${ed}</div>
       <div class="react" role="group" aria-label="Likes and comments for ${esc(label)}"><button class="rx rx-like" type="button" data-rx="like" aria-pressed="false" aria-label="Like">${HEART}<em>0</em></button><button class="rx rx-cm" type="button" aria-label="Open comments">${BUBBLE}<em>${compact(commentCount(it))}</em></button></div></article>`;
   }).join("") + ownerAdd;
+  const credits = items.map(it => BASE.collection.find(b => b.img === it.img && b.credit)).filter(Boolean)
+    .map(b => `${esc(b.alt)}: <a href="${esc(b.creditUrl)}" target="_blank" rel="noopener">${esc(b.credit)}</a>, <a href="${esc(b.licenseUrl)}" target="_blank" rel="noopener">${esc(b.license)}</a>`);
+  let cr = $("#colCredit");
+  if (!cr) { cr = document.createElement("p"); cr.id = "colCredit"; cr.className = "credit col-credit"; $("#grid").after(cr); }
+  cr.hidden = !credits.length; cr.innerHTML = credits.length ? "Photos: " + credits.join(" · ") + " (cropped)" : "";
   if (fine && !reduce) $$(".card").forEach(card => {
     const ci = $(".ci", card);
     ci.addEventListener("pointerenter", () => { card.classList.add("tilting"); Snd.fx("hover"); });

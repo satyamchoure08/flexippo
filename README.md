@@ -21,7 +21,7 @@ Personal "flex" pages: socials, a collection, music and a guestbook in one link.
 | `assets/og-default.jpg` | The preview picture for pages that haven't made their own yet. |
 | `manifest.webmanifest` | Lets people add the site to their home screen. |
 | `assets/opt/` | Smaller WebP copies of the built-in photos, for phones. The originals next to them are untouched and still used as the source. |
-| `assets/col/` | Collection and story photos. The collection photos are free stock photos from Wikimedia Commons (CC0 / public domain, cropped): gaming-pc (Pea santsbh), ps5 (Howardcorn33), jordan-1 (Osyffar), travis-jordans (Silverspoon21), switch (Evan-Amos), airpods-pro (Jackienyyy). |
+| `assets/col/` | Collection and story photos. The collection photos are the kind of stuff people really flex (a cheap anime figure, trend food, Crocs, energy drinks, 3am noodles, screen time); the funny line on each card is the `meme` text in `CONFIG.collection`. dubai-chocolate is CC0 (Jan Helebrant, Wikimedia Commons). The others are CC BY 2.0 from Flickr and their credit shows under the collection (fields `credit`, `creditUrl`, `license`, `licenseUrl`): miku-figure (animaster), crocs (epredator), monster (JeepersMedia), cup-noodles (elsie.hui), phone (r.nial.bradshaw). |
 | `assets/fonts/` | The five fonts, trimmed to the letters the site uses (licenses in `LICENSES.txt`). |
 | `assets/vendor/supabase.js` | Supabase's official JavaScript library v2.118.0, built from its source code. Only downloaded when someone logs in, likes, comments or opens a personal page. |
 | `assets/vendor/qrcodegen.js` | Makes the QR code (only downloaded when the share box comes into view, or for the story picture). |

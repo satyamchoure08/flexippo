@@ -882,3 +882,53 @@ button.own-empty{width:100%;font:inherit;color:var(--ink)}
   html{scroll-behavior:auto}
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
 }
+
+/* ---------- the extras (guestbook, share, contact, footer): smaller, so socials + collection stay the main thing ---------- */
+.sec.sec-sm{padding:34px 0 12px}
+.sec-sm .sec-head{margin-bottom:12px}
+.sec-sm .sec-title .bgk{display:none}
+.sec-sm .sec-title .kick{font-size:10px;letter-spacing:.26em}
+.sec-sm .sec-title .en{font-size:clamp(22px,4.6vw,30px)}
+.sec-sm::before{display:none}
+/* guestbook */
+.sec-sm .gb{gap:12px}
+.sec-sm .gb-form{gap:8px;padding:12px;border-radius:16px}
+.sec-sm .gb-form label{font-size:10px}
+.sec-sm .gb-form input,.sec-sm .gb-form textarea{padding:9px 12px}
+.sec-sm .gb-form textarea{min-height:58px}
+.sec-sm .gb-form .btn{padding-block:8px;font-size:14px}
+.sec-sm .gb-note:empty{display:none}
+.sec-sm .empty{padding:12px;border-radius:14px;font-size:13px}
+.sec-sm .empty b{font-size:16px;margin-bottom:2px}
+.sec-sm .wall{gap:12px}
+/* share + customize */
+.sec-sm .tri{gap:10px}
+.sec-sm .box{gap:10px;padding:12px;border-radius:16px}
+.sec-sm .box h3{font-size:16px}
+.sec-sm .box h3 small{font-size:10px}
+.sec-sm .skin{flex-direction:row;align-items:center;gap:6px;padding:6px;font-size:11px;line-height:1.15}
+.sec-sm .skin i{flex:none;width:22px;height:22px;border-radius:6px}
+.sec-sm .switch{padding:7px 10px;font-size:14px}
+.sec-sm .qr{gap:10px}
+.sec-sm .qr-box{width:84px;height:84px;padding:5px;border-radius:10px}
+.sec-sm .qr-box svg{width:74px;height:74px}
+.sec-sm .qr-acts{flex-direction:row;flex-wrap:wrap;gap:6px}
+.sec-sm .qr-acts .btn,.sec-sm .linkrow .btn{padding:7px 12px;font-size:13px}
+.sec-sm .lbl{font-size:10px}
+.sec-sm .linkrow input{padding:7px 10px;font-size:12px}
+.pv-more{display:flex;flex-direction:column;gap:10px}
+.pv-more[open]{gap:10px}
+.pv-more summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--pink);list-style:none}
+.pv-more summary::-webkit-details-marker{display:none}
+.pv-more summary::before{content:"▸ ";display:inline-block;transition:transform .2s}
+.pv-more[open] summary::before{transform:rotate(90deg)}
+.pv-more[open] > :not(summary){margin-top:10px}
+/* contact */
+.sec-sm .ct-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.sec-sm .cnt{gap:8px;padding:7px 10px;border-radius:12px}
+.sec-sm .cnt .soc-ic{width:28px;height:28px}
+.sec-sm .cnt-t{font-size:12px}
+/* get your own page + footer */
+.getown{padding-top:36px}
+footer{padding:22px 0 100px;font-size:12px}
+.col-credit{margin-top:10px}
