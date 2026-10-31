@@ -4,25 +4,24 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>flexippo</title>
-<meta name="description" content="Personal flex pages: your socials, your collection and your music in one link.">
-<meta property="og:title" content="flexippo.com">
-<meta property="og:description" content="Personal flex pages: your socials, your collection and your music in one link.">
-<meta property="og:image" content="https://flexippo.com/assets/og-flexippo.jpg">
-<meta name="theme-color" content="#07051a">
+<meta name="description" content="One page for your socials, photos and links.">
+<meta property="og:title" content="flexippo">
+<meta property="og:description" content="One page for your socials, photos and links.">
+<meta property="og:image" content="https://flexippo.com/assets/og-default.jpg">
+<meta name="theme-color" content="#f3f1fa">
 <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png">
 <script>
-/* flexippo.com/name -> that person's page */
+/* flexippo.com/name -> that person's page (GitHub Pages shows this file for any address it doesn't have) */
 (function () {
   var p = decodeURIComponent(location.pathname).replace(/^\/+|\/+$/g, "").replace(/^@/, "").toLowerCase();
-  if (/^[a-z0-9_]{3,20}$/.test(p)) location.replace("/?u=" + p + location.hash);
+  if (/^[a-z0-9_]{3,20}$/.test(p)) location.replace("/?u=" + p + location.search.replace(/^\?/, "&") + location.hash);
 })();
 </script>
 <style>
-:root{color-scheme:dark}
-body{margin:0;min-height:100vh;display:grid;place-items:center;background:#07051a;color:#f6f1ff;font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;text-align:center;padding:24px}
-b{display:block;font-size:44px;line-height:1;color:#ff2e88;margin-bottom:10px}
-a{display:inline-block;margin-top:18px;padding:12px 20px;border-radius:999px;background:linear-gradient(135deg,#ff2e88,#8b5cff);color:#fff;font-weight:800;text-decoration:none}
-p{margin:0;color:#a99fd3}
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f3f1fa;color:#17102e;font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;text-align:center;padding:24px}
+b{display:inline-block;font-size:56px;line-height:1;padding:6px 16px 10px;background:#c6ff3d;border-radius:14px;box-shadow:6px 6px 0 #6a2cff;margin-bottom:22px;letter-spacing:-.04em}
+p{margin:0;color:#625b7c}
+a{display:inline-block;margin-top:22px;padding:14px 24px;border-radius:999px;background:#17102e;color:#fff;font-weight:600;text-decoration:none}
 </style>
 </head>
 <body>

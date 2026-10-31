@@ -1,12 +1,12 @@
 {
   "name": "flexippo",
   "short_name": "flexippo",
-  "description": "Your socials, your collection and your music in one link.",
+  "description": "One page for your socials, photos and links.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#fff0f6",
-  "theme_color": "#07051a",
+  "background_color": "#f3f1fa",
+  "theme_color": "#f3f1fa",
   "icons": [
     { "src": "assets/favicon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" }
   ]

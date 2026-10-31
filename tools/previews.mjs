@@ -6,7 +6,7 @@
 //
 //   node tools/previews.mjs [folder]      (default: the website folder this file is in)
 //
-// The picture itself is made by the owner's browser while they edit (assets/edit.js) and saved in Supabase storage.
+// The picture itself is made by the owner's browser while they edit (assets/fx-edit.js) and saved in Supabase storage.
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -16,7 +16,7 @@ const ROOT = path.resolve(process.argv[2] || path.join(HERE, ".."));
 const SITE = "https://flexippo.com";
 const PROJECT = "https://knmjxdnzttyacdtktbdl.supabase.co";
 const API = process.env.FLEXIPPO_SUPABASE_URL || PROJECT;            // tests point this at a local copy
-const KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtubWp4ZG56dHR5YWNkdGt0YmRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzMjg5MTcsImV4cCI6MjEwNjkwNDkxN30.rEWcpL0OFyNhLAFLUuTWpx47uPquP40vcQz3GEqNvgE";   // the public (anon) key, same as in assets/app.js
+const KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtubWp4ZG56dHR5YWNkdGt0YmRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzMjg5MTcsImV4cCI6MjEwNjkwNDkxN30.rEWcpL0OFyNhLAFLUuTWpx47uPquP40vcQz3GEqNvgE";   // the public (anon) key, same as in assets/fx.js
 const MEDIA = PROJECT + "/storage/v1/object/public/media/";
 const DEFAULT_IMG = SITE + "/assets/og-default.jpg";
 const MANIFEST = path.join(ROOT, "tools", "previews.json");          // the files this script made (it never touches any other file)
@@ -30,7 +30,7 @@ const clean = (s, n) => String(s === undefined || s === null ? "" : s).replace(/
 function hash(s) { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return (h >>> 0).toString(36); }
 
 async function profiles() {
-  const cols = "id,username,display_name,v:settings->v,og:settings->og,profile:settings->profile,socials:settings->socials,ogimg:media->>og,avatar:media->>avatar";
+  const cols = "id,username,display_name,v:settings->v,og:settings->og,profile:settings->profile,socials:settings->socials,tiles:settings->tiles,ogimg:media->>og,avatar:media->>avatar";
   const rows = [];
   for (let from = 0; ; from += 1000) {
     const r = await fetch(`${API}/rest/v1/profiles?select=${cols}&order=username.asc&limit=1000&offset=${from}`, { headers: { apikey: KEY, Authorization: "Bearer " + KEY, Accept: "application/json" } });
@@ -53,13 +53,15 @@ function previewOf(p) {
   }
   // pages that haven't made one yet: their name and bio, with their profile picture (or the site's picture)
   const prof = p.profile && typeof p.profile === "object" ? p.profile : {};
-  const name = clean(prof.name, 24) || clean(p.display_name, 40) || u;
+  const name = clean(prof.name, 40) || clean(p.display_name, 40) || u;
   let titles = Array.isArray(prof.titles) ? prof.titles : [];
   if (JSON.stringify(titles) === EXAMPLE_TITLES) titles = [];          // older pages carried the example page's bio
   titles = titles.map(x => clean(x, 40)).filter(Boolean);
-  const socials = (p.v === 2 && Array.isArray(p.socials) ? p.socials : []).map(s => s && LABELS[s.k]).filter(Boolean);
+  const bio = p.v === 3 ? clean(prof.bio, 160) : "";                  // pages made with the new editor (settings v3)
+  const apps = p.v === 3 ? (Array.isArray(p.tiles) ? p.tiles : []).map(x => x && x.t === "link" && LABELS[x.k]) : (p.v === 2 && Array.isArray(p.socials) ? p.socials : []).map(s => s && LABELS[s.k]);
+  const socials = [...new Set(apps.filter(Boolean))];
   const t = (name.toLowerCase() === u ? name : `${name} (@${u})`).slice(0, 70);
-  const d = (titles.length ? titles.slice(0, 3).join(" · ") : socials.length ? socials.slice(0, 4).join(" · ") : "flexippo.com/" + u).slice(0, 160);
+  const d = (bio || (titles.length ? titles.slice(0, 3).join(" · ") : socials.length ? socials.slice(0, 4).join(" · ") : "flexippo.com/" + u)).slice(0, 160);
   const img = mine(p.avatar) ? p.avatar : DEFAULT_IMG;
   return { u, t, d, img, big: img === DEFAULT_IMG, v: hash(t + "|" + d + "|" + img) };
 }
@@ -85,12 +87,12 @@ ${x.big ? `<meta property="og:image:width" content="1200">\n<meta property="og:i
 <meta name="twitter:title" content="${esc(x.t)}">
 <meta name="twitter:description" content="${esc(x.d)}">
 <meta name="twitter:image" content="${esc(x.img)}">
-<meta name="theme-color" content="#07051a">
+<meta name="theme-color" content="#f3f1fa">
 <meta name="flexippo:v" content="${esc(x.v)}">
 <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png">
 <script>location.replace("${go}" + location.hash)</script>
 </head>
-<body style="margin:0;background:#07051a"><noscript><a href="${go}" style="color:#fff">Open the page</a></noscript></body>
+<body style="margin:0;background:#f3f1fa"><noscript><a href="${go}" style="color:#17102e">Open the page</a></noscript></body>
 </html>
 `;
 }

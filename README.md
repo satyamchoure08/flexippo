@@ -1,63 +1,77 @@
 # flexippo.com
 
-Personal "flex" pages: socials, a collection, music and a guestbook in one link.
+One page for your socials, photos and links. Anyone can claim `flexippo.com/theirname`, add tiles, and put the link in their Instagram, Snapchat or TikTok bio.
 
-- `flexippo.com` is the **example page**. Its likes and comments are made up and the page says so (the "DEMO" notes).
-- `flexippo.com/name` is a person's **own page**. A new page starts as a copy of the example page (its @flexippo accounts, posts, stories and collection photos); the owner changes or removes any of it with ✎ Customize. Its likes, comments, guestbook and page views are always real (saved in Supabase).
+- **Home page** (`flexippo.com`): type a name, see if it's free, claim it. Three example pages (Kabir, Aarav, Mochi) show what a page looks like.
+- **A person's page** (`flexippo.com/name`): their photo, name, bio and a grid of tiles.
+- **Editing**: the owner opens their own page and it *is* the editor. Changes save by themselves.
+
+## What a page can have
+
+| Tile | What it does |
+| --- | --- |
+| Link | Paste any link, or pick an app and type the username. 35 apps (Instagram, Snapchat, YouTube, WhatsApp, Spotify, X, TikTok, Discord, Threads, Telegram, LinkedIn…) get their own icon, colour and button ("Follow", "Listen", "Message"). |
+| Discord username | Shows the username; tapping it copies it (Discord has no profile links). |
+| Photo | Made smaller on the phone, then uploaded. Optional caption and optional link. |
+| Note | Short text in one of 6 colours. |
+| Heading | Starts a new group of tiles ("My music", "Shop"). |
+
+Every tile has 4 sizes (small, wide, tall, big) and can be moved earlier or later. A page also has 5 themes (Paper, Ink, Lime, Violet, Blush), a view counter, a QR code and its own link preview picture.
 
 ## Files
 
 | File | What it is |
 | --- | --- |
-| `index.html` | The page. |
-| `assets/style.css` | All the page styles. |
-| `assets/app.js` | Everything the page does. The `CONFIG` block at the top holds the example page's content (name, socials, collection, song, example comments). |
-| `assets/edit.js` | The page editor. Only the owner of a page downloads it (visitors never do). |
+| `index.html` | The home page. Personal pages are drawn into `<main id="app">` by `fx.js`. |
+| `assets/fx.css` | Styles for the home page, everyone's pages and the pop-up panels. |
+| `assets/fx.js` | Everything visitors need: the home page, showing a page, sign up / log in, the list of apps. |
+| `assets/fx-edit.js`, `assets/fx-edit.css` | The editor. Only downloaded when the owner opens their own page. |
+| `assets/fx-icons.js` | The icons, inside the site (Simple Icons CC0, Lucide ISC, LinkedIn from Font Awesome Free CC BY 4.0). |
+| `assets/img/` | Photos for the three example pages on the home page. They came with the previous version of the site (the chocolate photo is CC0 by Jan Helebrant, Wikimedia Commons). |
+| `assets/fonts/` | Inter and TeX Gyre Adventor, trimmed. Licences in `LICENSES.txt`. |
+| `assets/vendor/supabase.js` | Supabase's JavaScript library v2.118.0. Only downloaded when someone logs in, signs up or edits. |
+| `assets/vendor/qrcodegen.js` | Draws the QR code in the Share panel. |
+| `assets/og-flexippo.jpg` | The picture chat apps show for flexippo.com. |
+| `assets/og-default.jpg` | The picture for pages that haven't made their own yet. |
+| `assets/flexippo-avatar.png`, `assets/flexippo-pfp.png` | The logo as profile pictures (not used by the site itself). |
 | `404.html` | Turns short links (`flexippo.com/name`) into that person's page. |
-| `name.html` files (one per user) | Made automatically by `tools/previews.mjs`: the link preview of each person's page (see below). Don't edit them by hand. |
-| `tools/previews.mjs` | Makes those preview files from the public profile data. `tools/previews.json` lists the files it made (it never touches any other file). |
-| `.github/workflows/previews.yml` | Runs `tools/previews.mjs` on GitHub every 10 minutes and publishes the result. |
-| `assets/og-flexippo.jpg` | The chat preview picture of flexippo.com itself. |
-| `assets/og-default.jpg` | The preview picture for pages that haven't made their own yet. |
-| `manifest.webmanifest` | Lets people add the site to their home screen. |
-| `assets/opt/` | Smaller WebP copies of the built-in photos, for phones. The originals next to them are untouched and still used as the source. |
-| `assets/col/` | Collection and story photos. The collection photos are the kind of stuff people really flex (a cheap anime figure, trend food, Crocs, energy drinks, 3am noodles, screen time); the funny line on each card is the `meme` text in `CONFIG.collection`. dubai-chocolate is CC0 (Jan Helebrant, Wikimedia Commons). The others are CC BY 2.0 from Flickr and their credit shows under the collection (fields `credit`, `creditUrl`, `license`, `licenseUrl`): miku-figure (animaster), crocs (epredator), monster (JeepersMedia), cup-noodles (elsie.hui), phone (r.nial.bradshaw). |
-| `assets/fonts/` | The five fonts, trimmed to the letters the site uses (licenses in `LICENSES.txt`). |
-| `assets/vendor/supabase.js` | Supabase's official JavaScript library v2.118.0, built from its source code. Only downloaded when someone logs in, likes, comments or opens a personal page. |
-| `assets/vendor/qrcodegen.js` | Makes the QR code (only downloaded when the share box comes into view, or for the story picture). |
-| `assets/theme-soft.mp3` | The song, made about 10 dB quieter than `theme.mp3`. Nothing plays until someone taps play, and it stops when they leave the page. |
+| `name.html` files | Made automatically by `tools/previews.mjs` (link previews, see below). Don't edit them. |
+| `tools/previews.mjs`, `.github/workflows/previews.yml` | Make those files every 10 minutes on GitHub. |
 | `supabase/*.sql` | Database changes. Run each one once in Supabase (Dashboard → SQL Editor). |
-
-## Making your own page (how the editor works)
-
-- **Sign up** is one screen: pick your link (`flexippo.com/yourname`, checked while you type), email, password. If Supabase asks people to confirm their email, a "Check your email" screen shows (with *Send it again*), and the link in the email makes the page with the name they picked.
-- **Edit mode**: right after sign-up (and with **Edit my page**) the page itself becomes the editor. Everything that can change has a dashed outline, ✎ or ＋. Tap it and a small panel opens for just that thing; the page changes behind it as you type.
-- The bar at the bottom: the 3 themes, **Saved ✓** (changes save by themselves a moment later) and **Done**. ⋯ has the extras: birthday countdown, big name, small line, moving strip.
-- Socials: tap an app and type the username (or paste a profile link). The link is made from it. Photos are made smaller on the phone, then uploaded.
-- Outside edit mode the owner sees the page the way visitors do, plus their views, likes, comments and guestbook notes, an **Activity** list, a **Finish your page** checklist, and **Share** (copy/send the link, a story picture, the QR code).
 
 ## Link previews in chats
 
-When someone sends `flexippo.com/name` in WhatsApp, Instagram, iMessage, Telegram, Discord…, the chat shows that person's own picture, name and bio.
+When someone sends `flexippo.com/name` in WhatsApp, Instagram, iMessage, Telegram or Discord, the chat shows that person's picture, name and bio.
 
-1. When the owner finishes editing, their phone draws a 1200 × 630 picture of their page (their photo, name, bio and theme) and saves it in Supabase storage with the page (`profiles.media.og`, text in `profiles.settings.og`).
-2. Chat apps don't run the website's code, so every 10 minutes the **Link previews** job on GitHub (`.github/workflows/previews.yml`) writes a small `name.html` for each person with those tags and publishes the site. A person who opens the link is sent straight on to the page.
-3. In **Share** (and in "How it looks in chats" on their page) the owner sees exactly that preview, and whether chat apps already get the newest one ("✓ This is what friends see" or "Updating… a few minutes"). Links sent from there carry the preview's version (`?p=…`), so apps that saw an older preview fetch the new one.
+1. A moment after the owner edits their name, bio, photo or theme, their browser draws a 1200 × 630 picture and saves it in Supabase storage (`profiles.media.og`, text in `profiles.settings.og`).
+2. Chat apps don't run the website's code, so every 10 minutes the **Link previews** job on GitHub writes a small `name.html` with those tags for each person. Someone who opens the link is sent straight on to the page.
 
-If previews stop updating: open the repository's **Actions** tab on GitHub → **Link previews**. GitHub pauses scheduled jobs after 60 days without any change in the repository; the button there turns it back on, and **Run workflow** runs it right away.
-
-A page's content is saved in `profiles.settings` (format `v: 2`: `profile`, `socials`, `links`, `collection` and optional extras for the big Instagram, Snapchat, X, Spotify and Discord cards) and its photos in `profiles.media`. A page that was never saved (`settings` empty) is shown with the example content (`starterPage()` in `app.js`); the first save stores it like anything the owner added. Pages saved with the older editor still work: the parts they carried over from the example page (other people's photos, @flexippo, a made-up Snapscore) are left out when they're shown.
-
-## Rules this site follows
-
-1. **Nothing is loaded from other websites** (no CDNs, no Google Fonts, no hot-linked images). Everything the page needs lives in this repo. The only outside connection is the Supabase database.
-2. **Built for cheap phones**: no full-screen effects, no endless animations that repaint big areas, glass blur only on small things (and off on slow phones: `html.lite`), photos sized for the screen, music, login code and the editor only downloaded when needed.
-3. **The example page is honest**: made-up likes and comments only appear on `flexippo.com` and are labelled "DEMO". Personal pages always show real likes, comments, guestbook and views.
+If previews stop updating: GitHub → this repository → **Actions** → **Link previews**. GitHub pauses scheduled jobs after 60 days without any change in the repository; the button there turns it back on, and **Run workflow** runs it right away.
 
 ## Database (Supabase project `knmjxdnzttyacdtktbdl`)
 
-Link previews need no database change (they're saved in `profiles.settings` and `profiles.media`, in the owner's own photo folder).
+No database change is needed for this version. It uses what's already there:
 
-Already there: `profiles`, chat (`messages`, `blocks` + functions), photo storage bucket `media`.
+- `profiles`: `username`, `display_name`, `avatar_url`, `settings` (the page) and `media` (photo addresses).
+- Storage bucket `media`: each person's photos in a folder named after their user id. A page only ever shows photos from its owner's folder.
+- `page_stats` + function `add_view` (from `supabase/2026-10-20_likes_comments_guestbook_views.sql`) for the view counter. If that file was never run, pages still work; the owner just doesn't see a view count.
 
-`supabase/2026-10-20_likes_comments_guestbook_views.sql` adds `likes`, `comments`, `guestbook`, `page_stats` and the functions `page_summary` and `add_view`. Until it has been run, personal pages keep working the old way (likes saved on each visitor's phone only, no comments, no numbers or Activity for owners).
+A page is saved in `profiles.settings` as:
+
+```json
+{ "v": 3, "profile": { "name": "…", "bio": "…" }, "theme": "paper",
+  "tiles": [ { "id": "a1", "t": "link", "s": "w", "u": "https://www.instagram.com/…/", "k": "instagram" } ],
+  "og": { "v": "…", "k": "…", "t": "…", "d": "…" } }
+```
+
+Tile types (`t`): `link` (`u` link, `k` app, `l` title, `cp` text to copy), `photo` (`cap` caption, `u` link; the photo is `media["p_" + id]`), `note` (`x` text, `c` colour), `head` (`x` text). Sizes (`s`): `s` small, `w` wide, `t` tall, `l` big.
+
+Pages saved by the previous editor (`v: 2`) are shown as tiles automatically (their apps, links and uploaded photos). They're saved in the new format the first time the owner changes something.
+
+The old chat, likes, comments and guestbook tables are still in the database but the site no longer uses them.
+
+## Rules this site follows
+
+1. **Nothing is loaded from other websites** (no CDNs, no Google Fonts, no hot-linked images). The only outside connection is the Supabase database.
+2. **Built for cheap phones**: small files, no endless animations, photos made smaller before upload, the login library and editor only downloaded when needed.
+3. **Example pages are labelled as examples** and only appear on the home page.
