@@ -54,7 +54,8 @@ No database change is needed for this version. It uses what's already there:
 
 - `profiles`: `username`, `display_name`, `avatar_url`, `settings` (the page) and `media` (photo addresses).
 - Storage bucket `media`: each person's photos in a folder named after their user id. A page only ever shows photos from its owner's folder.
-- `page_stats` + function `add_view` (from `supabase/2026-10-20_likes_comments_guestbook_views.sql`) for the view counter. If that file was never run, pages still work; the owner just doesn't see a view count.
+- `page_stats` + function `add_view` for the view counter: run `supabase/2026-11-04_view_counter.sql` once. Checked 4 Nov 2026: it had **not** been run yet, so view counts were missing (pages still work without it).
+- `supabase/2026-10-20_likes_comments_guestbook_views.sql` is from the old site. Don't run it; only its view-counter part is still needed, and that is in the 4 Nov file.
 
 A page is saved in `profiles.settings` as:
 
@@ -68,10 +69,15 @@ Tile types (`t`): `link` (`u` link, `k` app, `l` title, `cp` text to copy), `pho
 
 Pages saved by the previous editor (`v: 2`) are shown as tiles automatically (their apps, links and uploaded photos). They're saved in the new format the first time the owner changes something.
 
-The old chat, likes, comments and guestbook tables are still in the database but the site no longer uses them.
+The site doesn't use chat, likes, comments or a guestbook. (Checked 4 Nov 2026: the likes table doesn't exist in the database.)
 
 ## Rules this site follows
 
 1. **Nothing is loaded from other websites** (no CDNs, no Google Fonts, no hot-linked images). The only outside connection is the Supabase database.
 2. **Built for cheap phones**: small files, no endless animations, photos made smaller before upload, the login library and editor only downloaded when needed.
 3. **Example pages are labelled as examples** and only appear on the home page.
+
+## Security
+
+- Only the public `anon` key is in this repo, and that is meant to be public. Checked 4 Nov 2026: no password, `service_role` key or `.env` file has ever been committed, in any version.
+- Never put the database password, the `service_role` key or any `sb_secret_` key in this folder or any copy of it. Keep them in a password manager.
